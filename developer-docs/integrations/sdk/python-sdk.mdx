@@ -37,8 +37,9 @@ docs_array = []
 docs_array.append({
     "content": "files content",
     "metadata": {   # optional
-        "filename": "name of the file",
-        "filetype": "pdf/txt/json"
+        "file_name": "name of the file",
+        "doc_type": "pdf/txt/json",
+        "group_name": ["group1", "group2"]
     }
 })
 
@@ -49,10 +50,11 @@ response = client.v1.context.add(
     context_type="resource",   # one of: resource | conversation | instruction
     scope="internal",          # one of: internal | external
     metadata={
-        "fileName": "file_name",
-        "fileType": "type",
-        "lastModified": "timestamp",
-        "fileSize": 1234,   # number
+        "file_name": "file_name",
+        "doc_type": "type",
+        "last_modified_at": "2025-10-02T04:07:26.495484",
+        "size": 1234,   # number
+        "group_name": ["group1", "group2"]
     }
 )
 ```
@@ -65,11 +67,16 @@ from alchemyst_ai import AlchemystAI
 client = AlchemystAI()
 
 results = client.v1.context.search(
-    query="your search query",
+    query="find test-data used",
     similarity_threshold=0.8,
     minimum_similarity_threshold=0.5,
     scope="internal",   # internal | external
-    metadata=None        # None if no metadata, otherwise a dict
+    metadata={          # Optional - can be None
+        "size": 100,
+        "doc_type": "ai/conversation",
+        "file_name": "chatgpt-convo-1",
+        "group_name": ["project-ideas"]
+    }
 )
 ```
 
