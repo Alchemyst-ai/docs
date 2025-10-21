@@ -89,7 +89,7 @@ const client = new AlchemystAI({
 });
 
 const { contexts } = await client.v1.context.search({
-        query: 'your search query',
+        query: 'Your search query here',
         similarity_threshold: 0.8,
         minimum_similarity_threshold: 0.5,
         scope: 'internal',

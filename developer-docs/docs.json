@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "aspen",
   "api": {
-    "openapi": "/api-reference/openapi.json"
+    "openapi": "https://platform-backend.getalchemystai.com/api/openapi.json"
   },
   "fonts": {
     "heading": {

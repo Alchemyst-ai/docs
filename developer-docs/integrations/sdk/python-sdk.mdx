@@ -50,10 +50,10 @@ response = client.v1.context.add(
     context_type="resource",   # one of: resource | conversation | instruction
     scope="internal",          # one of: internal | external
     metadata={
-        "fileName": "file_name",
+        "fileName": "name of the file",
         "fileType": "type",
-        "lastModified": "2025-10-02T04:07:26.495484",
-        "size": 1234,   # number
+        "lastModified": "timestamp",
+        "fileSize": 1234,   # number
         "groupName": ["group1", "group2"]
     }
 )
