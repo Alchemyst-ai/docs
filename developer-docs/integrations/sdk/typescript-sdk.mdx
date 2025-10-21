@@ -70,11 +70,11 @@ await client.v1.context.add({
           source: 'web-upload',
           scope: 'internal',
           metadata: {
-            file_name: 'notes.txt',
-            doc_type: 'text/plain',
-            last_modified_at: '2025-10-02T04:07:26.495484',
-            size: 1024,
-            group_name: ['group1', 'group2'],
+            fileName: 'notes.txt',
+            fileType: 'text/plain',
+            lastModified: new Date().toISOString(),
+            fileSize: 1024,
+            groupName: ['group1', 'group2'],
         },
 });
 ```
@@ -89,15 +89,15 @@ const client = new AlchemystAI({
 });
 
 const { contexts } = await client.v1.context.search({
-        query: 'find test-data used',
+        query: 'your search query',
         similarity_threshold: 0.8,
         minimum_similarity_threshold: 0.5,
         scope: 'internal',
         metadata: {          // Optional - can be null
             size: 100,
-            doc_type: 'ai/conversation',
-            file_name: 'chatgpt-convo-1',
-            group_name: ['project-ideas']
+            fileType: 'ai/conversation',
+            fileName: 'chatgpt-convo-1',
+            groupName: ['project-name']
         },
 });
 

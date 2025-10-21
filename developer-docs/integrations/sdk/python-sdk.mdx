@@ -37,9 +37,9 @@ docs_array = []
 docs_array.append({
     "content": "files content",
     "metadata": {   # optional
-        "file_name": "name of the file",
-        "doc_type": "pdf/txt/json",
-        "group_name": ["group1", "group2"]
+        "filename": "file_name",
+        "filetype": "pdf/txt/json",
+        "groupName": ["group1", "group2"]
     }
 })
 
@@ -50,11 +50,11 @@ response = client.v1.context.add(
     context_type="resource",   # one of: resource | conversation | instruction
     scope="internal",          # one of: internal | external
     metadata={
-        "file_name": "file_name",
-        "doc_type": "type",
-        "last_modified_at": "2025-10-02T04:07:26.495484",
+        "fileName": "file_name",
+        "fileType": "type",
+        "lastModified": "2025-10-02T04:07:26.495484",
         "size": 1234,   # number
-        "group_name": ["group1", "group2"]
+        "groupName": ["group1", "group2"]
     }
 )
 ```
@@ -67,15 +67,14 @@ from alchemyst_ai import AlchemystAI
 client = AlchemystAI()
 
 results = client.v1.context.search(
-    query="find test-data used",
+    query="your search query",
     similarity_threshold=0.8,
     minimum_similarity_threshold=0.5,
     scope="internal",   # internal | external
     metadata={          # Optional - can be None
-        "size": 100,
-        "doc_type": "ai/conversation",
-        "file_name": "chatgpt-convo-1",
-        "group_name": ["project-ideas"]
+        "fileType": "ai/conversation",
+        "fileName": "chatgpt-convo-1",
+        "groupName": ["project-name"]
     }
 )
 ```
