@@ -3,8 +3,6 @@ title: 'Python SDK'
 description: 'Get started with the Alchemyst Python SDK'
 ---
 
-# Alchemyst AI Python SDK
-
 
 ## Installation
 
@@ -58,6 +56,10 @@ response = client.v1.context.add(
     }
 )
 ```
+
+<Warning>
+  **Version Requirements**: The `groupName` field is introduced in Python SDK version 0.5.0. If you use `groupName` in previous versions, you will encounter an error. If `groupName` is not provided, it will be set to a default value automatically.
+</Warning>
 
 <Note>
   **groupName**: The group name acts like a namespace which creates a scope for context. Documents with the same group name will be grouped together for better organization and retrieval.
