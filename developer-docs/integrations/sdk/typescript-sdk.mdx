@@ -130,6 +130,12 @@ const view = await client.v1.context.view.retrieve();
 const docs = await client.v1.context.view.docs();
 ```
 
+<Note>
+  **Per-user vs Organization View**: 
+  - **Per-user view** (`v1.context.view.*`) retrieves context data for the authenticated user only
+  - **Organization view** (`v1.org.context.view`) allows you to view context data across multiple users within your organization by providing their user IDs
+</Note>
+
 #### Context: Traces
 
 ```ts
