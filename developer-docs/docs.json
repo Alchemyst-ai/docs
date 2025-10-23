@@ -53,7 +53,8 @@
             "pages": [
               "tutorials/mcp-setup",
               "tutorials/typescript-agent",
-              "tutorials/python-agent"
+              "tutorials/python-agent",
+              "tutorials/agno-memory-integration"
             ]
           },
           {
