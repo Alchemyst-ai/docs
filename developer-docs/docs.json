@@ -95,7 +95,7 @@
               "integrations/introduction"
             ]
           },
-           {
+          {
             "group": "Extensions",
             "pages": [
               "integrations/extensions/chrome"
@@ -171,6 +171,7 @@
               "api-reference/endpoint/api/v1/context/delete/post",
               "api-reference/endpoint/api/v1/context/memory/add/post",
               "api-reference/endpoint/api/v1/context/memory/delete/post",
+              "api-reference/endpoint/api/v1/context/memory/update/post",
               "api-reference/endpoint/api/v1/context/search/post",
               "api-reference/endpoint/api/v1/context/traces/get",
               "api-reference/endpoint/api/v1/context/traces/{traceId}/delete/delete",
@@ -229,7 +230,7 @@
   },
   "integrations": {
     "ga4": {
-        "measurementId": "G-WHNWY5LTDN"
+      "measurementId": "G-WHNWY5LTDN"
     }
   },
   "seo": {

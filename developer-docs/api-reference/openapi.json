@@ -85,6 +85,13 @@
                         "type": "string",
                         "description": "Type/MIME of the file"
                       },
+                      "groupName": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Array of Group Name to which the file belongs to"
+                      },
                       "lastModified": {
                         "type": "string",
                         "description": "Last modified timestamp"
@@ -353,6 +360,72 @@
           },
           "403": {
             "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/context/memory/update": {
+      "post": {
+        "summary": "Update memory context data",
+        "description": "This endpoint updates memory context data.",
+        "tags": [
+          "context"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "memoryId": {
+                    "type": "string",
+                    "description": "The ID of the memory to update"
+                  },
+                  "contents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    "description": "Array of updated content objects"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Memory context updated successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "402": {
+            "description": "Payment Required"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal server error"
