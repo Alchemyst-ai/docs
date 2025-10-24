@@ -1,6 +1,376 @@
 ---
-title: 'Agno Integration (coming soon)'
+title: 'Agno Integration'
 description: "Integrate Alchemyst's memory with Agno"
 icon: "python"
 ---
-Coming soon
+
+## Overview
+
+This guide demonstrates how to integrate **Alchemyst AI's memory capabilities** with the **Agno framework** in Python. You'll learn how to build context-aware applications that can remember, learn, and maintain state across interactions using both frameworks together.
+
+## What is Agno?
+
+**Agno** is a Python framework designed for building intelligent applications with built-in support for AI agents, memory management, and context awareness. When combined with Alchemyst AI's memory system, it creates powerful applications that can:
+
+- Maintain persistent memory across sessions
+- Learn from user interactions
+- Provide contextually relevant responses
+- Scale from prototypes to production systems
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Python 3.8 or higher
+- An Alchemyst AI account and API key
+- Basic understanding of Python and AI concepts
+
+## Installation
+
+### 1. Install Required Packages
+
+```bash
+pip install alchemyst-ai-sdk agno
+```
+
+### 2. Set Up Environment Variables
+
+Create a `.env` file in your project directory:
+
+```bash
+ALCHEMYST_API_KEY=your_api_key_here
+ALCHEMYST_ORG_ID=your_org_id_here
+```
+
+## Basic Integration
+
+### Step 1: Initialize Alchemyst Memory
+
+```python
+import os
+from alchemyst_ai_sdk import AlchemystClient
+from agno import Agent, Memory
+
+alchemyst = AlchemystClient(
+    api_key=os.getenv("ALCHEMYST_API_KEY"),
+    org_id=os.getenv("ALCHEMYST_ORG_ID")
+)
+
+memory = Memory(
+    backend="alchemyst",
+    client=alchemyst,
+    context_id="agno_agent_001"
+)
+```
+
+### Step 2: Create an Agno Agent with Memory
+
+```python
+from agno import Agent, Tool
+
+class AlchemystMemoryAgent(Agent):
+    def __init__(self, memory):
+        super().__init__()
+        self.memory = memory
+        
+    def remember(self, key, value):
+        self.memory.store(key, value)
+        
+    def recall(self, key):
+        return self.memory.retrieve(key)
+        
+    def search_memory(self, query):
+        return self.memory.search(query)
+```
+
+### Step 3: Implement Memory-Aware Tools
+
+```python
+@Tool
+def remember_user_preference(agent, preference, value):
+    agent.remember(f"preference_{preference}", value)
+    return f"Remembered: {preference} = {value}"
+
+@Tool
+def get_user_preference(agent, preference):
+    value = agent.recall(f"preference_{preference}")
+    return f"User prefers {preference}: {value}" if value else f"No preference found for {preference}"
+
+@Tool
+def search_user_history(agent, query):
+    results = agent.search_memory(query)
+    return f"Found {len(results)} relevant memories: {results}"
+```
+
+## Advanced Integration Patterns
+
+### Pattern 1: Context-Aware Conversations
+
+```python
+class ContextAwareAgent(AlchemystMemoryAgent):
+    def __init__(self, memory):
+        super().__init__(memory)
+        self.conversation_context = []
+        
+    def process_message(self, message):
+        self.conversation_context.append({
+            "timestamp": datetime.now().isoformat(),
+            "message": message,
+            "context": self.get_current_context()
+        })
+        
+        relevant_memories = self.search_memory(message)
+        response = self.generate_response(message, relevant_memories)
+        
+        self.remember(f"conversation_{len(self.conversation_context)}", {
+            "message": message,
+            "response": response,
+            "memories_used": relevant_memories
+        })
+        
+        return response
+```
+
+### Pattern 2: Learning from Interactions
+
+```python
+class LearningAgent(AlchemystMemoryAgent):
+    def __init__(self, memory):
+        super().__init__(memory)
+        self.learning_patterns = {}
+        
+    def learn_from_feedback(self, interaction_id, feedback):
+        interaction = self.recall(f"conversation_{interaction_id}")
+        if interaction:
+            pattern_key = f"pattern_{hash(interaction['message'])}"
+            if pattern_key not in self.learning_patterns:
+                self.learning_patterns[pattern_key] = []
+            
+            self.learning_patterns[pattern_key].append({
+                "feedback": feedback,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+            self.remember(pattern_key, self.learning_patterns[pattern_key])
+```
+
+### Pattern 3: Multi-Agent Memory Sharing
+
+```python
+class SharedMemoryAgent(AlchemystMemoryAgent):
+    def __init__(self, memory, agent_id):
+        super().__init__(memory)
+        self.agent_id = agent_id
+        
+    def share_memory(self, other_agent_id, memory_key, data):
+        shared_key = f"shared_{other_agent_id}_{memory_key}"
+        self.remember(shared_key, {
+            "from_agent": self.agent_id,
+            "data": data,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    def get_shared_memories(self, from_agent_id=None):
+        if from_agent_id:
+            pattern = f"shared_{from_agent_id}_"
+        else:
+            pattern = "shared_"
+            
+        return self.search_memory(pattern)
+```
+
+## Complete Example: Personal Assistant
+
+Here's a complete example of a personal assistant that uses both Agno and Alchemyst memory:
+
+```python
+import os
+from datetime import datetime
+from alchemyst_ai_sdk import AlchemystClient
+from agno import Agent, Tool, Memory
+
+class PersonalAssistant(Agent):
+    def __init__(self):
+        self.alchemyst = AlchemystClient(
+            api_key=os.getenv("ALCHEMYST_API_KEY"),
+            org_id=os.getenv("ALCHEMYST_ORG_ID")
+        )
+        
+        self.memory = Memory(
+            backend="alchemyst",
+            client=self.alchemyst,
+            context_id="personal_assistant"
+        )
+        
+        self.register_tool(self.remember_task)
+        self.register_tool(self.get_tasks)
+        self.register_tool(self.complete_task)
+        self.register_tool(self.learn_preference)
+        
+    @Tool
+    def remember_task(self, task, priority="medium", due_date=None):
+        task_id = f"task_{datetime.now().timestamp()}"
+        task_data = {
+            "task": task,
+            "priority": priority,
+            "due_date": due_date,
+            "status": "pending",
+            "created": datetime.now().isoformat()
+        }
+        
+        self.memory.store(task_id, task_data)
+        return f"Remembered task: {task}"
+        
+    @Tool
+    def get_tasks(self, status="pending"):
+        all_tasks = self.memory.search("task_")
+        filtered_tasks = [task for task in all_tasks if task.get("status") == status]
+        return filtered_tasks
+        
+    @Tool
+    def complete_task(self, task_id):
+        task = self.memory.retrieve(task_id)
+        if task:
+            task["status"] = "completed"
+            task["completed_at"] = datetime.now().isoformat()
+            self.memory.store(task_id, task)
+            return f"Completed task: {task['task']}"
+        return "Task not found"
+        
+    @Tool
+    def learn_preference(self, category, preference):
+        pref_key = f"preference_{category}"
+        self.memory.store(pref_key, preference)
+        return f"Learned preference for {category}: {preference}"
+        
+    def process_user_input(self, user_input):
+        relevant_memories = self.memory.search(user_input)
+        response = self.generate_contextual_response(user_input, relevant_memories)
+        
+        interaction_id = f"interaction_{datetime.now().timestamp()}"
+        self.memory.store(interaction_id, {
+            "user_input": user_input,
+            "response": response,
+            "memories_used": relevant_memories,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        return response
+
+if __name__ == "__main__":
+    assistant = PersonalAssistant()
+    
+    print(assistant.process_user_input("Remember that I have a meeting at 3 PM tomorrow"))
+    print(assistant.process_user_input("What tasks do I have pending?"))
+    print(assistant.process_user_input("I prefer coffee over tea"))
+    print(assistant.process_user_input("What are my preferences for drinks?"))
+```
+
+## Best Practices
+
+### 1. Memory Organization
+- Use consistent naming conventions for memory keys
+- Organize memories by categories (tasks, preferences, conversations)
+- Implement memory cleanup for old or irrelevant data
+
+### 2. Context Management
+- Always search for relevant memories before responding
+- Store interaction context for future reference
+- Implement memory pruning to prevent information overload
+
+### 3. Performance Optimization
+- Use batch operations for multiple memory operations
+- Implement caching for frequently accessed memories
+- Monitor memory usage and implement cleanup strategies
+
+### 4. Error Handling
+```python
+def safe_memory_operation(operation, *args, **kwargs):
+    try:
+        return operation(*args, **kwargs)
+    except Exception as e:
+        print(f"Memory operation failed: {e}")
+        return None
+```
+
+## Production Deployment
+
+### 1. Environment Configuration
+```python
+import os
+
+class Config:
+    ALCHEMYST_API_KEY = os.getenv("ALCHEMYST_API_KEY")
+    ALCHEMYST_ORG_ID = os.getenv("ALCHEMYST_ORG_ID")
+    MEMORY_CONTEXT_ID = os.getenv("MEMORY_CONTEXT_ID", "production_agent")
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+```
+
+### 2. Monitoring and Logging
+```python
+import logging
+from datetime import datetime
+
+class MonitoredAgent(PersonalAssistant):
+    def __init__(self):
+        super().__init__()
+        self.logger = logging.getLogger(__name__)
+        
+    def process_user_input(self, user_input):
+        start_time = datetime.now()
+        
+        try:
+            response = super().process_user_input(user_input)
+            self.logger.info(f"Processed input in {datetime.now() - start_time}")
+            return response
+        except Exception as e:
+            self.logger.error(f"Error processing input: {e}")
+            return "I encountered an error. Please try again."
+```
+
+### 3. Docker Deployment
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+CMD ["python", "main.py"]
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Memory not persisting:**
+- Check API credentials and network connectivity
+- Verify context ID is consistent across sessions
+- Ensure proper error handling for memory operations
+
+**Slow performance:**
+- Implement memory caching
+- Use batch operations for multiple memory calls
+- Optimize search queries
+
+**Integration errors:**
+- Verify Agno and Alchemyst SDK versions are compatible
+- Check environment variables are properly set
+- Review API rate limits and quotas
+
+## Resources
+
+- [Alchemyst AI Platform](https://getalchemystai.com)
+- [Agno Framework Documentation](https://agno.ai/docs)
+- [Python SDK Reference](https://docs.getalchemystai.com/integrations/sdk/python-sdk)
+- [Memory Management Best Practices](https://docs.getalchemystai.com/ai-context/how-alchemyst-works)
+
+## Next Steps
+
+1. **Experiment** with different memory patterns and see what works best for your use case
+2. **Scale** your application by implementing multi-agent memory sharing
+3. **Monitor** memory usage and performance in production
+4. **Extend** functionality by integrating additional Agno tools and capabilities
+
+This integration opens up powerful possibilities for building intelligent, memory-aware applications that can learn and adapt over time.
