@@ -125,10 +125,12 @@ const client = new AlchemystAI({
     apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-const view = await client.v1.context.view.retrieve();
-
 const docs = await client.v1.context.view.docs();
 ```
+
+<Note>
+  **Per-user View**: This endpoint gives the authenticated user their own context from the organization.
+</Note>
 
 #### Context: Traces
 
@@ -157,3 +159,7 @@ const res = await client.v1.org.context.view({
   userIds: ['your_user_id', 'your_user_id_2'],
 });
 ```
+
+<Note>
+  **Organization View**: This endpoint allows you to fetch context based on specific user IDs within your organization.
+</Note>
