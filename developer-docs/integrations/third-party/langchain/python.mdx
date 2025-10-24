@@ -4,73 +4,93 @@ description: "Integrate Alchemyst's memory with Langchain in Python"
 icon: "python"
 ---
 
-LangChain:
+## What is LangChain
 
 LangChain is a framework that helps developers build applications powered by large language models (LLMs) such as OpenAI or Anthropic. It provides useful building blocks like prompts, chains, agents, and memory to manage conversations, connect data sources, and perform reasoning over multiple steps.
 
-Normally, LangChain’s built-in memory (like ConversationBufferMemory) stores information only during a single runtime session. Once the app stops, all past context is lost.
+Normally, LangChain's built-in memory (like ConversationBufferMemory) stores information only during a single runtime session. Once the app stops, all past context is lost.
 This is where Alchemyst Memory becomes valuable — it provides persistent, long-term memory that allows your LLM applications to remember and reuse context across sessions.
 
-How to Integrate Alchemyst Memory with LangChain in Python:
+## How to Integrate Alchemyst Memory with LangChain in Python
 
 1. Install the required packages
-   ->pip install langchain openai alchemyst
-     Replace alchemyst with the actual SDK name if it differs (for example, alchemyst-sdk).
+
+```sh
+pip install langchain openai alchemyst
+```
+
+Replace alchemyst with the actual SDK name if it differs (for example, alchemyst-sdk).
 
 2. Import dependencies
-   ->from langchain import LLMChain, PromptTemplate
-     from alchemyst.memory import AlchemystMemory
-     from openai import OpenAI
+
+```python
+from langchain import LLMChain, PromptTemplate
+from alchemyst.memory import AlchemystMemory
+from openai import OpenAI
+```
 
 3. Initialize Alchemyst Memory
-   ->memory = AlchemystMemory(
-        api_key="YOUR_ALCHEMYST_API_KEY",
-        namespace="demo-session"
-    )
-    This creates a dedicated memory namespace that stores previous interactions and knowledge.
-    Each namespace acts like a separate “brain” for your app.
+
+```python
+memory = AlchemystMemory(
+    api_key="YOUR_ALCHEMYST_API_KEY",
+    namespace="demo-session"
+)
+
+```
+This creates a dedicated memory namespace that stores previous interactions and knowledge.
+Each namespace acts like a separate “brain” for your app.
 
 4. Build a LangChain using the memory
-   ->template = """You are a helpful assistant.
-    Remember past context and respond accordingly.
 
-    User: {user_input}
-    Assistant:"""
+```python
+template = """You are a helpful assistant.
+Remember past context and respond accordingly.
 
-    prompt = PromptTemplate(template=template, input_variables=["user_input"])
+User: {user_input}
+Assistant:"""
 
-    llm = OpenAI(api_key="YOUR_OPENAI_API_KEY")
+prompt = PromptTemplate(template=template, input_variables=["user_input"])
 
-    chain = LLMChain(
-        llm=llm,
-        prompt=prompt,
-        memory=memory   # <-- integrate Alchemyst memory here
-    )
+llm = OpenAI(api_key="YOUR_OPENAI_API_KEY")
 
-   Here, we pass memory=memory to connect Alchemyst’s persistent storage to the LangChain pipeline.
-   Now your AI can recall previous user messages even after restarting the app.
+chain = LLMChain(
+    llm=llm,
+    prompt=prompt,
+    memory=memory   # <-- integrate Alchemyst memory here
+)
+```
+
+Here, we pass memory=memory to connect Alchemyst's persistent storage to the LangChain pipeline.
+Now your AI can recall previous user messages even after restarting the app.
 
 5. Run the conversation
-    ->while True:
-          query = input("You: ")
-              if query.lower() in ["exit", "quit"]:
-                  break
-              response = chain.run(user_input=query)
-              print("Bot:", response)
-    The assistant will remember past inputs and generate context-aware responses.
+```python
+while True:
+    query = input("You: ")
+        if query.lower() in ["exit", "quit"]:
+            break
+        response = chain.run(user_input=query)
+        print("Bot:", response)
+```
+
+The assistant will remember past inputs and generate context-aware responses.
 
 6. Inspect stored memory
-   ->entries = memory.list_entries(namespace="demo-session")
-     for e in entries:
-         print(e["content"])
-   This shows all stored conversations or facts that your app has learned.
 
-Summary:
+```python
+entries = memory.list_entries(namespace="demo-session")
+    for e in entries:
+        print(e["content"])
+```
+This shows all stored conversations or facts that your app has learned.
 
-By combining LangChain’s workflow capabilities with Alchemyst’s persistent memory, developers can build intelligent agents that:
+## Summary
 
-•Retain user context and preferences
-•Continue conversations across sessions
-•Improve personalization over time
+By combining LangChain's workflow capabilities with Alchemyst's persistent memory, developers can build intelligent agents that:
+
+- Retain user context and preferences
+- Continue conversations across sessions
+- Improve personalization over time
 
 This simple integration makes your LLM applications more human-like and contextually aware — without losing information after every run.
