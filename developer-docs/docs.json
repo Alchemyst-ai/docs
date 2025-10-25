@@ -82,6 +82,12 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Self Hosting",
+            "pages": [
+              "self-hosting/self-hosting"
+            ]
           }
         ]
       },
