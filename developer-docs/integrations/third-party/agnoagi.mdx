@@ -38,8 +38,7 @@ pip install alchemyst-ai-sdk agno
 Create a `.env` file in your project directory:
 
 ```bash
-ALCHEMYST_API_KEY=your_api_key_here
-ALCHEMYST_ORG_ID=your_org_id_here
+ALCHEMYST_AI_API_KEY=your_api_key_here
 ```
 
 ## Basic Integration
@@ -48,17 +47,16 @@ ALCHEMYST_ORG_ID=your_org_id_here
 
 ```python
 import os
-from alchemyst_ai_sdk import AlchemystClient
+from alchemyst_ai import AlchemystAI
 from agno import Agent, Memory
 
-alchemyst = AlchemystClient(
-    api_key=os.getenv("ALCHEMYST_API_KEY"),
-    org_id=os.getenv("ALCHEMYST_ORG_ID")
+client = AlchemystAI(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY")
 )
 
 memory = Memory(
     backend="alchemyst",
-    client=alchemyst,
+    client=client,
     context_id="agno_agent_001"
 )
 ```
@@ -186,19 +184,18 @@ Here's a complete example of a personal assistant that uses both Agno and Alchem
 ```python
 import os
 from datetime import datetime
-from alchemyst_ai_sdk import AlchemystClient
+from alchemyst_ai import AlchemystAI
 from agno import Agent, Tool, Memory
 
 class PersonalAssistant(Agent):
     def __init__(self):
-        self.alchemyst = AlchemystClient(
-            api_key=os.getenv("ALCHEMYST_API_KEY"),
-            org_id=os.getenv("ALCHEMYST_ORG_ID")
+        self.client = AlchemystAI(
+            api_key=os.getenv("ALCHEMYST_AI_API_KEY")
         )
         
         self.memory = Memory(
             backend="alchemyst",
-            client=self.alchemyst,
+            client=self.client,
             context_id="personal_assistant"
         )
         
@@ -300,8 +297,7 @@ def safe_memory_operation(operation, *args, **kwargs):
 import os
 
 class Config:
-    ALCHEMYST_API_KEY = os.getenv("ALCHEMYST_API_KEY")
-    ALCHEMYST_ORG_ID = os.getenv("ALCHEMYST_ORG_ID")
+    ALCHEMYST_AI_API_KEY = os.getenv("ALCHEMYST_AI_API_KEY")
     MEMORY_CONTEXT_ID = os.getenv("MEMORY_CONTEXT_ID", "production_agent")
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 ```
