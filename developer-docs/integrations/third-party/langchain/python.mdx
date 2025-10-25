@@ -4,7 +4,7 @@ description: "Integrate Alchemyst's memory with Langchain in Python"
 icon: "python"
 ---
 
-LangChain:
+## What is LangChain?
 
 LangChain is a framework that helps developers build applications powered by large language models (LLMs) such as OpenAI or Anthropic. It provides useful building blocks like prompts, chains, agents, and memory to manage conversations, connect data sources, and perform reasoning over multiple steps.
 
@@ -36,14 +36,12 @@ class AlchemystMemory(BaseChatMemory):
         self,
         api_key: str,
         session_id: str,
-        base_url: Optional[str] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
         self._session_id = session_id
         self._client = AlchemystAI(
             api_key=api_key,
-            base_url=base_url
         )
     
     @property
