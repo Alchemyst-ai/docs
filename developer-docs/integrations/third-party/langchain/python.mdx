@@ -1,93 +1,187 @@
 ---
-title: 'Langchain Integration (coming soon)'
+title: 'Langchain Python Integration'
 description: "Integrate Alchemyst's memory with Langchain in Python"
 icon: "python"
 ---
 
-## What is LangChain
+LangChain:
 
 LangChain is a framework that helps developers build applications powered by large language models (LLMs) such as OpenAI or Anthropic. It provides useful building blocks like prompts, chains, agents, and memory to manage conversations, connect data sources, and perform reasoning over multiple steps.
 
-Normally, LangChain's built-in memory (like ConversationBufferMemory) stores information only during a single runtime session. Once the app stops, all past context is lost.
+Normally, LangChain’s built-in memory (like ConversationBufferMemory) stores information only during a single runtime session. Once the app stops, all past context is lost.
 This is where Alchemyst Memory becomes valuable — it provides persistent, long-term memory that allows your LLM applications to remember and reuse context across sessions.
 
-## How to Integrate Alchemyst Memory with LangChain in Python
+## Installation
 
-1. Install the required packages
-
-```sh
-pip install langchain openai alchemyst
+```bash
+pip install langchain langchain-openai alchemystai python-dotenv
 ```
 
-Replace alchemyst with the actual SDK name if it differs (for example, alchemyst-sdk).
+## AlchemystMemory Implementation
 
-2. Import dependencies
+Here's the complete implementation of `AlchemystMemory` for LangChain:
 
 ```python
-from langchain import LLMChain, PromptTemplate
-from alchemyst.memory import AlchemystMemory
-from openai import OpenAI
+from langchain.memory.chat_memory import BaseChatMemory
+from alchemyst_ai import AlchemystAI
+from typing import Dict, Any, List, Optional
+import time
+import uuid
+
+
+class AlchemystMemory(BaseChatMemory):
+    """AlchemystMemory implementation for persistent chat memory using Alchemyst AI."""
+    
+    def __init__(
+        self,
+        api_key: str,
+        session_id: str,
+        base_url: Optional[str] = None,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        self._session_id = session_id
+        self._client = AlchemystAI(
+            api_key=api_key,
+            base_url=base_url
+        )
+    
+    @property
+    def memory_variables(self) -> List[str]:
+        """Return the list of memory variables."""
+        return ["history"]
+    
+    def load_memory_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """Load memory variables from Alchemyst."""
+        try:
+            # Use the input as query if available, otherwise use "conversation"
+            query = inputs.get("input", "").strip() if inputs.get("input") else "conversation"
+            
+            response = self._client.v1.context.search(
+                query=query,
+                similarity_threshold=0.0,
+                minimum_similarity_threshold=0.0,
+                scope="internal",
+                metadata=None
+            )
+            
+            contexts = response.contexts if hasattr(response, 'contexts') else []
+            items = [c.content for c in contexts if hasattr(c, 'content') and c.content]
+            
+            return {"history": "\n".join(items)}
+        except Exception as error:
+            print(f"Error loading memory variables: {error}")
+            return {"history": ""}
+    
+    def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, Any]) -> None:
+        """Save context to Alchemyst memory."""
+        user_input = str(inputs.get("input", ""))
+        ai_output = str(outputs.get("output", ""))
+        
+        contents = []
+        timestamp = int(time.time() * 1000)  # milliseconds
+        
+        if user_input:
+            contents.append({
+                "content": user_input,
+                "metadata": {
+                    "source": self._session_id,
+                    "messageId": str(timestamp),
+                    "type": "text"
+                }
+            })
+        
+        if ai_output:
+            contents.append({
+                "content": ai_output,
+                "metadata": {
+                    "source": self._session_id,
+                    "messageId": str(timestamp + 1),
+                    "type": "text"
+                }
+            })
+        
+        if not contents:
+            return
+        
+        try:
+            self._client.v1.context.memory.add(
+                memory_id=self._session_id,
+                contents=contents
+            )
+        except Exception as error:
+            print(f"Error saving context: {error}")
+    
+    def clear(self) -> None:
+        """Clear memory for this session."""
+        try:
+            self._client.v1.context.memory.delete(
+                memory_id=self._session_id
+            )
+        except Exception as error:
+            print(f"Error clearing memory: {error}")
+    
+    @property
+    def memory_keys(self) -> List[str]:
+        """Return the memory keys."""
+        return ["history"]
 ```
 
-3. Initialize Alchemyst Memory
+## Usage Example
 
 ```python
-memory = AlchemystMemory(
-    api_key="YOUR_ALCHEMYST_API_KEY",
-    namespace="demo-session"
-)
+from dotenv import load_dotenv
+import os
+from langchain_openai import ChatOpenAI
+from langchain.chains import ConversationChain
 
+load_dotenv()
+
+
+def main():
+    print("Alchemyst-LangChain Integration Test")
+    print("=" * 50)
+    
+    session_id = str(uuid.uuid4())
+    print(f"Session ID: {session_id}")
+    
+    # Initialize memory
+    memory = AlchemystMemory(
+        api_key=os.getenv("ALCHEMYST_AI_API_KEY", "YOUR_ALCHEMYST_API_KEY"),
+        session_id=session_id
+    )
+    
+    # Initialize model
+    model = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0,
+    )
+    
+    # Create conversation chain
+    chain = ConversationChain(llm=model, memory=memory)
+    
+    # Test conversation
+    test_messages = [
+        "Hi, my name is Alice from New York.",
+        "Who is Alice? Where is Alice from?",
+        "What did I tell you about myself in our previous conversation?"
+    ]
+    
+    for i, message in enumerate(test_messages, 1):
+        print(f"\n[Test {i}] User: {message}")
+        response = chain.invoke({"input": message})
+        print(f"Bot: {response.get('response', response)}")
+    
+    print("\n" + "=" * 50)
+    print("Test completed! The bot should have remembered your information.")
+
+if __name__ == "__main__":
+    main()
 ```
-This creates a dedicated memory namespace that stores previous interactions and knowledge.
-Each namespace acts like a separate “brain” for your app.
 
-4. Build a LangChain using the memory
+Summary:
 
-```python
-template = """You are a helpful assistant.
-Remember past context and respond accordingly.
-
-User: {user_input}
-Assistant:"""
-
-prompt = PromptTemplate(template=template, input_variables=["user_input"])
-
-llm = OpenAI(api_key="YOUR_OPENAI_API_KEY")
-
-chain = LLMChain(
-    llm=llm,
-    prompt=prompt,
-    memory=memory   # <-- integrate Alchemyst memory here
-)
-```
-
-Here, we pass memory=memory to connect Alchemyst's persistent storage to the LangChain pipeline.
-Now your AI can recall previous user messages even after restarting the app.
-
-5. Run the conversation
-```python
-while True:
-    query = input("You: ")
-        if query.lower() in ["exit", "quit"]:
-            break
-        response = chain.run(user_input=query)
-        print("Bot:", response)
-```
-
-The assistant will remember past inputs and generate context-aware responses.
-
-6. Inspect stored memory
-
-```python
-entries = memory.list_entries(namespace="demo-session")
-    for e in entries:
-        print(e["content"])
-```
-This shows all stored conversations or facts that your app has learned.
-
-## Summary
-
-By combining LangChain's workflow capabilities with Alchemyst's persistent memory, developers can build intelligent agents that:
+By combining LangChain’s workflow capabilities with Alchemyst’s persistent memory, developers can build intelligent agents that:
 
 - Retain user context and preferences
 - Continue conversations across sessions
