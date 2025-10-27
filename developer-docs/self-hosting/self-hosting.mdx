@@ -26,23 +26,23 @@ flowchart TB
             DB["Vector Database"]
             CACHE["Redis Cache"]
         end
-        
+
         subgraph "Observability Stack"
             OTEL["OpenTelemetry"]
             TRACE["Tracing Backend"]
             METRICS["Metrics Backend"]
         end
-        
+
         subgraph "Configuration Management"
             INFISICAL["Infisical<br/>(Secrets & Config)"]
         end
-        
+
         subgraph "Infrastructure"
             K8S["Kubernetes Cluster"]
             LB["Load Balancer"]
         end
     end
-    
+
     API --> CP
     CP --> DB
     CP --> CACHE
@@ -64,7 +64,7 @@ flowchart TB
 
 ### 2. OpenTelemetry Integration
 - **Purpose**: Standardized observability and monitoring
-- **Features**: 
+- **Features**:
   - Distributed tracing
   - Metrics collection
   - Performance monitoring
@@ -140,7 +140,7 @@ Set up monitoring dashboards to track:
 <Card
     title="Enterprise Contact"
     icon="envelope"
-    href="mailto:enterprise@getalchemystai.com"
+    href="mailto:anuran@getalchemystai.com"
     horizontal
     target="_blank"
 >

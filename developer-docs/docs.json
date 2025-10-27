@@ -57,6 +57,12 @@
             ]
           },
           {
+            "group": "Enterprise",
+            "pages": [
+              "self-hosting/self-hosting"
+            ]
+          },
+          {
             "group": "Contributions",
             "pages": [
               "contribution/contributing",
@@ -81,12 +87,6 @@
                   "example-projects/community/b2b-newsletter-writer"
                 ]
               }
-            ]
-          },
-          {
-            "group": "Self Hosting",
-            "pages": [
-              "self-hosting/self-hosting"
             ]
           }
         ]
