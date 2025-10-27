@@ -3,8 +3,6 @@ title: 'Python SDK'
 description: 'Get started with the Alchemyst Python SDK'
 ---
 
-# Alchemyst AI Python SDK
-
 
 ## Installation
 
@@ -37,8 +35,9 @@ docs_array = []
 docs_array.append({
     "content": "files content",
     "metadata": {   # optional
-        "filename": "name of the file",
-        "filetype": "pdf/txt/json"
+        "filename": "file_name",
+        "filetype": "pdf/txt/json",
+        "groupName": ["group1", "group2"]
     }
 })
 
@@ -49,13 +48,28 @@ response = client.v1.context.add(
     context_type="resource",   # one of: resource | conversation | instruction
     scope="internal",          # one of: internal | external
     metadata={
-        "fileName": "file_name",
+        "fileName": "name of the file",
         "fileType": "type",
         "lastModified": "timestamp",
         "fileSize": 1234,   # number
+        "groupName": ["group1", "group2"]
     }
 )
 ```
+
+<Warning>
+  **Version Requirements**: The `groupName` field is introduced in Python SDK version 0.5.0. If you use `groupName` in previous versions, you will encounter an error. If `groupName` is not provided, it will be set to a default value automatically.
+</Warning>
+
+<Note>
+  **groupName**: The group name acts like a namespace which creates a scope for context. Documents with the same group name will be grouped together for better organization and retrieval.
+  
+  **Example Use Cases**:
+  - `['project-alpha']` - Group all documents related to a specific project
+  - `['customer-support', 'tier-1']` - Organize support documentation by department and priority
+  - `['legal', 'contracts']` - Categorize legal documents by type and category
+  - `['training', 'onboarding']` - Group training materials for new employee onboarding
+</Note>
 
 ## Context: Search
 
@@ -69,7 +83,11 @@ results = client.v1.context.search(
     similarity_threshold=0.8,
     minimum_similarity_threshold=0.5,
     scope="internal",   # internal | external
-    metadata=None        # None if no metadata, otherwise a dict
+    metadata={          # Optional - can be None
+        "fileType": "ai/conversation",
+        "fileName": "chatgpt-convo-1",
+        "groupName": ["project-name"]
+    }
 )
 ```
 
