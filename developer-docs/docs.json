@@ -199,7 +199,7 @@
         },
         {
           "anchor": "Community",
-          "href": "https://dub.sh/context-community",
+          "href": "/join-discord",
           "icon": "discord"
         },
         {
@@ -209,7 +209,14 @@
         }
       ]
     }
-  },
+   },
+  "redirects": [
+        {
+          "source": "/join-discord",
+          "destination": "https://dub.sh/context-community?utm_source=docs&utm_medium=redirect&utm_campaign=discord_join",
+          "permanent": true
+        }
+  ],
   "logo": {
     "light": "/logo/logo-light-2.png",
     "dark": "/logo/logo-dark.png"
@@ -232,7 +239,7 @@
       "x": "https://x.com/getalchemyst",
       "github": "https://github.com/alchemyst-ai",
       "linkedin": "https://linkedin.com/company/alchemystai",
-      "discord": "https://dub.sh/context-community"
+      "discord": "/join-discord"
     }
   },
   "integrations": {
