@@ -199,7 +199,7 @@
         },
         {
           "anchor": "Community",
-          "href": "https://docs.getalchemystai.com/discord-join",
+          "href": "https://docs.getalchemystai.com/join-discord",
           "icon": "discord"
         },
         {
@@ -239,7 +239,7 @@
       "x": "https://x.com/getalchemyst",
       "github": "https://github.com/alchemyst-ai",
       "linkedin": "https://linkedin.com/company/alchemystai",
-      "discord": "https://docs.getalchemystai.com/discord-join"
+      "discord": "https://docs.getalchemystai.com/join-discord"
     }
   },
   "integrations": {
