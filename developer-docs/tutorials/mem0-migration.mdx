@@ -1,0 +1,113 @@
+---
+title: 'Migrating from Mem0.ai to Alchemyst AI'
+description: 'Export memories from Mem0.ai and import them into Alchemyst AI with one script or detailed steps.'
+---
+
+
+<Info>
+  **Prerequisites**
+  - Python 3.9+ with `pip install mem0ai alchemystai`
+  - Mem0 API key.
+  - Alchemyst AI API key (create one in the [platform dashboard](https://platform.getalchemystai.com))
+</Info>
+
+
+## Quick migration
+
+Replace the placeholder API keys and tweak filters as needed.
+
+```python
+import json
+import time
+from datetime import datetime
+
+from mem0 import MemoryClient
+from alchemyst_ai import AlchemystAI
+
+MEM0_KEY = "mem0_api_key"
+ALCHEMYST_KEY = "alchemyst_api_key"
+
+# 1. Export from Mem0
+mem0 = MemoryClient(api_key=MEM0_KEY)
+export = mem0.create_memory_export(
+    schema={
+        "type": "object",
+        "properties": {
+            "memories": {"type": "array", "items": {"type": "object"}},
+        },
+    },
+    filters={},
+)
+
+print(f"Started export {export['id']}")
+time.sleep(30)
+payload = mem0.get_memory_export(memory_export_id=export["id"])
+memories = payload.get("memories", [])
+print(f"Fetched {len(memories)} memories")
+
+# 2. Import into Alchemyst AI
+alchemyst = AlchemystAI(api_key=ALCHEMYST_KEY)
+documents = []
+
+for memory in memories:
+    content = memory.get("memory") or memory.get("content") or memory.get("summary")
+    if not content:
+        continue
+
+    documents.append(
+        {
+            "content": content,
+            "metadata": {
+                "memoryId": memory.get("id"),
+                "userId": memory.get("user_id"),
+                "source": "mem0",
+            },
+        }
+    )
+
+if documents:
+    response = alchemyst.v1.context.add(
+        documents=documents,
+        source="mem0_migration",
+        context_type="resource",
+        scope="internal",
+        metadata={
+            "fileName": f"mem0_migration-{export['id']}.json",
+            "fileType": "json",
+            "fileSize": len(json.dumps(documents).encode("utf-8")),
+            "lastModified": datetime.utcnow().isoformat() + "Z",
+            "groupName": ["mem0", "imported"],
+        },
+    )
+    print("Migration complete ✅")
+    print(response)
+else:
+    print("No memories to migrate")
+```
+
+## Step-by-step migration (UI method)
+
+Another way to migrate is using the Alchemyst AI platform dashboard - no code required.
+
+<Steps>
+  <Step title="Export your memories from Mem0.ai">
+    1. Log into your [Mem0 dashboard](https://app.mem0.ai)
+    2. Navigate to **Settings** or **Export**
+    3. Export your memories as **JSON** and download the file
+  </Step>
+
+  <Step title="Create an Alchemyst AI account">
+    1. Go to [platform.getalchemystai.com](https://platform.getalchemystai.com)
+    2. Create an account or log in if you already have one
+  </Step>
+
+  <Step title="Upload your export JSON">
+    1. Go to the **Context** tab in your dashboard
+    2. Click **Upload** or **Add Documents**
+    3. Select your Mem0 export JSON file
+    4. Wait for processing to complete
+
+    Your memories are now imported and ready to use! 🎉
+  </Step>
+</Steps>
+

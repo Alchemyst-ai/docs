@@ -58,6 +58,12 @@
             ]
           },
           {
+            "group": "Migration Guides",
+            "pages": [
+              "tutorials/mem0-migration"
+            ]
+          },
+          {
             "group": "Enterprise",
             "pages": [
               "self-hosting/self-hosting"
