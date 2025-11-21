@@ -6,8 +6,9 @@ description: 'Export memories from Mem0.ai and import them into Alchemyst AI wit
 
 <Info>
   **Prerequisites**
-  - Python 3.9+ with `pip install mem0ai alchemystai`
-  - Mem0 API key.
+  - **Python**: Python 3.9+ with `pip install mem0ai alchemystai`
+  - **JavaScript**: Node.js 18+ with `npm install mem0ai @alchemystai/sdk`
+  - Mem0 API key
   - Alchemyst AI API key (create one in the [platform dashboard](https://platform.getalchemystai.com))
 </Info>
 
@@ -16,7 +17,8 @@ description: 'Export memories from Mem0.ai and import them into Alchemyst AI wit
 
 Replace the placeholder API keys and tweak filters as needed.
 
-```python
+<CodeGroup>
+```python Python
 import json
 import time
 from datetime import datetime
@@ -84,6 +86,79 @@ if documents:
 else:
     print("No memories to migrate")
 ```
+
+```javascript JavaScript
+import MemoryClient from 'mem0ai';
+import AlchemystAI from '@alchemystai/sdk';
+
+const MEM0_KEY = "mem0_api_key";
+const ALCHEMYST_KEY = "alchemyst_api_key";
+
+// 1. Export from Mem0
+const mem0 = new MemoryClient({ apiKey: MEM0_KEY });
+const jsonSchema = {
+  type: "object",
+  properties: {
+    memories: {
+      type: "array",
+      items: { type: "object" }
+    }
+  }
+};
+
+const exportResult = await mem0.createMemoryExport({
+  schema: jsonSchema,
+  filters: {}
+});
+
+console.log(`Started export ${exportResult.id}`);
+
+// Wait for export to complete
+await new Promise(resolve => setTimeout(resolve, 30000));
+
+const payload = await mem0.getMemoryExport({ memory_export_id: exportResult.id });
+const memories = payload.memories || [];
+console.log(`Fetched ${memories.length} memories`);
+
+// 2. Import into Alchemyst AI
+const alchemyst = new AlchemystAI({ apiKey: ALCHEMYST_KEY });
+const documents = [];
+
+for (const memory of memories) {
+  const content = memory.memory || memory.content || memory.summary;
+  if (!content) continue;
+
+  documents.push({
+    content: content,
+    metadata: {
+      memoryId: memory.id,
+      userId: memory.user_id,
+      source: "mem0"
+    }
+  });
+}
+
+if (documents.length > 0) {
+  const response = await alchemyst.v1.context.add({
+    documents: documents,
+    source: "mem0_migration",
+    context_type: "resource",
+    scope: "internal",
+    metadata: {
+      fileName: `mem0_migration-${exportResult.id}.json`,
+      fileType: "json",
+      fileSize: JSON.stringify(documents).length,
+      lastModified: new Date().toISOString(),
+      groupName: ["mem0", "imported"]
+    }
+  });
+  console.log("Migration complete ✅");
+  console.log(response);
+} else {
+  console.log("No memories to migrate");
+}
+```
+</CodeGroup>
 
 ## Step-by-step migration (UI method)
 
