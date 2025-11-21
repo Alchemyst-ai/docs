@@ -53,7 +53,14 @@
             "pages": [
               "tutorials/mcp-setup",
               "tutorials/typescript-agent",
-              "tutorials/python-agent"
+              "tutorials/python-agent",
+              "tutorials/chrome-extension"
+            ]
+          },
+          {
+            "group": "Enterprise",
+            "pages": [
+              "self-hosting/self-hosting"
             ]
           },
           {
@@ -82,12 +89,6 @@
                 ]
               }
             ]
-          },
-          {
-            "group": "Self Hosting",
-            "pages": [
-              "self-hosting/self-hosting"
-            ]
           }
         ]
       },
@@ -101,7 +102,7 @@
               "integrations/introduction"
             ]
           },
-           {
+          {
             "group": "Extensions",
             "pages": [
               "integrations/extensions/chrome"
@@ -177,6 +178,7 @@
               "api-reference/endpoint/api/v1/context/delete/post",
               "api-reference/endpoint/api/v1/context/memory/add/post",
               "api-reference/endpoint/api/v1/context/memory/delete/post",
+              "api-reference/endpoint/api/v1/context/memory/update/post",
               "api-reference/endpoint/api/v1/context/search/post",
               "api-reference/endpoint/api/v1/context/traces/get",
               "api-reference/endpoint/api/v1/context/traces/{traceId}/delete/delete",
@@ -192,22 +194,29 @@
       "anchors": [
         {
           "anchor": "Website",
-          "href": "https://getalchemystai.com",
+          "href": "https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
           "icon": "book-open-cover"
         },
         {
           "anchor": "Community",
-          "href": "https://dub.sh/context-community",
+          "href": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join",
           "icon": "discord"
         },
         {
           "anchor": "Blog",
-          "href": "https://getalchemystai.com/blog",
+          "href": "https://getalchemystai.com/blog?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
           "icon": "newspaper"
         }
       ]
     }
   },
+  "redirects": [
+    {
+      "source": "/join-discord",
+      "destination": "https://dub.sh/context-community",
+      "permanent": true
+    }
+  ],
   "logo": {
     "light": "/logo/logo-light-2.png",
     "dark": "/logo/logo-dark.png"
@@ -230,12 +239,12 @@
       "x": "https://x.com/getalchemyst",
       "github": "https://github.com/alchemyst-ai",
       "linkedin": "https://linkedin.com/company/alchemystai",
-      "discord": "https://dub.sh/context-community"
+      "discord": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
     }
   },
   "integrations": {
     "ga4": {
-        "measurementId": "G-WHNWY5LTDN"
+      "measurementId": "G-WHNWY5LTDN"
     }
   },
   "seo": {

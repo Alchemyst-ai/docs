@@ -5,7 +5,7 @@ description: 'Put your SEO on AutoPilot with automated indexing'
 
 ## Overview
 
-**Zendocs** is a starter project built with **Next.js + MongoDB** that helps you put your documentation and SEO on **autopilot**.  
+**Zendocs** is a starter project built with **Next.js + MongoDB** that helps you put your documentation and SEO on **autopilot**.
 Instead of manually creating and maintaining docs pages, you upload your documentation, and the **Alchemyst Platform** takes care of indexing, generating SEO-friendly pages, and enabling Q&A directly from your docs.
 
 ---
@@ -28,11 +28,11 @@ npm run dev   # app starts at http://localhost:4163
 
 ## How It Works ?
 
-1. **Prepare your docs** – Gather your internal documentation (text, markdown, or zipped files).  
-2. **Create a MongoDB instance** – Either self-hosted or on [MongoDB Atlas](https://www.mongodb.com/atlas/database).  
-3. **Sign up on [Alchemyst Platform](https://getalchemystai.com/)** – Create an account and get an [API KEY](https://platform.getalchemystai.com/settings).  
-4. **Upload docs to [Context Surgeon](https://platform.getalchemystai.com/context)** – This tool indexes your documents so the AI can use them.  
-5. **Set environment variables** – Copy `.env.example` → `.env` and fill in:  
+1. **Prepare your docs** – Gather your internal documentation (text, markdown, or zipped files).
+2. **Create a MongoDB instance** – Either self-hosted or on [MongoDB Atlas](https://www.mongodb.com/atlas/database).
+3. **Sign up on [Alchemyst Platform](https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web)** – Create an account and get an [API KEY](https://platform.getalchemystai.com/settings).
+4. **Upload docs to [Context Surgeon](https://platform.getalchemystai.com/context)** – This tool indexes your documents so the AI can use them.
+5. **Set environment variables** – Copy `.env.example` → `.env` and fill in:
    ```bash
    BACKEND_BASE_URL=https://platform-backend.getalchemystai.com
    NEXT_BACKEND_URL=http://localhost:4163   # or your deployed URL
@@ -42,7 +42,7 @@ npm run dev   # app starts at http://localhost:4163
 
 ```mermaid
 flowchart LR
-    
+
     U["User: Upload Docs"] --> FE["Upload UI"]
     FE --> API["API Route /api/upload"]
     API --> BE["Alchemyst Platform (Context Surgeon)"]
@@ -124,7 +124,7 @@ Root Directory
 ```
 
 
---- 
+---
 ## Architecture & Flow
 **Zendocs** is divided into four main modules: **Frontend**, **Backend**, **Database**, and **Config**. Below is a detailed breakdown with flowcharts for each module.
 
@@ -138,7 +138,7 @@ Handles user interactions, file uploads, and displaying documentation and search
 
 ```mermaid
 flowchart LR
-    
+
     U["User"] --> FE["Upload UI (upload.tsx)"]
     FE --> VIEW["Docs Viewer (DocViewer.tsx)"]
     VIEW --> SEARCH["Search & Chat UI (Search.tsx)"]
