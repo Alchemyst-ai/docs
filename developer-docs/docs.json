@@ -115,6 +115,12 @@
             ]
           },
           {
+            "group": "No-code tools",
+            "pages": [
+              "integrations/no-code-tools/n8n"
+            ]
+          },
+          {
             "group": "Alchemyst SDK",
             "pages": [
               "integrations/sdk/python-sdk",

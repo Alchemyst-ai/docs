@@ -1,0 +1,75 @@
+---
+title: 'n8n Integration'
+description: 'Keep Alchemyst memory in sync with simple no-code workflows'
+icon: 'puzzle-piece'
+---
+
+This guide shows how to connect n8n to Alchemyst’s REST API, so every automation you build can read and write context.
+
+## Prerequisites
+
+- An n8n account (cloud or self-hosted)
+- An Alchemyst API key from the [dashboard](https://platform.getalchemystai.com/settings)
+- Basic familiarity with n8n’s node editor
+
+## Connect n8n to Alchemyst
+
+### Setting Up the HTTP Request Node
+
+1. Add an **HTTP Request** node anywhere in your workflow.
+2. Under **Authentication**, pick **Generic Credential Type → Bearer Token**.
+3. Create a credential, paste your Alchemyst API key, and save it.
+4. Set **Method** to `POST` and **Content Type** to `JSON`.
+5. Use one of these endpoints:
+   - Add context: `https://platform-backend.getalchemystai.com/api/v1/context/add`
+   - Search context: `https://platform-backend.getalchemystai.com/api/v1/context/search`
+
+<Tip>
+Re-use the same HTTP Request node as a template by duplicating it inside other workflows.
+</Tip>
+
+### Setting Up the MCP Node
+
+1. Add an **MCP** node in your workflow by pasting the below code snippet.
+```json
+{
+  "name": "Alchemyst MCP Client",
+  "nodes": [
+    {
+      "id": "alchemyst-mcp-client-1",
+      "name": "Alchemyst MCP Client",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [300, 300],
+      "parameters": {
+        "endpointUrl": "https://mcp.getalchemystai.com/mcp/sse",
+        "serverTransport": "sse",
+        "authentication": "bearerAuth",
+        "include": "selected",
+        "includeTools": [
+          "alchemyst_ai_context_mcp_search_context"
+        ],
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "",
+          "name": ""
+        }
+      }
+    }
+  ],
+  "connections": {}
+}
+```
+2. Open the node you just added and confirm the following settings:
+   - **Endpoint**: `https://mcp.getalchemystai.com/mcp/sse`
+   - **Authentication**: **Bearer Auth**
+3. Create a Bearer Auth credential:
+   - Click **Create New Credential**
+   - Paste your Alchemyst API key into the **Bearer Token** field
+   - Save the credential and select it for the MCP node
+
+Once these steps are complete, the MCP node can call Alchemyst tools inside your workflows.
