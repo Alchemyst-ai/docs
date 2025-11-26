@@ -54,7 +54,8 @@
               "tutorials/mcp-setup",
               "tutorials/typescript-agent",
               "tutorials/python-agent",
-              "tutorials/chrome-extension"
+              "tutorials/chrome-extension",
+              "tutorials/n8n-automation"
             ]
           },
           {
