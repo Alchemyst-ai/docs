@@ -85,7 +85,7 @@ await client.v1.context.add({
 
 <Note>
   **groupName**: The group name acts like a namespace which creates a scope for context. Documents with the same group name will be grouped together for better organization and retrieval.
-  
+
   **Example Use Cases**:
   - `['project-alpha']` - Group all documents related to a specific project
   - `['customer-support', 'tier-1']` - Organize support documentation by department and priority
@@ -107,7 +107,7 @@ const { contexts } = await client.v1.context.search({
         similarity_threshold: 0.8,
         minimum_similarity_threshold: 0.5,
         scope: 'internal',
-        metadata: {          // Optional - can be null
+        body_metadata: {          // Optional - can be null
             size: 100,
             fileType: 'ai/conversation',
             fileName: 'chatgpt-convo-1',

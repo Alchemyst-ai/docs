@@ -35,9 +35,9 @@ docs_array = []
 docs_array.append({
     "content": "files content",
     "metadata": {   # optional
-        "filename": "file_name",
-        "filetype": "pdf/txt/json",
-        "groupName": ["group1", "group2"]
+        "file_name": "file_name",
+        "file_type": "pdf/txt/json",
+        "group_name": ["group1", "group2"]
     }
 })
 
@@ -48,11 +48,11 @@ response = client.v1.context.add(
     context_type="resource",   # one of: resource | conversation | instruction
     scope="internal",          # one of: internal | external
     metadata={
-        "fileName": "name of the file",
-        "fileType": "type",
-        "lastModified": "timestamp",
-        "fileSize": 1234,   # number
-        "groupName": ["group1", "group2"]
+        "file_name": "name of the file",
+        "file_type": "type",
+        "last_modified": "timestamp",
+        "file_size": 1234,   # number
+        "group_name": ["group1", "group2"]
     }
 )
 ```
@@ -63,7 +63,7 @@ response = client.v1.context.add(
 
 <Note>
   **groupName**: The group name acts like a namespace which creates a scope for context. Documents with the same group name will be grouped together for better organization and retrieval.
-  
+
   **Example Use Cases**:
   - `['project-alpha']` - Group all documents related to a specific project
   - `['customer-support', 'tier-1']` - Organize support documentation by department and priority
@@ -83,10 +83,10 @@ results = client.v1.context.search(
     similarity_threshold=0.8,
     minimum_similarity_threshold=0.5,
     scope="internal",   # internal | external
-    metadata={          # Optional - can be None
-        "fileType": "ai/conversation",
-        "fileName": "chatgpt-convo-1",
-        "groupName": ["project-name"]
+    body_metadata={          # Optional - can be None
+        "file_type": "ai/conversation",
+        "file_name": "chatgpt-convo-1",
+        "group_name": ["project-name"]
     }
 )
 ```
