@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://platform-backend.getalchemystai.com"
     }
   ],
   "security": [
@@ -103,6 +103,28 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "documents": [
+                  {
+                    "content": "Customer asked about pricing for the Scale plan.",
+                    "containerTag": "support-emails",
+                    "ticketId": "TCK-1234"
+                  }
+                ],
+                "source": "support-inbox",
+                "context_type": "resource",
+                "scope": "internal",
+                "metadata": {
+                  "fileName": "support_thread_TCK-1234.txt",
+                  "fileType": "text/plain",
+                  "groupName": [
+                    "support",
+                    "pricing"
+                  ],
+                  "lastModified": "2025-01-10T12:34:56.000Z",
+                  "fileSize": 2048
+                }
               }
             }
           }
@@ -194,6 +216,7 @@
                   "user_id": {
                     "type": "string",
                     "description": "Optional user ID",
+                    "deprecated": true,
                     "nullable": true
                   },
                   "organization_id": {
@@ -214,6 +237,11 @@
                     "nullable": true
                   }
                 }
+              },
+              "example": {
+                "source": "support-inbox",
+                "by_doc": true,
+                "by_id": false
               }
             }
           }
@@ -281,6 +309,29 @@
                     "description": "Array of content objects with additional properties allowed"
                   }
                 }
+              },
+              "example": {
+                "memoryId": "support-thread-TCK-1234",
+                "contents": [
+                  {
+                    "content": "Customer asked about pricing for the Scale plan.",
+                    "metadata": {
+                      "messageId": "msg-1"
+                    },
+                    "role": "user",
+                    "id": "msg-1",
+                    "createdAt": "2025-01-10T12:34:56.000Z"
+                  },
+                  {
+                    "content": "Explained the Scale plan pricing and shared the pricing page link.",
+                    "metadata": {
+                      "messageId": "msg-2"
+                    },
+                    "role": "assistant",
+                    "id": "msg-2",
+                    "createdAt": "2025-01-10T12:35:30.000Z"
+                  }
+                ]
               }
             }
           }
@@ -336,6 +387,7 @@
                   "user_id": {
                     "type": "string",
                     "description": "Optional user ID",
+                    "deprecated": true,
                     "nullable": true
                   },
                   "organization_id": {
@@ -344,6 +396,9 @@
                     "nullable": true
                   }
                 }
+              },
+              "example": {
+                "memoryId": "support-thread-TCK-1234"
               }
             }
           }
@@ -404,6 +459,29 @@
                     "description": "Array of updated content objects"
                   }
                 }
+              },
+              "example": {
+                "memoryId": "support-thread-TCK-1234",
+                "contents": [
+                  {
+                    "content": "Customer asked about pricing for the Scale plan.",
+                    "metadata": {
+                      "messageId": "msg-1"
+                    },
+                    "role": "user",
+                    "id": "msg-1",
+                    "createdAt": "2025-01-10T12:34:56.000Z"
+                  },
+                  {
+                    "content": "Updated answer about the Scale plan pricing after discounts.",
+                    "metadata": {
+                      "messageId": "msg-2"
+                    },
+                    "role": "assistant",
+                    "id": "msg-2",
+                    "createdAt": "2025-01-10T12:36:00.000Z"
+                  }
+                ]
               }
             }
           }
@@ -445,6 +523,21 @@
             "bearerAuth": []
           }
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "metadata",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "required": false,
+            "description": "Use this flag to control metadata-filter behavior:\n- metadata=true → you must include a non-empty `metadata` object in the request body; it will be used as filters.\n- metadata=false (or omitted) → you must NOT send `metadata` in the body; any provided metadata will be rejected.\n"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -460,7 +553,8 @@
                   "user_id": {
                     "type": "string",
                     "description": "The ID of the user making the request",
-                    "example": "user123"
+                    "example": "user123",
+                    "deprecated": true
                   },
                   "query": {
                     "type": "string",
@@ -492,8 +586,36 @@
                   },
                   "metadata": {
                     "type": "object",
-                    "description": "Additional metadata for the search",
+                    "description": "Additional metadata for the search. A metadata object in the request body is only allowed when query parameter metadata=true. Adding a metadata object will make retrieval of context data slower, so use it wisely.",
                     "default": {}
+                  }
+                }
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Search without metadata filters (metadata=false or omitted)",
+                  "value": {
+                    "query": "What did the customer ask about pricing for the Scale plan?",
+                    "similarity_threshold": 0.8,
+                    "minimum_similarity_threshold": 0.5,
+                    "scope": "internal"
+                  }
+                },
+                "withMetadata": {
+                  "summary": "Search with metadata filters (requires metadata=true)",
+                  "value": {
+                    "query": "What did the customer ask about pricing for the Scale plan?",
+                    "similarity_threshold": 0.8,
+                    "minimum_similarity_threshold": 0.5,
+                    "scope": "internal",
+                    "metadata": {
+                      "fileName": "support_thread_TCK-1234.txt",
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ],
+                      "lastModifiedAt": "2025-01-10T12:34:56.000Z"
+                    }
                   }
                 }
               }
@@ -619,6 +741,20 @@
                       "description": "The deleted trace data"
                     }
                   }
+                },
+                "example": {
+                  "trace": {
+                    "_id": "trace_123",
+                    "userId": "user_123",
+                    "type": "context.search",
+                    "data": {
+                      "query": "What did the customer ask about pricing for the Scale plan?",
+                      "source": "support-inbox",
+                      "fileName": "support_thread_TCK-1234.txt"
+                    },
+                    "createdAt": "2025-01-10T12:35:10.000Z",
+                    "updatedAt": "2025-01-10T12:35:10.000Z"
+                  }
                 }
               }
             }
@@ -689,6 +825,22 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "traces": [
+                    {
+                      "_id": "trace_123",
+                      "userId": "user_123",
+                      "type": "context.search",
+                      "data": {
+                        "query": "What did the customer ask about pricing for the Scale plan?",
+                        "source": "support-inbox",
+                        "fileName": "support_thread_TCK-1234.txt"
+                      },
+                      "createdAt": "2025-01-10T12:35:10.000Z",
+                      "updatedAt": "2025-01-10T12:35:10.000Z"
+                    }
+                  ]
                 }
               }
             }
@@ -740,6 +892,20 @@
               "application/json": {
                 "schema": {
                   "type": "object"
+                },
+                "example": {
+                  "documents": [
+                    {
+                      "fileName": "support_thread_TCK-1234.txt",
+                      "fileType": "text/plain",
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ],
+                      "lastModified": "2025-01-10T12:34:56.000Z",
+                      "fileSize": 2048
+                    }
+                  ]
                 }
               }
             }
@@ -787,6 +953,23 @@
                       "description": "List of context items"
                     }
                   }
+                },
+                "example": {
+                  "context": [
+                    {
+                      "content": "Customer asked about pricing for the Scale plan.",
+                      "metadata": {
+                        "fileName": "support_thread_TCK-1234.txt",
+                        "fileType": "text/plain",
+                        "groupName": [
+                          "support",
+                          "pricing"
+                        ],
+                        "lastModified": "2025-01-10T12:34:56.000Z",
+                        "fileSize": 2048
+                      }
+                    }
+                  ]
                 }
               }
             }
@@ -823,9 +1006,16 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "deprecated": true
                   }
                 }
+              },
+              "example": {
+                "userIds": [
+                  "user_123",
+                  "user_456"
+                ]
               }
             }
           }
@@ -841,6 +1031,25 @@
                     "contexts": {
                       "type": "object"
                     }
+                  }
+                },
+                "example": {
+                  "contexts": {
+                    "user_123": [
+                      {
+                        "content": "Customer asked about pricing for the Scale plan.",
+                        "metadata": {
+                          "fileName": "support_thread_TCK-1234.txt",
+                          "fileType": "text/plain",
+                          "groupName": [
+                            "support",
+                            "pricing"
+                          ],
+                          "lastModified": "2025-01-10T12:34:56.000Z",
+                          "fileSize": 2048
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -860,28 +1069,6 @@
           },
           "500": {
             "description": "Context processor error"
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
           }
         }
       }

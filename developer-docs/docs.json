@@ -54,7 +54,8 @@
               "tutorials/mcp-setup",
               "tutorials/typescript-agent",
               "tutorials/python-agent",
-              "tutorials/chrome-extension"
+              "tutorials/chrome-extension",
+              "tutorials/n8n-automation"
             ]
           },
           {
@@ -112,6 +113,12 @@
             "group": "Extensions",
             "pages": [
               "integrations/extensions/chrome"
+            ]
+          },
+          {
+            "group": "No-code tools",
+            "pages": [
+              "integrations/no-code-tools/n8n"
             ]
           },
           {
