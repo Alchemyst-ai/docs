@@ -523,6 +523,21 @@
             "bearerAuth": []
           }
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "metadata",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "required": false,
+            "description": "Use this flag to control metadata-filter behavior:\n- metadata=true → you must include a non-empty `metadata` object in the request body; it will be used as filters.\n- metadata=false (or omitted) → you must NOT send `metadata` in the body; any provided metadata will be rejected.\n"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -571,23 +586,37 @@
                   },
                   "metadata": {
                     "type": "object",
-                    "description": "Additional metadata for the search",
+                    "description": "Additional metadata for the search. A metadata object in the request body is only allowed when query parameter metadata=true. Adding a metadata object will make retrieval of context data slower, so use it wisely.",
                     "default": {}
                   }
                 }
               },
-              "example": {
-                "query": "What did the customer ask about pricing for the Scale plan?",
-                "similarity_threshold": 0.8,
-                "minimum_similarity_threshold": 0.5,
-                "scope": "internal",
-                "metadata": {
-                  "fileName": "support_thread_TCK-1234.txt",
-                  "groupName": [
-                    "support",
-                    "pricing"
-                  ],
-                  "lastModifiedAt": "2025-01-10T12:34:56.000Z"
+              "examples": {
+                "simple": {
+                  "summary": "Search without metadata filters (metadata=false or omitted)",
+                  "value": {
+                    "query": "What did the customer ask about pricing for the Scale plan?",
+                    "similarity_threshold": 0.8,
+                    "minimum_similarity_threshold": 0.5,
+                    "scope": "internal"
+                  }
+                },
+                "withMetadata": {
+                  "summary": "Search with metadata filters (requires metadata=true)",
+                  "value": {
+                    "query": "What did the customer ask about pricing for the Scale plan?",
+                    "similarity_threshold": 0.8,
+                    "minimum_similarity_threshold": 0.5,
+                    "scope": "internal",
+                    "metadata": {
+                      "fileName": "support_thread_TCK-1234.txt",
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ],
+                      "lastModifiedAt": "2025-01-10T12:34:56.000Z"
+                    }
+                  }
                 }
               }
             }
