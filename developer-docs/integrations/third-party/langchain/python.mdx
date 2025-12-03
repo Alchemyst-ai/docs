@@ -31,7 +31,7 @@ import uuid
 
 class AlchemystMemory(BaseChatMemory):
     """AlchemystMemory implementation for persistent chat memory using Alchemyst AI."""
-    
+
     def __init__(
         self,
         api_key: str,
@@ -43,42 +43,42 @@ class AlchemystMemory(BaseChatMemory):
         self._client = AlchemystAI(
             api_key=api_key,
         )
-    
+
     @property
     def memory_variables(self) -> List[str]:
         """Return the list of memory variables."""
         return ["history"]
-    
+
     def load_memory_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """Load memory variables from Alchemyst."""
         try:
             # Use the input as query if available, otherwise use "conversation"
             query = inputs.get("input", "").strip() if inputs.get("input") else "conversation"
-            
+
             response = self._client.v1.context.search(
                 query=query,
                 similarity_threshold=0.0,
                 minimum_similarity_threshold=0.0,
                 scope="internal",
-                metadata=None
+                body_metadata=None
             )
-            
+
             contexts = response.contexts if hasattr(response, 'contexts') else []
             items = [c.content for c in contexts if hasattr(c, 'content') and c.content]
-            
+
             return {"history": "\n".join(items)}
         except Exception as error:
             print(f"Error loading memory variables: {error}")
             return {"history": ""}
-    
+
     def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, Any]) -> None:
         """Save context to Alchemyst memory."""
         user_input = str(inputs.get("input", ""))
         ai_output = str(outputs.get("output", ""))
-        
+
         contents = []
         timestamp = int(time.time() * 1000)  # milliseconds
-        
+
         if user_input:
             contents.append({
                 "content": user_input,
@@ -88,7 +88,7 @@ class AlchemystMemory(BaseChatMemory):
                     "type": "text"
                 }
             })
-        
+
         if ai_output:
             contents.append({
                 "content": ai_output,
@@ -98,10 +98,10 @@ class AlchemystMemory(BaseChatMemory):
                     "type": "text"
                 }
             })
-        
+
         if not contents:
             return
-        
+
         try:
             self._client.v1.context.memory.add(
                 memory_id=self._session_id,
@@ -109,7 +109,7 @@ class AlchemystMemory(BaseChatMemory):
             )
         except Exception as error:
             print(f"Error saving context: {error}")
-    
+
     def clear(self) -> None:
         """Clear memory for this session."""
         try:
@@ -118,7 +118,7 @@ class AlchemystMemory(BaseChatMemory):
             )
         except Exception as error:
             print(f"Error clearing memory: {error}")
-    
+
     @property
     def memory_keys(self) -> List[str]:
         """Return the memory keys."""
@@ -139,37 +139,37 @@ load_dotenv()
 def main():
     print("Alchemyst-LangChain Integration Test")
     print("=" * 50)
-    
+
     session_id = str(uuid.uuid4())
     print(f"Session ID: {session_id}")
-    
+
     # Initialize memory
     memory = AlchemystMemory(
         api_key=os.getenv("ALCHEMYST_AI_API_KEY", "YOUR_ALCHEMYST_API_KEY"),
         session_id=session_id
     )
-    
+
     # Initialize model
     model = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0,
     )
-    
+
     # Create conversation chain
     chain = ConversationChain(llm=model, memory=memory)
-    
+
     # Test conversation
     test_messages = [
         "Hi, my name is Alice from New York.",
         "Who is Alice? Where is Alice from?",
         "What did I tell you about myself in our previous conversation?"
     ]
-    
+
     for i, message in enumerate(test_messages, 1):
         print(f"\n[Test {i}] User: {message}")
         response = chain.invoke({"input": message})
         print(f"Bot: {response.get('response', response)}")
-    
+
     print("\n" + "=" * 50)
     print("Test completed! The bot should have remembered your information.")
 
