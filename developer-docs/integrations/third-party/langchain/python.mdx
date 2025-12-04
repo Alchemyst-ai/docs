@@ -21,6 +21,10 @@ pip install langchain langchain-openai alchemystai python-dotenv
 
 Here's the complete implementation of `AlchemystMemory` for LangChain:
 
+<Note>
+  **groupName**: The group name acts like a namespace which creates a scope for context. Documents with the same group name will be grouped together for better organization and retrieval. In this implementation, we use the `session_id` as the group name to isolate conversations by session.
+</Note>
+
 ```python
 from langchain.memory.chat_memory import BaseChatMemory
 from alchemyst_ai import AlchemystAI
@@ -60,7 +64,10 @@ class AlchemystMemory(BaseChatMemory):
                 similarity_threshold=0.0,
                 minimum_similarity_threshold=0.0,
                 scope="internal",
-                body_metadata=None
+                body_metadata={
+                    "file_type": "text",
+                    "group_name": [self._session_id]
+                }
             )
 
             contexts = response.contexts if hasattr(response, 'contexts') else []
@@ -105,7 +112,11 @@ class AlchemystMemory(BaseChatMemory):
         try:
             self._client.v1.context.memory.add(
                 memory_id=self._session_id,
-                contents=contents
+                contents=contents,
+                # Use group_name to namespace this memory by session (or any other grouping you prefer)
+                metadata={
+                    "group_name": [self._session_id],
+                },
             )
         except Exception as error:
             print(f"Error saving context: {error}")
