@@ -70,7 +70,7 @@ const retriever = new AlchemystRetriever({
   similarityThreshold: 0.8,
   minimumSimilarityThreshold: 0.5,
   scope: "internal",
-  metadata: {           // Optional filter for context search
+  body_metadata: {           // Optional filter for context search
     fileType: "text/plain",
     groupName: ["project-name"],
   },
