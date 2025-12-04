@@ -588,7 +588,8 @@
                     "minimum": 0,
                     "maximum": 1,
                     "description": "Minimum similarity threshold",
-                    "example": 0.5
+                    "example": 0.5,
+                    "deprecated": true
                   },
                   "scope": {
                     "type": "string",
