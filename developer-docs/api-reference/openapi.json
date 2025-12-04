@@ -532,10 +532,25 @@
               "enum": [
                 "true",
                 "false"
-              ]
+              ],
+              "default": "false"
             },
             "required": false,
-            "description": "Use this flag to control metadata-filter behavior:\n- metadata=true → you must include a non-empty `metadata` object in the request body; it will be used as filters.\n- metadata=false (or omitted) → you must NOT send `metadata` in the body; any provided metadata will be rejected.\n"
+            "description": "Controls whether metadata is included in the response:\n- metadata=true → metadata will be included in each context item in the response.\n- metadata=false (or omitted) → metadata will be excluded from the response for better performance.\n"
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "fast",
+                "standard"
+              ],
+              "default": "standard"
+            },
+            "required": false,
+            "description": "Controls the search mode:\n- mode=fast → prioritizes speed over completeness.\n- mode=standard → performs a comprehensive search (default if omitted).\n"
           }
         ],
         "requestBody": {
@@ -586,7 +601,7 @@
                   },
                   "metadata": {
                     "type": "object",
-                    "description": "Additional metadata for the search. A metadata object in the request body is only allowed when query parameter metadata=true. Adding a metadata object will make retrieval of context data slower, so use it wisely.",
+                    "description": "Additional metadata for the search",
                     "default": {}
                   }
                 }
@@ -624,7 +639,7 @@
         },
         "responses": {
           "202": {
-            "description": "Context search request successfully processed",
+            "description": "Context search request successfully processed. Response structure varies based on metadata query parameter: if metadata=true, each context includes metadata; if metadata=false or omitted, metadata is excluded from the response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -644,7 +659,8 @@
                             "format": "date-time"
                           },
                           "metadata": {
-                            "type": "object"
+                            "type": "object",
+                            "description": "Only included when query parameter metadata=true"
                           },
                           "content": {
                             "type": "string"
