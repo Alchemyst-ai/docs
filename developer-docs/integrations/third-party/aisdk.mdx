@@ -47,15 +47,230 @@ The snippet below shows how to set up a tool using Vercel's AI SDK, using OpenAI
 
 This assumes that you have an OpenAI Key and Alchemyst API Key. If you don't have the Alchemyst API Key, you can get them in the [**Alchemyst Settings page**](https://platform.getalchemystai.com/settings)
 
+### Basic Setup
+
 ```ts aiSdkToolSetup.ts
 import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 import { alchemystTools } from '@alchemystai/aisdk';
+
 const result = await streamText({
-  model: "gpt-5-nano",
-  prompt: "Remember that my name is Alice",
+  model: openai('gpt-4o-mini'),
+  prompt: "Search for users with the name rohan",
   tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true)
 });
- ```
+```
+
+### Complete Streaming Example
+
+This example shows how to handle streaming responses and tool calls:
+
+```ts streamingExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "What information do we have about our product documentation?",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true)
+});
+
+// Stream the text response
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+
+// Handle tool calls if any were made
+const toolCalls = await result.toolCalls;
+if (toolCalls && toolCalls.length > 0) {
+  console.log('\n\nTool calls made:');
+  for (const toolCall of toolCalls) {
+    console.log(`- ${toolCall.toolName}:`, toolCall.args);
+  }
+}
+
+// Get the full text result
+const fullText = await result.text;
+console.log('\n\nFull response:', fullText);
+```
+
+### Context Search Example
+
+This example demonstrates how the AI can search your stored context:
+
+```ts contextSearchExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Find all information about our pricing plans and feature comparisons",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true)
+});
+
+// The AI will automatically use the search_context tool to find relevant information
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+### Adding Context Example
+
+This example shows how to add context that the AI can later search:
+
+```ts addContextExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// First, add some context
+const addResult = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: `store this information:  rohan is a good boy`,
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true)
+});
+
+
+const toolCalls = await addResult.toolCalls;
+if (toolCalls && toolCalls.length > 0) {
+  console.log('\n\nTool calls made:');
+  for (const toolCall of toolCalls) {
+    console.log(`- ${toolCall.toolName}:`, JSON.stringify(toolCall, null, 2));
+  }
+}
+// Wait for the tool to execute
+await addResult.text;
+
+// Now search for it
+const searchResult = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Search for users with the name rohan",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true)
+});
+
+for await (const chunk of searchResult.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+### Memory Management Example
+
+This example demonstrates using memory to store user preferences:
+
+```ts memoryExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+const userId = "user_123";
+const memoryId = `memory_${userId}`;
+
+// Store user preferences in memory
+const storeMemory = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: `Remember that user ${userId} prefers:
+    - Dark mode interface
+    - Email notifications disabled
+    - Preferred language: English
+    - Timezone: IST`,
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true) // Only memory, no context
+});
+
+const toolCalls = await storeMemory.toolCalls;
+if (toolCalls && toolCalls.length > 0) {
+  console.log('\n\nTool calls made:');
+  for (const toolCall of toolCalls) {
+    console.log(`- ${toolCall.toolName}:`, JSON.stringify(toolCall, null, 2));
+  }
+}
+
+await storeMemory.text;
+
+// Later, retrieve and use the memory
+const retrieveMemory = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: `What are the preferences for user ${userId}?`,
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true)
+});
+
+for await (const chunk of retrieveMemory.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+### Chat Assistant with Context and Memory
+
+A complete chat assistant that uses both context and memory:
+
+```ts chatAssistant.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+async function chatWithAssistant(userMessage: string, userId: string) {
+  const result = await streamText({
+    model: openai('gpt-4o-mini'),
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a helpful assistant with access to company knowledge and user preferences.'
+      },
+      {
+        role: 'user',
+        content: userMessage
+      }
+    ],
+    tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true) // Both context and memory
+  });
+
+  // Stream the response
+  let response = '';
+  for await (const chunk of result.textStream) {
+    process.stdout.write(chunk);
+    response += chunk;
+  }
+
+  // Check for tool calls
+  const toolCalls = await result.toolCalls;
+  if (toolCalls) {
+    console.log('\n\n[Tools used:', toolCalls.map(t => t.toolName).join(', '), ']');
+  }
+
+  return response;
+}
+
+// Example usage
+await chatWithAssistant("who is rohan?", "user_123");
+```
+
+### Tool Configuration Options
+
+Control which tools are available:
+
+```ts toolConfiguration.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// Only context tools (search, add, delete context)
+const contextOnly = alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false);
+
+// Only memory tools (add, delete memory)
+const memoryOnly = alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true);
+
+// Both context and memory (default)
+const both = alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true);
+
+// Use context-only for knowledge base queries
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Search our documentation for API examples",
+  tools: contextOnly
+});
+```
 </Tab>
 
 <Tab title="As MCP Tool (experimental)" icon="plug">
