@@ -16,6 +16,701 @@
     }
   ],
   "paths": {
+    "/api/v1/context/add-async/{id}/cancel": {
+      "delete": {
+        "summary": "Cancel a context add job",
+        "description": "Attempts to cancel a context add job by job id.\n- If the job is already completed or failed, returns 404.\n- If the job is currently running (\"active\"), returns 409 and cannot be cancelled.\n- Only jobs in \"waiting\" or \"delayed\" state can be cancelled.\n",
+        "tags": [
+          "context"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID to cancel"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "jobId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid job id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: insufficient scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found or already completed/failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Job is currently running and cannot be cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/context/add-async/{id}/status": {
+      "get": {
+        "summary": "Get status of a context add job",
+        "description": "Returns the status and result of a context add job by job id.",
+        "tags": [
+          "context"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job ID to check status for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job status and result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "jobId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "result": {
+                      "type": "object"
+                    },
+                    "attemptsMade": {
+                      "type": "number"
+                    },
+                    "failedReason": {
+                      "type": "string"
+                    },
+                    "finishedOn": {
+                      "type": "number"
+                    },
+                    "processedOn": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid job id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/context/add-async": {
+      "post": {
+        "summary": "Add context data to the context processor",
+        "description": "This endpoint accepts context data and sends it to a context processor for further handling. It returns a success or error response depending on the result from the context processor.",
+        "tags": [
+          "context"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string",
+                          "description": "The content of the document"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "Array of documents with content and additional metadata"
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "The source of the context data"
+                  },
+                  "context_type": {
+                    "type": "string",
+                    "enum": [
+                      "resource",
+                      "conversation",
+                      "instruction"
+                    ],
+                    "description": "Type of context being added"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "internal",
+                      "external"
+                    ],
+                    "default": "internal",
+                    "description": "Scope of the context"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "Additional metadata for the context",
+                    "properties": {
+                      "fileName": {
+                        "type": "string",
+                        "description": "Name of the file"
+                      },
+                      "fileType": {
+                        "type": "string",
+                        "description": "Type/MIME of the file"
+                      },
+                      "groupName": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Array of Group Name to which the file belongs to"
+                      },
+                      "lastModified": {
+                        "type": "string",
+                        "description": "Last modified timestamp"
+                      },
+                      "fileSize": {
+                        "type": "number",
+                        "description": "Size of the file in bytes"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "documents": [
+                  {
+                    "content": "Customer asked about pricing for the Scale plan.",
+                    "containerTag": "support-emails",
+                    "ticketId": "TCK-1234"
+                  }
+                ],
+                "source": "support-inbox",
+                "context_type": "resource",
+                "scope": "internal",
+                "metadata": {
+                  "fileName": "support_thread_TCK-1234.txt",
+                  "fileType": "text/plain",
+                  "groupName": [
+                    "support",
+                    "pricing"
+                  ],
+                  "lastModified": "2025-01-10T12:34:56.000Z",
+                  "fileSize": 2048
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Context added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "queued": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "jobId": {
+                      "type": "string",
+                      "example": "context-add-123456"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request – Invalid or missing context data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Error details"
+                    },
+                    "status": {
+                      "type": "number",
+                      "example": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized – User is not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required - User does not have enough credits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not have required scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Invalid context data format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/context/add-async/status": {
+      "get": {
+        "summary": "List all ongoing context add jobs for the authenticated user",
+        "description": "Returns all jobs (active, waiting, delayed) belonging to the authenticated user.",
+        "tags": [
+          "context"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "active",
+                "failed",
+                "completed"
+              ],
+              "default": "all"
+            },
+            "description": "Type of jobs to list",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "string",
+              "default": "100"
+            },
+            "description": "Maximum number of jobs to return",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "string",
+              "default": "0"
+            },
+            "description": "Number of jobs to skip before starting to collect the result set",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "jobId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "attemptsMade": {
+                            "type": "number"
+                          },
+                          "failedReason": {
+                            "type": "string"
+                          },
+                          "finishedOn": {
+                            "type": "number"
+                          },
+                          "processedOn": {
+                            "type": "number"
+                          },
+                          "data": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/context/add": {
       "post": {
         "summary": "Add context data to the context processor",
@@ -588,8 +1283,7 @@
                     "minimum": 0,
                     "maximum": 1,
                     "description": "Minimum similarity threshold",
-                    "example": 0.5,
-                    "deprecated": true
+                    "example": 0.5
                   },
                   "scope": {
                     "type": "string",
@@ -952,6 +1646,26 @@
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "file_name",
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "description": "Name of the file to retrieve context for"
+          },
+          {
+            "in": "query",
+            "name": "magic_key",
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "description": "Magic key for context retrieval"
           }
         ],
         "responses": {

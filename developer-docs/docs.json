@@ -188,6 +188,10 @@
             "group": "Endpoint examples",
             "pages": [
               "api-reference/endpoint/api/v1/context/add/post",
+              "api-reference/endpoint/api/v1/context/add-async/post",
+              "api-reference/endpoint/api/v1/context/add-async/status/get",
+              "api-reference/endpoint/api/v1/context/add-async/{id}/cancel/delete",
+              "api-reference/endpoint/api/v1/context/add-async/{id}/status/get",
               "api-reference/endpoint/api/v1/context/delete/post",
               "api-reference/endpoint/api/v1/context/memory/add/post",
               "api-reference/endpoint/api/v1/context/memory/delete/post",
