@@ -177,6 +177,7 @@
       },
       {
         "tab": "API reference",
+        "icon": "code",
         "groups": [
           {
             "group": "API documentation",
@@ -202,6 +203,24 @@
               "api-reference/endpoint/api/v1/context/view/docs/get",
               "api-reference/endpoint/api/v1/context/view/get",
               "api-reference/endpoint/api/v1/org/context/view/post"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "icon": "list",
+        "groups": [
+          {
+            "group": "Summary",
+            "pages": [
+              "changelog/index"
+            ]
+          },
+          {
+            "group": "December",
+            "pages": [
+              "changelog/december/index"
             ]
           }
         ]
