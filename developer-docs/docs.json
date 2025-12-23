@@ -210,19 +210,9 @@
       {
         "tab": "Changelog",
         "icon": "list",
-        "groups": [
-          {
-            "group": "Updates",
-            "pages": [
-              "changelog/index"
-            ]
-          },
-          {
-            "group": "changelog",
-            "pages": [
-              "changelog/platform/index"
-            ]
-          }
+        "pages": [
+          "changelog/index",
+          "changelog/platform/index"
         ]
       }
     ],
