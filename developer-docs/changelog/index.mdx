@@ -3,22 +3,15 @@ title: Overview
 description: Key platform, performance, and developer experience updates.
 ---
 
-Past few months (oct - dec, 2025), we focused on strengthening the **context layer**, improving performance and developer experience across the platform.
+Past couple of months (Oct - Dec, 2025), we focused on strengthening the **context layer**, improving performance and developer experience across the platform.
 
-### The milestones we reached 
-- **ingestion speed and reliability**
-  - Introduced add-async routes adding a job queue for faster upload without blocking.
-- **UI revamp**
-  - Simplified navigation and workflows to make core features easier and faster to use.
-- **Retrival speed**
-  - Reduced  retrieval time by **~71%** (from ~7s to ~2s)
-  - Improved fast mode latency by **~57%** (from ~400ms to ~170ms) 
+### The milestones we reached
+- **Ingestion Speed and reliability**
+  - We toiled at improving our ingestion speed as much as possible, and will continue doing so. We improved our upload times by around 37% for large documents, and by >70% over short conversations. Exact numbers may vary, and so do the speedups; but they are definitely there!
+- **UI Revamp**
+  - We simplified navigation and workflows to make core features easier and faster to use. Onboarding experience is shorter and smoother, whether you're a user trying to make ChatGPT remember stuff, or an experienced developer incorporating context to your AI agent!
+- **Retrieval speed**
+  - Reduced **ranked** retrieval time (radius: 10k data points) by **~71%** (from ~4s to ~1.14s)
+  - Improved latency for `fast` mode by **~57%** (from p50 ~400ms to p50 ~170ms)
 - **Introduced Namespaces**
   - Group and scope data under named namespaces for precise, controlled context retrieval.
-
-
----
-
-retrival time - 7s to 2s
-fast mode - 400ms to 170ms
-grouping metadata
