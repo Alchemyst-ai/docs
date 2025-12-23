@@ -212,15 +212,15 @@
         "icon": "list",
         "groups": [
           {
-            "group": "Summary",
+            "group": "Updates",
             "pages": [
               "changelog/index"
             ]
           },
           {
-            "group": "December",
+            "group": "changelog",
             "pages": [
-              "changelog/december/index"
+              "changelog/platform/index"
             ]
           }
         ]
