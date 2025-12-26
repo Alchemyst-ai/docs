@@ -1,7 +1,8 @@
 ---
-title: 'Typescript SDK'
+title: Typescript SDK
 description: 'Get started with the Alchemyst Typescript SDK'
 ---
+
 ### Installation
 
 
@@ -60,23 +61,34 @@ const client = new AlchemystAI({
     apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-await client.v1.context.add({
-  documents: [
-            {
-              content: 'The content of the document',
+try {
+    await client.v1.context.add({
+       // [REQUIRED] The actual data to embed
+      documents: [
+                {
+                  content: 'The content of the document',
+                },
+              ],
+              // [REQUIRED] System classifications
+              context_type: 'resource',
+              source: 'web-upload',
+              scope: 'internal',
+
+              // [OPTIONAL] Can be null. Use for filtering later.
+              metadata: {
+                fileName: 'notes.txt',
+                fileType: 'text/plain',
+                lastModified: new Date().toISOString(),
+                fileSize: 1024,
+                groupName: ['group1', 'group2'],
             },
-          ],
-          context_type: 'resource',
-          source: 'web-upload',
-          scope: 'internal',
-          metadata: {
-            fileName: 'notes.txt',
-            fileType: 'text/plain',
-            lastModified: new Date().toISOString(),
-            fileSize: 1024,
-            groupName: ['group1', 'group2'],
-        },
-});
+    });
+    console.log("Context successfully added.")
+    
+} catch (error) {
+    //Handles validation error (eg. missing required fields like 'documents')
+    console.error("Error adding context:", error)    
+}
 ```
 
 <Warning>
@@ -99,23 +111,31 @@ await client.v1.context.add({
 import AlchemystAI from '@alchemystai/sdk';
 
 const client = new AlchemystAI({
-    apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-const { contexts } = await client.v1.context.search({
-        query: 'Your search query here',
-        similarity_threshold: 0.8,
-        minimum_similarity_threshold: 0.5,
-        scope: 'internal',
-        body_metadata: {          // Optional - can be null
-            size: 100,
-            fileType: 'ai/conversation',
-            fileName: 'chatgpt-convo-1',
-            groupName: ['project-name']
-        },
-});
+try {
+  const { contexts } = await client.v1.context.search({
 
-console.log(contexts);
+    // [REQUIRED] Core search parameters
+    query: 'Your search query here',
+    similarity_threshold: 0.8,
+    minimum_similarity_threshold: 0.5,
+    scope: 'internal',
+
+    // Optional - can be null
+    body_metadata: {
+       groupName: ['project-alpha'],
+       fileType: 'ai/conversation',
+    },
+  });
+
+  console.log(contexts);
+
+} 
+catch (error) {
+  console.error("Search failed:", error);
+}
 ```
 
 #### Context: Delete
@@ -124,16 +144,28 @@ console.log(contexts);
 import AlchemystAI from '@alchemystai/sdk';
 
 const client = new AlchemystAI({
-    apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-await client.v1.context.delete({
-  source: 'web-upload',
-  user_id: 'your_user_id',          // optional
-  organization_id: 'your_organization_id',  // optional
-  by_doc: true,                // optional
-  by_id: false,                // optional
-});
+try {
+  await client.v1.context.delete({
+    // [REQUIRED] Must specify the source to delete from
+    source: 'web-upload',
+    
+    // [OPTIONAL] Target specific users or organizations
+    user_id: 'your_user_id', 
+    organization_id: 'your_organization_id',
+    
+    // [REQUIRED] Flags to specify deletion scope (must set one)
+    by_doc: true,
+    by_id: false,
+  });
+
+  console.log("Context deleted successfully.");
+
+} catch (error) {
+  console.error("Failed to delete context:", error);
+}
 ```
 
 #### Context: View (per-user)
@@ -145,7 +177,13 @@ const client = new AlchemystAI({
     apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-const docs = await client.v1.context.view.docs();
+try {
+    // Retrieves context specific to the authenticated user
+    const docs = await client.v1.context.view.docs();
+    console.log("User docs retrieved:", docs)
+} catch (error) {
+    console.error("Could not retrieve user docs:", error)
+}
 ```
 
 <Note>
@@ -158,12 +196,24 @@ const docs = await client.v1.context.view.docs();
 import AlchemystAI from '@alchemystai/sdk';
 
 const client = new AlchemystAI({
-    apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-const { traces } = await client.v1.context.traces.list();
+try {
+  // List all traces
+  const { traces } = await client.v1.context.traces.list();
+  console.log("Traces found:", traces);
 
-await client.v1.context.traces.delete('traceId');
+  // Example: Delete a specific trace
+  if (traces.length > 0) {
+     const traceId = traces[0].id;
+     await client.v1.context.traces.delete(traceId);
+     console.log(`Trace ${traceId} deleted.`);
+  }
+
+} catch (error) {
+  console.error("Error managing traces:", error.message);
+}
 ```
 
 #### Organization: View Context
@@ -172,14 +222,46 @@ await client.v1.context.traces.delete('traceId');
 import AlchemystAI from '@alchemystai/sdk';
 
 const client = new AlchemystAI({
-    apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-const res = await client.v1.org.context.view({
-  userIds: ['your_user_id', 'your_user_id_2'],
-});
+try {
+  // Retrieves context for specific users within the organization
+  const res = await client.v1.org.context.view({
+    userIds: ['user_123', 'user_456'],
+  });
+  
+  console.log("Organization context retrieved:", res);
+
+} catch (error) {
+  console.error("Organization view failed:", error);
+}
 ```
 
 <Note>
   **Organization View**: This endpoint allows you to fetch context based on specific user IDs within your organization.
 </Note>
+
+## Technical Reference
+
+### Troubleshooting & "First Aid"
+
+| Status Code | Error Type | Common Cause | Recommended Fix |
+| :--- | :--- | :--- | :--- |
+| **400** | `BadRequest` | Invalid JSON or missing required fields (e.g., `source`). | Validate your payload against the schema. Ensure `documents` array is not empty. |
+| **401** | `Unauthorized` | Invalid or missing `ALCHEMYST_AI_API_KEY`. | Check your `.env` file. Ensure you aren't using a Test key in Prod. |
+| **403** | `Forbidden` | Accessing a `scope` (e.g., `user_123`) you don't have permission for. | Verify the `user_id` matches the authenticated session. |
+| **413** | `PayloadTooLarge` | Document exceeds the 50MB limit or batch size > 100. | Split your `documents` array into chunks of 50 and retry. |
+| **429** | `RateLimit` | Exceeded 1000 requests/minute. | Implement exponential backoff (default in SDK). Contact support for limits. |
+| **422** | `Unprocessable` | The file type provided in `metadata` matches `source` but content is unparseable. | Ensure `fileType` matches the actual binary content (e.g., don't send PDF bytes as `text/plain`). |
+
+### Platform Limits
+
+| Feature | Limit / Specification |
+| :--- | :--- |
+| **Max File Size** | 50 MB per document |
+| **Max Batch Size** | 100 documents per `add()` request |
+| **Supported File Types** | `.pdf`, `.txt`, `.docx`, `.md`, `.json`, `.csv` |
+| **Token Limit** | 8,192 tokens per document chunk |
+| **Metadata Fields** | Max 20 keys per document; Values must be `string` or `number` |
+| **Indexing Speed** | ~120 records/sec (Text), ~5 sec/page (OCR PDF) |
