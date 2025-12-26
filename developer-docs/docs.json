@@ -26,6 +26,20 @@
   "navigation": {
     "tabs": [
       {
+        "tab": "Concepts",
+        "icon": "lightbulb",
+        "groups": [
+         {
+            "group": "AI Context",
+            "pages": [
+              "ai-context/what-is-ai-context",
+              "ai-context/why-you-need-ai-context",
+              "ai-context/how-alchemyst-works"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Guides",
         "icon": "book",
         "groups": [
@@ -46,14 +60,6 @@
               "tutorials/mcp-setup",
               "tutorials/chrome-extension",
               "tutorials/n8n-automation"
-            ]
-          },
-           {
-            "group": "AI Context",
-            "pages": [
-              "ai-context/what-is-ai-context",
-              "ai-context/why-you-need-ai-context",
-              "ai-context/how-alchemyst-works"
             ]
           },
           {
