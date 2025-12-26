@@ -26,20 +26,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Concepts",
-        "icon": "lightbulb",
-        "groups": [
-         {
-            "group": "AI Context",
-            "pages": [
-              "ai-context/what-is-ai-context",
-              "ai-context/why-you-need-ai-context",
-              "ai-context/how-alchemyst-works"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Guides",
         "icon": "book",
         "groups": [
@@ -76,6 +62,20 @@
           }
         ]
       },
+       {
+        "tab": "Concepts",
+        "icon": "lightbulb",
+        "groups": [
+         {
+            "group": "Concepts",
+            "pages": [
+              "ai-context/what-is-ai-context",
+              "ai-context/why-you-need-ai-context",
+              "ai-context/how-alchemyst-works"
+            ]
+          }
+        ]
+      },
       {
         "tab": "Cookbook",
         "icon": "utensils",
@@ -84,6 +84,7 @@
                 "group": "By our team",
                 "expanded": true,
                 "pages": [
+                  "example-projects/team/cli-chatbot",
                   "example-projects/team/syllabai",
                   "example-projects/team/zendocs"
                 ]

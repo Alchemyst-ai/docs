@@ -1,42 +1,72 @@
 ---
 title: "Introduction"
-description: "Get started with AI context in general, and Alchemyst in particular."
+description: "Understand AI context, memory, and how Alchemyst helps you build reliable, context-aware LLMs and agents."
 ---
 
 ## Overview
 
-Alchemyst is the context cloud for LLMs and AI agents, a unified platform that helps developers build, integrate, and scale context-aware AI applications. Whether you are enhancing an existing workflow, building a new intelligent product, or exploring research prototypes, Alchemyst provides the memory, tooling, and integrations required to make AI systems more accurate, relevant, and maintainable.
+Alchemyst is the **context layer for LLMs and AI agents**.  
+It helps you store, retrieve, and apply context so AI systems stay accurate, relevant, and consistent over time.
 
-Key outcomes you can expect from Alchemyst:
+If you’ve ever struggled with:
+- Stateless LLM responses  
+- Prompt stuffing  
+- Fragile RAG pipelines  
+- Agents that forget users or past actions  
 
-- **Aggregate and enrich data** from diverse sources, making it accessible to LLMs and agents in real time.
-- **Maintain persistent, context-aware memory** to enhance reasoning, retrieval, and generation.
-- **Orchestrate complex workflows** by connecting specialized frameworks, libraries, and platforms.
-- **Deploy modular, scalable AI solutions** that are easy to maintain and extend.
+Alchemyst is built to solve exactly that.
 
----
+## What problem does Alchemyst solve?
+
+Large language models don’t remember anything by default.
+
+Every request starts from scratch unless you:
+- Manually inject context  
+- Rebuild memory systems  
+- Orchestrate retrieval logic yourself  
+
+This quickly becomes brittle, expensive, and hard to scale.
+
+**Alchemyst makes context a first-class system capability.**
+
 
 ## What is Alchemyst?
 
-Alchemyst is a developer-first platform focused on AI context management and runtime orchestration. It offers:
+Alchemyst is a **developer-first platform for AI context management**.
 
-- **Context management**: Store, index, and retrieve context in ways that improve model outputs.
-- **SDKs & APIs**: Official SDKs for Python and TypeScript plus a rich REST API surface for other languages and environments.
-- **Integration tooling**: Built-in connectors and examples for popular tools and editors to accelerate development.
-- **Sample projects & best practices**: Real-world examples you can adapt to jumpstart your work
+It gives you a reliable way to:
+- Store application, user, and workflow context as raw facts
+- Retrieve the most relevant information based on query
+- Feed that context into LLMs and agents
+
+All without writing custom memory or retrieval infrastructure.
 
 
-## Why Alchemyst?
+## What you can do with Alchemyst
 
-- **Boost AI accuracy and relevance** by giving your models the context they need.
-- **Accelerate development** with robust SDKs for Python and TypeScript.
-- **Integrate seamlessly** with popular tools like VS Code, GitHub Copilot, and more.
-- **Leverage real-world examples** and best practices from our community and team projects.
+- **Persist memory across sessions**  
+  Give agents long-term memory without prompt hacks.
 
+- **Retrieve relevant context on demand**  
+  Search and fetch only what matters for a given request.
+
+- **Build reliable AI agents**  
+  Create agents that behave consistently and deterministically.
+
+- **Scale from prototype to production**  
+  Use the same system for experiments, products, and enterprise workloads.
+
+
+## Why use Alchemyst instead of rolling your own?
+
+- **Cleaner architecture** – No custom vector plumbing or brittle glue code  
+- **Better AI outputs** – Models respond using relevant, grounded context  
+- **Faster development** – Official SDKs for Python and TypeScript  
+- **Production-ready** – Built for real workloads, not demos  
 
 ## How Alchemyst works
 
-Alchemyst acts as an intelligent layer between your user's raw data and your LLM.
+Alchemyst sits between your data and your LLM.
 
 ```mermaid
 flowchart LR
@@ -46,89 +76,51 @@ flowchart LR
     classDef store fill:#2d3436,stroke:#ff9f43,stroke-width:2px,color:#fff;
     linkStyle default stroke:#ff9f43,stroke-width:2px;
 
-    A[User Data]:::node -->|Upload| B(Alchemyst Engine):::engine
-    B -->|1. Chunking| C[(Vector Store)]:::store
-    B -->|2. Graphing| D[(Knowledge Graph)]:::store
-    
-    E[User Query]:::node -->|Search| B
-    B -->|Retrieves & Augments| F[LLM]:::node
-    
-    C -.->|Context| F
-    D -.->|Context| F
-    
-    F --> G[AI Response]:::node
+    A[Your App or Data] -->|Store context| B[Alchemyst]:::engine
+    D[User Request] -->|Search context| B
+    B -->|Relevant context| E[Your App or Agent]
+    E -->|Prompt + Context| F[LLM]
+    F --> G[Response]
 ```
 
-- **Ingest**: Bring data from databases, files, user interactions, and external APIs.
-- **Enrich & Index**: Normalize and enrich data, then index it for fast retrieval by your agents or LLM prompts.
-- **Serve context**: Provide contextual snippets and memories to models at inference time.
-- **Orchestrate**: Chain tools and services to create deterministic workflows and agent behaviors.
-- **Persist & Evolve**: Store user- or application-level memory that can be updated and audited over time.
+## The flow is simple
+
+**Ingest context**  
+Store data from users, files, APIs, or application events.
+
+**Index and organize**  
+Context is structured for fast, relevant retrieval.
+
+**Search when needed**  
+Retrieve only the most useful context for a request.
+
+**Use with LLMs or agents**  
+Pass retrieved context into prompts or agent logic.
+
+**Persist and evolve**  
+Update memory as users and workflows change.
+
+
+## Who is this for?
+
+Alchemyst is built for:
+- Developers building AI agents  
+- Teams shipping LLM-powered products  
+- Engineers tired of fragile context pipelines  
+
+If you’re building with LLMs in production, you’re in the right place.
+
+---
+
+## Next steps
+
+Start with the fastest path to value:
+
+- [**Quick Start**](quickstart) – Store and reuse context in minutes  
+- [**Cookbooks & Examples**](example-projects/team/syllabai) – Real projects built by the community  
+- [**Concepts**](ai-context/what-is-ai-context) – Learn more about context, memory, and alchemyst
+
+When you’re ready, head to the **Quick Start** and build your first context-aware application.
 
 
 
-## Get Started
-
-Everything you need to create world-class, context-driven AI applications:
-
-<Columns cols={2}>
-  <Card
-    title="Python SDK"
-    icon="python"
-    href="/integrations/sdk/python-sdk"
-    horizontal
-  >
-    Build with Python
-  </Card>
-  <Card
-    title="TypeScript SDK"
-    icon="js"
-    href="/integrations/sdk/typescript-sdk"
-    horizontal
-  >
-    Build with TypeScript
-  </Card>
-  <Card
-    title="AI Tools & MCP Setup"
-    icon="robot"
-    href="/mcps/introduction"
-    horizontal
-  >
-    Integrate with AI tools and Model Context Protocol
-  </Card>
-  <Card
-    title="API Reference"
-    icon="terminal"
-    href="/api-reference/introduction"
-    horizontal
-  >
-    Explore the full API documentation
-  </Card>
-</Columns>
-
-## Explore Further
-
-<Columns cols={2}>
-  <Card
-    title="Sample Projects"
-    icon="code"
-    href="/example-projects"
-  >
-    See real-world code and implementation patterns.
-  </Card>
-  <Card
-    title="Cookbook"
-    icon="book"
-    href="https://github.com/alchemyst-ai/awesome-saas"
-  >
-    Explore full-fledged projects built on top of our platform.
-  </Card>
-</Columns>
-
-## Need Help?
-
-If you get stuck or want to share feedback:
-
-- Browse the **Guides** and **API docs** on this site.
-- Search the documentation for targeted answers.
-- Join our [Discord server](https://dub.sh/context-community) for real-time help.

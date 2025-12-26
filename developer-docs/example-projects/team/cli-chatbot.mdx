@@ -1,0 +1,159 @@
+---
+title:  CLI Agent
+description: Build a Context-Aware CLI tool that answers questions using stored context from Alchemyst and Gemini.
+---
+
+## What it does :
+- Accepts questions from the terminal
+- Searches Alchemyst for relevant stored context
+- Injects that context into the prompt
+- Generates grounded responses using an LLM
+
+This pattern is ideal for **developer tools, internal assistants, and debugging workflows**.
+
+### Repo link
+The full source code for this CLI agent is also available in our public repository.  
+It includes this **Node.js implementation** as well as a **Python version** of the same context-aware agent.
+
+If you prefer Python, you can use that implementation directly or adapt it to your workflow.
+
+View the repository: 
+- [python](https://github.com/Alchemyst-ai/awesome-saas/tree/main/agents/alchemystai-python-SDK)
+- [typescript](https://github.com/Alchemyst-ai/awesome-saas/tree/main/agents/alchemystai-ts-SDK)
+
+## Prerequisites
+
+You’ll need:
+- Node.js 18+
+- An Alchemyst AI API key
+- A Google Gemini API key
+
+## 1. Set your environment variables:
+
+```bash
+export ALCHEMYST_AI_API_KEY=your_key_here
+export GEMINI_API_KEY=your_key_here
+```
+
+### How it works
+
+The flow is simple:
+
+- **Accept a user question** from the CLI  
+- **Search Alchemyst** for relevant context  
+- **Inject retrieved context** into the LLM prompt  
+- **Generate and display** the response  
+
+If no relevant context is found, the agent falls back to general model knowledge.
+
+## 2.Install dependencies
+
+```bash
+npm install @alchemystai/sdk @google/generative-ai dotenv
+```
+
+## 3.Add the code
+
+```ts
+import AlchemystAI from '@alchemystai/sdk';
+import * as readline from 'readline';
+import 'dotenv/config';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const client = new AlchemystAI({
+  apiKey: process.env.ALCHEMYST_AI_API_KEY || '',
+});
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+const askQuestion = (prompt: string): Promise<string> => {
+  return new Promise((resolve) => {
+    rl.question(prompt, (answer) => resolve(answer));
+  });
+};
+
+async function runCLI() {
+  console.log('Alchemyst AI CLI Tool');
+  console.log('Type your questions and get AI-powered answers with context!');
+  console.log('Type "exit", "quit", or "bye" to stop.\n');
+
+  if (!process.env.ALCHEMYST_AI_API_KEY || !process.env.GEMINI_API_KEY) {
+    console.error('Missing required environment variables.');
+    process.exit(1);
+  }
+
+  while (true) {
+    const userQuestion = await askQuestion('Ask me anything: ');
+
+    if (['exit', 'quit', 'bye', 'stop'].includes(userQuestion.toLowerCase().trim())) {
+      console.log('Goodbye!');
+      break;
+    }
+
+    if (!userQuestion.trim()) {
+      console.log(' Please enter a question.\n');
+      continue;
+    }
+
+    console.log('Searching for relevant context...');
+
+    const { contexts } = await client.v1.context.search({
+      query: userQuestion,
+      similarity_threshold: 0.8,
+      minimum_similarity_threshold: 0.5,
+      scope: 'internal',
+    });
+
+    let promptText = userQuestion;
+
+    if (contexts && contexts.length > 0) {
+      const formattedContexts = contexts
+        .map((c, i) => `Context ${i + 1}: ${c.content}`)
+        .join('\n\n');
+
+      promptText = `
+Based on the following context, answer the question.
+If the context is insufficient, say so clearly.
+
+Contexts:
+${formattedContexts}
+
+Question: ${userQuestion}
+`;
+    }
+
+    console.log('Generating response...');
+    const result = await model.generateContent(promptText);
+    console.log(result.response.text());
+    console.log('\n' + '─'.repeat(50) + '\n');
+  }
+
+  rl.close();
+}
+
+runCLI();
+
+```
+
+## 4. Run the code
+
+```bash
+node index.js
+```
+
+## Build Beyond the CLI
+
+You’ve built a foundational context-aware agent, but this is just the beginning. The Alchemyst AI platform is designed to be the "brain" of your larger systems. From here, you can extend this pattern to:
+
+**Persistent Memory**: Enable long-term recall by saving user preferences in dedicated namespaces.
+
+**Knowledge Ingestion**: Connect your agent to PDFs, GitHub repos, or Slack history for deep domain expertise.
+
+**Serverless Agents**: Wrap this logic in a FastAPI or Next.js route to power a web-based AI microservice.
+

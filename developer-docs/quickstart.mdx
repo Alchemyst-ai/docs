@@ -3,7 +3,150 @@ title: "Quickstart"
 description: "Start building awesome AI systems in minutes"
 ---
 
-## Setting up
+## Add Context to Alchemyst AI
+
+This guide shows you how to **store context in Alchemyst AI and reuse it in your LLM or agent** - step by step.
+
+
+## What you’ll build
+
+By the end of this guide, you will:
+- Store context (memory) in Alchemyst
+- Reuse that context in future requests
+- Understand what Alchemyst handles for you vs what you control
+
+
+## Prerequisites
+
+You’ll need:
+- An Alchemyst AI account - [sign up](https://platform.getalchemystai.com)
+- Your `ALCHEMYST_AI_API_KEY`
+- Python 3.9+ or Node.js 18+
+
+---
+
+## Step 1: Install the SDK
+
+<CodeGroup>
+```bash node 
+npm install alchemyst-ai
+```
+```bash python
+pip install alchemyst-ai
+```
+</CodeGroup>
+
+## Step 2: Initialize the client
+<CodeGroup>
+
+```javascript ts
+import AlchemystAI from '@alchemystai/sdk';
+
+const client = new AlchemystAI({
+    apiKey: process.env.ALCHEMYST_AI_API_KEY,
+});
+```
+
+```python python
+import os
+from alchemyst_ai import AlchemystAI
+
+client = AlchemystAI(
+    api_key=os.environ.get("ALCHEMYST_AI_API_KEY"),  
+)
+```
+
+</CodeGroup>
+
+## Step 3: Add context (store memory)
+
+This step persists information so it can be reused later.
+
+<CodeGroup>
+
+```javascript ts
+    await client.v1.context.add({
+       // [REQUIRED] The actual data to embed
+      documents: [
+                {
+                  content: 'The content of the document',
+                },
+              ],
+              // [REQUIRED] System classifications
+              context_type: 'resource',
+              source: 'web-upload',
+              scope: 'internal',
+
+              // [OPTIONAL] Can be null. Use for filtering later.
+              metadata: {
+                fileName: 'notes.txt',
+                fileType: 'text/plain',
+                lastModified: new Date().toISOString(),
+                fileSize: 1024,
+                groupName: ['group1', 'group2'],
+            },
+    });
+    console.log("Context successfully added.")
+
+```
+
+```python python
+docs_array = []
+
+docs_array.append({
+    "content": "files content",
+    "metadata": {   # optional
+        "file_name": "file_name",
+        "file_type": "pdf/txt/json",
+        "group_name": ["group1", "group2"]
+    }
+})
+
+# Add documents to context
+response = client.v1.context.add(
+    documents=docs_array,
+    source="source of context data",
+    context_type="resource",   # one of: resource | conversation | instruction
+    scope="internal",          # one of: internal | external
+    metadata={
+        "file_name": "name of the file",
+        "file_type": "type",
+        "last_modified": "timestamp",
+        "file_size": 1234,   # number
+        "group_name": ["group1", "group2"]
+    }
+)
+```
+
+</CodeGroup>
+
+### What just happened?
+
+- The data was stored in Alchemyst’s [context layer](https://platform.getalchemystai.com/context) 
+- It can be used to search query and provide llm with relevant context
+
+
+## Step 4: Use stored context in an LLM request
+
+By using the [Search Context](/integrations/sdk/typescript-sdk#context%3A-search) endpoint, you turn stored data into live intelligence. Instead of guessing what to include in prompts, you explicitly search for relevant context, and pass them directly to the LLM at inference time. 
+
+
+That's it you are all set.
+
+#### What Alchemyst does automatically
+
+- Stores context securely
+- Retrieves relevant memory
+- keeps behavior consistent across sessions
+
+#### You don’t need:
+
+- Custom vector stores
+- Prompt stuffing
+- Memory orchestration logic
+
+
+## Next Steps: Go Deeper with the SDK & APIs
 
 Get up and running with our dedicated SDKs or integrate directly via our API.
 
@@ -42,9 +185,9 @@ Get up and running with our dedicated SDKs or integrate directly via our API.
   </Card>
 </Columns>
 
-## Ready to get started?
+## Cookbooks & Community Examples
 
-Everything you need to create Smart AI Agents.
+Step-by-step cookbooks and real projects from the community to help you build faster with Alchemyst.
 
 <Columns cols={2}>
   <Card
