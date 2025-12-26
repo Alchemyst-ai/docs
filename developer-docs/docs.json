@@ -34,28 +34,26 @@
             "pages": []
           },
           {
-            "group": "AI Context",
-            "pages": [
-              "ai-context/what-is-ai-context",
-              "ai-context/why-you-need-ai-context",
-              "ai-context/how-alchemyst-works"
-            ]
-          },
-          {
             "group": "Getting started",
             "pages": [
-              "index",
-              "quickstart"
+              "quickstart",
+              "index"
             ]
           },
           {
             "group": "Tutorials",
             "pages": [
               "tutorials/mcp-setup",
-              "tutorials/typescript-agent",
-              "tutorials/python-agent",
               "tutorials/chrome-extension",
               "tutorials/n8n-automation"
+            ]
+          },
+           {
+            "group": "AI Context",
+            "pages": [
+              "ai-context/what-is-ai-context",
+              "ai-context/why-you-need-ai-context",
+              "ai-context/how-alchemyst-works"
             ]
           },
           {
@@ -69,17 +67,13 @@
             "pages": [
               "self-hosting/self-hosting"
             ]
-          },
-          {
-            "group": "Contributions",
-            "pages": [
-              "contribution/contributing",
-              "contribution/awesome-saas-repo"
-            ]
-          },
-          {
-            "group": "Sample Projects",
-            "pages": [
+          }
+        ]
+      },
+      {
+        "tab": "Cookbook",
+        "icon": "utensils",
+        "groups": [
               {
                 "group": "By our team",
                 "expanded": true,
@@ -94,9 +88,14 @@
                   "example-projects/community/discord-bot",
                   "example-projects/community/b2b-newsletter-writer"
                 ]
+              },  
+              {
+                "group": "Contributions",
+                "pages": [
+                  "contribution/contributing",
+                  "contribution/awesome-saas-repo"
+                ]
               }
-            ]
-          }
         ]
       },
       {
