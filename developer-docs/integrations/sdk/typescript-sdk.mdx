@@ -242,24 +242,7 @@ try {
   **Organization View**: This endpoint allows you to fetch context based on specific user IDs within your organization.
 </Note>
 
-### Troubleshooting & "First Aid"
+## Troubleshooting and Errors
 
-| Status Code | Error Type | Common Cause | Recommended Fix |
-| :--- | :--- | :--- | :--- |
-| **400** | `BadRequest` | Invalid JSON or missing required fields (e.g., `source`). | Validate your payload against the schema. Ensure `documents` array is not empty. |
-| **401** | `Unauthorized` | Invalid or missing `ALCHEMYST_AI_API_KEY`. | Check your `.env` file. Ensure you aren't using a Test key in Prod. |
-| **403** | `Forbidden` | Accessing a `scope` (e.g., `user_123`) you don't have permission for. | Verify the `user_id` matches the authenticated session. |
-| **413** | `PayloadTooLarge` | Document exceeds the 50MB limit or batch size > 100. | Split your `documents` array into chunks of 50 and retry. |
-| **429** | `RateLimit` | Exceeded 1000 requests/minute. | Implement exponential backoff (default in SDK). Contact support for limits. |
-| **422** | `Unprocessable` | The file type provided in `metadata` matches `source` but content is unparseable. | Ensure `fileType` matches the actual binary content (e.g., don't send PDF bytes as `text/plain`). |
+Errors while adding or searching documents usually relate to payload structure, limits, or permissions. Refer to the **Add Documents** and **Search Context** sections above for correct usage
 
-### Platform Limits
-
-| Feature | Limit / Specification |
-| :--- | :--- |
-| **Max File Size** | 50 MB per document |
-| **Max Batch Size** | 100 documents per `add()` request |
-| **Supported File Types** | `.pdf`, `.txt`, `.docx`, `.md`, `.json`, `.csv` |
-| **Token Limit** | 8,192 tokens per document chunk |
-| **Metadata Fields** | Max 20 keys per document; Values must be `string` or `number` |
-| **Indexing Speed** | ~120 records/sec (Text), ~5 sec/page (OCR PDF) |

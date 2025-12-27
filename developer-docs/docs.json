@@ -59,19 +59,11 @@
             "pages": [
               "self-hosting/self-hosting"
             ]
-          }
-        ]
-      },
-       {
-        "tab": "Concepts",
-        "icon": "lightbulb",
-        "groups": [
-         {
-            "group": "Concepts",
+          },
+          {
+            "group": "Troubleshoot",
             "pages": [
-              "ai-context/what-is-ai-context",
-              "ai-context/why-you-need-ai-context",
-              "ai-context/how-alchemyst-works"
+              "tutorials/troubleshoot"
             ]
           }
         ]
@@ -298,3 +290,4 @@
     }
   }
 }
+

@@ -13,7 +13,7 @@ This guide shows you how to **store context in Alchemyst AI and reuse it in your
 By the end of this guide, you will:
 - Store context (memory) in Alchemyst
 - Reuse that context in future requests
-- Understand what Alchemyst handles for you vs what you control
+- Retrieve relevant context and feed it to llms
 
 
 ## Prerequisites
@@ -28,69 +28,66 @@ You’ll need:
 ## Step 1: Install the SDK
 
 <CodeGroup>
-```bash node 
-npm install alchemyst-ai
-```
-```bash python
-pip install alchemyst-ai
-```
+  ```bash node
+  npm install alchemyst-ai
+  ```
+  ```bash python
+  pip install alchemyst-ai
+  ```
 </CodeGroup>
 
 ## Step 2: Initialize the client
 <CodeGroup>
 
-```javascript ts
-import AlchemystAI from '@alchemystai/sdk';
+  ```javascript ts
+  import AlchemystAI from '@alchemystai/sdk';
 
-const client = new AlchemystAI({
-    apiKey: process.env.ALCHEMYST_AI_API_KEY,
-});
-```
+  const client = new AlchemystAI({
+      apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  });
+  ```
 
-```python python
-import os
-from alchemyst_ai import AlchemystAI
+  ```python python
+  import os
+  from alchemyst_ai import AlchemystAI
 
-client = AlchemystAI(
-    api_key=os.environ.get("ALCHEMYST_AI_API_KEY"),  
-)
-```
+  client = AlchemystAI(
+      api_key=os.environ.get("ALCHEMYST_AI_API_KEY"),
+  )
+  ```
 
 </CodeGroup>
 
-## Step 3: Add context (store memory)
+## Step 3 : Create documents array 
 
-This step persists information so it can be reused later.
+The ```documents``` array contains the raw content you want Alchemyst to store - documents, PDFs, and other sources must first be converted into text strings and then uploaded
 
 <CodeGroup>
 
-```javascript ts
-    await client.v1.context.add({
-       // [REQUIRED] The actual data to embed
-      documents: [
-                {
-                  content: 'The content of the document',
-                },
-              ],
-              // [REQUIRED] System classifications
-              context_type: 'resource',
-              source: 'web-upload',
-              scope: 'internal',
+  ```javascript ts
 
-              // [OPTIONAL] Can be null. Use for filtering later.
-              metadata: {
-                fileName: 'notes.txt',
-                fileType: 'text/plain',
-                lastModified: new Date().toISOString(),
-                fileSize: 1024,
-                groupName: ['group1', 'group2'],
-            },
-    });
-    console.log("Context successfully added.")
+interface AlchemystDocument {
+  content: string;
+  metadata?: { //optional
+    file_name?: string;
+    file_type?: string;
+    group_name?: string[];
+  };
+}
 
-```
+const docs_array: AlchemystDocument[] = [];
 
-```python python
+docs_array.push({
+  content: "files content",
+  metadata: {
+    file_name: "file_name",
+    file_type: "pdf/txt/json",
+    group_name: ["group1", "group2"],
+  },
+});
+  ```
+
+  ```python python
 docs_array = []
 
 docs_array.append({
@@ -101,37 +98,125 @@ docs_array.append({
         "group_name": ["group1", "group2"]
     }
 })
-
-# Add documents to context
-response = client.v1.context.add(
-    documents=docs_array,
-    source="source of context data",
-    context_type="resource",   # one of: resource | conversation | instruction
-    scope="internal",          # one of: internal | external
-    metadata={
-        "file_name": "name of the file",
-        "file_type": "type",
-        "last_modified": "timestamp",
-        "file_size": 1234,   # number
-        "group_name": ["group1", "group2"]
-    }
-)
 ```
+
+</CodeGroup>
+
+
+## Step 4: Add context (store memory)
+
+This step adds documents into the context processor which are then turned into nodes.
+
+<CodeGroup>
+
+  ```javascript ts
+  await client.v1.context.add({
+    documents:docs_array,
+    context_type: 'resource',  // one of: resource | conversation | instruction
+    source: 'web-upload',
+    scope: 'internal',     // one of: internal | external       
+      // [OPTIONAL] metadata can be null. Use for filtering later.
+    metadata: { 
+      fileName: 'notes.txt',
+      fileType: 'text/plain',
+      lastModified: new Date().toISOString(),
+      fileSize: 1024,
+      groupName: ['group1', 'group2'],
+    },
+  });
+  console.log("Context successfully added.")
+
+  ```
+
+  ```python python
+  # Add documents to context
+  response = client.v1.context.add(
+      documents=docs_array,
+      source="source of context data",
+      context_type="resource",   # one of: resource | conversation | instruction
+      scope="internal",          # one of: internal | external
+      metadata={                 # optional
+          "file_name": "name of the file",
+          "file_type": "type",
+          "last_modified": "timestamp",
+          "file_size": 1234,   # number
+          "group_name": ["group1", "group2"]
+      }
+  )
+  ```
 
 </CodeGroup>
 
 ### What just happened?
 
-- The data was stored in Alchemyst’s [context layer](https://platform.getalchemystai.com/context) 
+- The data was stored in Alchemyst’s [context layer](https://platform.getalchemystai.com/context)
 - It can be used to search query and provide llm with relevant context
 
 
-## Step 4: Use stored context in an LLM request
+## Step 5: Search through context 
 
-By using the [Search Context](/integrations/sdk/typescript-sdk#context%3A-search) endpoint, you turn stored data into live intelligence. Instead of guessing what to include in prompts, you explicitly search for relevant context, and pass them directly to the LLM at inference time. 
+Retrieve the most relevant stored context before invoking the model.
 
+<CodeGroup>
 
-That's it you are all set.
+  ```javascript ts
+    const { contexts } = await client.v1.context.search({
+        query: "user_query",
+        similarity_threshold: 0.8,
+        minimum_similarity_threshold: 0.5,
+        scope: 'internal',
+        metadata: null,
+    });
+  ```
+
+  ```python python
+    results = client.v1.context.search(
+        query=question,
+        similarity_threshold=0.8, 
+        minimum_similarity_threshold = 0.5,
+        scope = "internal",
+        metadata= None,
+    )
+
+    docs = results.contexts or []
+
+  ```
+
+</CodeGroup>
+
+## Step 6 : Ingest the retrieved context into llm prompts
+
+Convert the resolved context into a structured prompt before sending it to the LLM.
+
+<CodeGroup>
+
+  ```javascript ts
+  const promptText = contexts?.length ? `Use the context below to answer the question. If the context is insufficient, say so.
+        ${contexts.map((c, i) => `Context ${i + 1}: ${c.content ?? JSON.stringify(c)}`).join('\n\n')}
+        Question: ${userQuestion}`;
+
+  const result = await model.generateContent(promptText);
+
+  ```
+
+  ```python python
+  if docs:
+    context = "\n\n".join(
+        f"Context {i+1}: {getattr(doc, 'content', str(doc))}"
+        for i, doc in enumerate(docs)
+    )
+    prompt = f"""Use the context below to answer the question. If the context is insufficient, say so.
+        {context}
+        Question: {question}"""
+  else:
+    prompt = question
+    response = model.generate_content(prompt)
+  ```
+
+</CodeGroup>
+
+That's it, you're all set. With context in place, the model can now generate accurate, context-aware responses.
+
 
 #### What Alchemyst does automatically
 
@@ -142,8 +227,12 @@ That's it you are all set.
 #### You don’t need:
 
 - Custom vector stores
-- Prompt stuffing
+- Manual Prompt stuffing
 - Memory orchestration logic
+
+## Troubleshooting and Errors
+
+Errors while adding or searching documents usually relate to payload structure, limits, or permissions. Refer to the **Add Documents** and **Search Context** sections above for correct usage.
 
 
 ## Next Steps: Go Deeper with the SDK & APIs
@@ -152,37 +241,37 @@ Get up and running with our dedicated SDKs or integrate directly via our API.
 
 <Columns cols={2}>
   <Card
-    title="Python SDK"
-    icon="python"
-    href="/integrations/sdk/python-sdk"
-    horizontal
+  title="Python SDK"
+  icon="python"
+  href="/integrations/sdk/python-sdk"
+  horizontal
   >
-    Python
-  </Card>
-  <Card
-    title="TypeScript SDK"
-    icon="js"
-    href="/integrations/sdk/typescript-sdk"
-    horizontal
-  >
-    TypeScript
-  </Card>
-    <Card
-    title="AI Tools Setup"
-    icon="robot"
-    href="/mcps/introduction"
-    horizontal
-  >
-    Use Alchemyst with AI Tools
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-    horizontal
-  >
-    Read the API documentation.
-  </Card>
+  Python
+</Card>
+<Card
+title="TypeScript SDK"
+icon="js"
+href="/integrations/sdk/typescript-sdk"
+horizontal
+>
+TypeScript
+</Card>
+<Card
+title="AI Tools Setup"
+icon="robot"
+href="/mcps/introduction"
+horizontal
+>
+Use Alchemyst with AI Tools
+</Card>
+<Card
+title="API documentation"
+icon="terminal"
+href="/api-reference/introduction"
+horizontal
+>
+Read the API documentation.
+</Card>
 </Columns>
 
 ## Cookbooks & Community Examples
@@ -191,19 +280,19 @@ Step-by-step cookbooks and real projects from the community to help you build fa
 
 <Columns cols={2}>
   <Card
-    title="Sample Projects"
-    icon="code"
-    href="https://github.com/alchemyst-ai/awesome-saas"
+  title="Sample Projects"
+  icon="code"
+  href="https://github.com/alchemyst-ai/awesome-saas"
   >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Cookbook"
-    icon="utensils"
-    href="/example-projects"
-  >
-    Explore full fledged projects built on top of our platform.
-  </Card>
+  Add sample code to demonstrate how to use your product.
+</Card>
+<Card
+title="Cookbook"
+icon="utensils"
+href="/example-projects"
+>
+Explore full fledged projects built on top of our platform.
+</Card>
 </Columns>
 
 ## Need Help?
