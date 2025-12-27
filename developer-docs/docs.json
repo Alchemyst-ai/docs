@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "aspen",
+  "theme": "mint",
   "api": {
     "openapi": "https://platform-backend.getalchemystai.com/api/openapi.json"
   },
@@ -18,13 +18,26 @@
   },
   "name": "Alchemyst AI Docs",
   "colors": {
-    "primary": "#f49025",
-    "light": "#e8a916",
+    "primary": "#f59025",
+    "light": "#f39025",
     "dark": "#151515"
   },
   "favicon": "/logo/logo.png",
   "navigation": {
     "tabs": [
+      {
+        "tab": "welcome",
+        "icon": "stars",
+        "groups": [
+          {
+            "group": "By our team",
+            "expanded": true,
+            "pages": [
+              "welcome"
+            ]
+          }
+        ]
+      },
       {
         "tab": "Guides",
         "icon": "book",
@@ -72,29 +85,29 @@
         "tab": "Cookbook",
         "icon": "utensils",
         "groups": [
-              {
-                "group": "By our team",
-                "expanded": true,
-                "pages": [
-                  "example-projects/team/cli-chatbot",
-                  "example-projects/team/syllabai",
-                  "example-projects/team/zendocs"
-                ]
-              },
-              {
-                "group": "By our community",
-                "pages": [
-                  "example-projects/community/discord-bot",
-                  "example-projects/community/b2b-newsletter-writer"
-                ]
-              },  
-              {
-                "group": "Contributions",
-                "pages": [
-                  "contribution/contributing",
-                  "contribution/awesome-saas-repo"
-                ]
-              }
+          {
+            "group": "By our team",
+            "expanded": true,
+            "pages": [
+              "example-projects/team/cli-chatbot",
+              "example-projects/team/syllabai",
+              "example-projects/team/zendocs"
+            ]
+          },
+          {
+            "group": "By our community",
+            "pages": [
+              "example-projects/community/discord-bot",
+              "example-projects/community/b2b-newsletter-writer"
+            ]
+          },
+          {
+            "group": "Contributions",
+            "pages": [
+              "contribution/contributing",
+              "contribution/awesome-saas-repo"
+            ]
+          }
         ]
       },
       {
@@ -290,4 +303,3 @@
     }
   }
 }
-
