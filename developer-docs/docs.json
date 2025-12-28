@@ -42,18 +42,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Welcome",
-        "icon": "stars",
-        "groups": [
-          {
-            "group": "Welcome",
-            "pages": [
-              "index"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Guides",
         "icon": "book",
         "groups": [
