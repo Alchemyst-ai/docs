@@ -1,0 +1,294 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "aspen",
+  "api": {
+    "openapi": "https://platform-backend.getalchemystai.com/api/openapi.json"
+  },
+  "fonts": {
+    "heading": {
+      "family": "Sora",
+      "weight": 400,
+      "format": "woff2"
+    },
+    "body": {
+      "family": "Sora",
+      "weight": 400,
+      "format": "woff2"
+    }
+  },
+  "name": "Alchemyst AI Docs",
+  "colors": {
+    "primary": "#f49025",
+    "light": "#e8a916",
+    "dark": "#151515"
+  },
+  "favicon": "/logo/logo.png",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "icon": "book",
+        "groups": [
+          {
+            "group": "AI Memory",
+            "pages": []
+          },
+          {
+            "group": "AI Context",
+            "pages": [
+              "ai-context/what-is-ai-context",
+              "ai-context/why-you-need-ai-context",
+              "ai-context/how-alchemyst-works"
+            ]
+          },
+          {
+            "group": "Getting started",
+            "pages": [
+              "index",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Tutorials",
+            "pages": [
+              "tutorials/mcp-setup",
+              "tutorials/typescript-agent",
+              "tutorials/python-agent",
+              "tutorials/chrome-extension",
+              "tutorials/n8n-automation"
+            ]
+          },
+          {
+            "group": "Migration Guides",
+            "pages": [
+              "tutorials/mem0-migration"
+            ]
+          },
+          {
+            "group": "Enterprise",
+            "pages": [
+              "self-hosting/self-hosting"
+            ]
+          },
+          {
+            "group": "Contributions",
+            "pages": [
+              "contribution/contributing",
+              "contribution/awesome-saas-repo"
+            ]
+          },
+          {
+            "group": "Sample Projects",
+            "pages": [
+              {
+                "group": "By our team",
+                "expanded": true,
+                "pages": [
+                  "example-projects/team/syllabai",
+                  "example-projects/team/zendocs"
+                ]
+              },
+              {
+                "group": "By our community",
+                "pages": [
+                  "example-projects/community/discord-bot",
+                  "example-projects/community/b2b-newsletter-writer"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Integrations",
+        "icon": "puzzle-piece",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "integrations/introduction"
+            ]
+          },
+          {
+            "group": "Extensions",
+            "pages": [
+              "integrations/extensions/chrome"
+            ]
+          },
+          {
+            "group": "No-code tools",
+            "pages": [
+              "integrations/no-code-tools/n8n"
+            ]
+          },
+          {
+            "group": "Alchemyst SDK",
+            "pages": [
+              "integrations/sdk/python-sdk",
+              "integrations/sdk/typescript-sdk"
+            ]
+          },
+          {
+            "group": "Third-party integrations",
+            "pages": [
+              "integrations/third-party/introduction",
+              "integrations/third-party/aisdk",
+              "integrations/third-party/agnoagi",
+              {
+                "group": "LangChain",
+                "pages": [
+                  "integrations/third-party/langchain/python",
+                  "integrations/third-party/langchain/js"
+                ]
+              },
+              {
+                "group": "LLamaIndex (coming soon)",
+                "pages": [
+                  "integrations/third-party/llamaindex/python",
+                  "integrations/third-party/llamaindex/js"
+                ]
+              }
+            ],
+            "expanded": false
+          },
+          {
+            "group": "LLM Proxy",
+            "pages": [
+              "integrations/llm-proxy/anthropic",
+              "integrations/llm-proxy/openai"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "MCPs",
+        "icon": "plug",
+        "groups": [
+          {
+            "group": "MCPs",
+            "pages": [
+              "mcps/introduction",
+              "mcps/claude-desktop",
+              "mcps/cursor",
+              "mcps/visual-studio-code"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "icon": "code",
+        "groups": [
+          {
+            "group": "API documentation",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Endpoint examples",
+            "pages": [
+              "api-reference/endpoint/api/v1/context/add/post",
+              "api-reference/endpoint/api/v1/context/add-async/post",
+              "api-reference/endpoint/api/v1/context/add-async/status/get",
+              "api-reference/endpoint/api/v1/context/add-async/{id}/cancel/delete",
+              "api-reference/endpoint/api/v1/context/add-async/{id}/status/get",
+              "api-reference/endpoint/api/v1/context/delete/post",
+              "api-reference/endpoint/api/v1/context/memory/add/post",
+              "api-reference/endpoint/api/v1/context/memory/delete/post",
+              "api-reference/endpoint/api/v1/context/memory/update/post",
+              "api-reference/endpoint/api/v1/context/search/post",
+              "api-reference/endpoint/api/v1/context/traces/get",
+              "api-reference/endpoint/api/v1/context/traces/{traceId}/delete/delete",
+              "api-reference/endpoint/api/v1/context/view/docs/get",
+              "api-reference/endpoint/api/v1/context/view/get",
+              "api-reference/endpoint/api/v1/org/context/view/post"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "icon": "list",
+        "groups": [
+          {
+            "group": "Updates",
+            "pages": [
+              "changelog/index"
+            ]
+          },
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog/platform/index"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Website",
+          "href": "https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
+          "icon": "book-open-cover"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join",
+          "icon": "discord"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://getalchemystai.com/blog?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
+          "icon": "newspaper"
+        }
+      ]
+    }
+  },
+  "redirects": [
+    {
+      "source": "/join-discord",
+      "destination": "https://dub.sh/context-community",
+      "permanent": true
+    }
+  ],
+  "logo": {
+    "light": "/logo/logo-light-2.png",
+    "dark": "/logo/logo-dark.png"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:anuran@getalchemystai.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://platform.getalchemystai.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/getalchemyst",
+      "github": "https://github.com/alchemyst-ai",
+      "linkedin": "https://linkedin.com/company/alchemystai",
+      "discord": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
+    }
+  },
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-WHNWY5LTDN"
+    }
+  },
+  "seo": {
+    "indexing": "all",
+    "metatags": {
+      "og:type": "website",
+      "og:site_name": "Alchemyst AI Documentation",
+      "og:description": "Complete guide to Alchemyst AI - context management, SDKs, integrations, and API reference"
+    }
+  }
+}

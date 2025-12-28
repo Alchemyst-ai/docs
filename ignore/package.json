@@ -1,0 +1,14 @@
+{
+  "name": "ignore",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@alchemystai/sdk": "^0.7.0",
+    "dotenv": "^17.2.3"
+  }
+}
