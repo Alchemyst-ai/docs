@@ -23,7 +23,7 @@ jobs:
       - name: Generate sitemap.xml (in developer-docs)
         working-directory: developer-docs
         env:
-          SITE_URL: https://docs.getalchemystai.com   # change
+          SITE_URL: https://getalchemystai.com/docs   # change
           DOCS_JSON: docs.json                         # relative to developer-docs/
           DOCS_DIR: docs                               # relative to developer-docs/
           SITEMAP_OUT_DIR: .                           # writes developer-docs/sitemap.xml
