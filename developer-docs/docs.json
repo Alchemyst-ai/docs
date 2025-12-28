@@ -26,26 +26,9 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "welcome",
-        "icon": "stars",
-        "groups": [
-          {
-            "group": "By our team",
-            "expanded": true,
-            "pages": [
-              "welcome"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Guides",
         "icon": "book",
         "groups": [
-          {
-            "group": "AI Memory",
-            "pages": []
-          },
           {
             "group": "Getting started",
             "pages": [
