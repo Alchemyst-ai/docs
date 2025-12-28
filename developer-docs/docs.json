@@ -85,9 +85,12 @@
             ]
           },
           {
-            "group": "Advanced",
+            "group": "Advanced Usage",
             "pages": [
-              "advanced/advanced-usage",
+              "advanced/overview",
+              "advanced/context-arithmetic",
+              "advanced/usage-patterns",
+              "advanced/realworld-use-cases",
               "advanced/troubleshooting"
             ]
           }

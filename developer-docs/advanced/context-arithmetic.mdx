@@ -1,0 +1,217 @@
+---
+title: "Context Arithmetic"
+description: "Understanding the foundational principles on which Alchemyst works"
+---
+
+## Introduction
+
+**Context arithmetic** is the set of rules by which Alchemyst **selects, combines, filters, and ranks context** at query time.
+
+It answers a deceptively simple question:
+
+> *Given a large universe of documents, which pieces of information should the model see right now—and why?*
+
+Unlike traditional retrieval systems that rely on static queries or hard-coded joins, context arithmetic is **dynamic**. The result set is not fixed; it is *computed* based on scope, intent, constraints, and relevance.
+
+Think of it less like a database query, and more like **set algebra over meaning**.
+
+---
+
+### The Mental Model: Context as Sets
+
+Every document you ingest belongs to one or more **sets**.
+
+These sets are defined implicitly by:
+
+* `groupName`
+* metadata fields
+* semantic similarity
+* recency and relevance signals
+
+At query time, Alchemyst performs a series of **set operations** to determine what survives into the final context window.
+
+Conceptually:
+
+```
+Final Context
+  = (Semantic Matches)
+    ∩ (groupName Scope)
+    ∩ (Metadata Filters)
+    − (Deduplicated / Superseded Content)
+```
+
+This is context arithmetic.
+
+---
+
+### Primitive Operations
+
+At a high level, Alchemyst applies four core operations.
+
+#### 1. **Intersection (AND)**
+
+Used to **narrow scope**.
+
+When you specify multiple `groupName` values, *all* of them must match.
+
+```javascript
+search({
+  groupName: ["engineering", "backend", "auth"]
+})
+```
+
+This is equivalent to:
+
+```
+engineering ∩ backend ∩ auth
+```
+
+Only documents that belong to **all three sets** survive.
+
+This is why `groupName` is composable—and why flat or overloaded tags break down quickly.
+
+---
+
+#### 2. **Union (OR)**
+
+Used implicitly when:
+
+* searching semantically
+* retrieving top-K results
+* expanding related context
+
+For example, a query like:
+
+> “How does authentication work?”
+
+may retrieve documents from:
+
+* design docs
+* code
+* past PRs
+* resolved incidents
+
+These are **unioned**, then ranked.
+
+```
+(Auth Docs ∪ Auth Code ∪ Auth Tickets ∪ Auth PRs)
+```
+
+Union increases recall; intersection increases precision.
+
+Good context arithmetic balances both.
+
+---
+
+#### 3. **Subtraction (EXCLUSION)**
+
+Used to **remove noise and conflicts**.
+
+Common examples:
+
+* Older versions of the same document
+* Superseded policies
+* Duplicate or near-duplicate chunks
+* Out-of-scope access groups
+
+For example:
+
+```
+All Auth Docs
+− Deprecated Docs
+− Draft Versions
+− Private/Internal Scope
+```
+
+This is why deduplication, versioning, and delete-then-add semantics matter—they directly affect arithmetic correctness.
+
+---
+
+#### 4. **Ranking (WEIGHTING)**
+
+Once the candidate set is computed, Alchemyst ranks what remains.
+
+Ranking signals typically include:
+
+* semantic similarity
+* recency
+* metadata signals (priority, freshness)
+* historical usefulness
+* proximity to the query intent
+
+Only the **top-ranked** results are passed to the model.
+
+This is where cost, latency, and answer quality converge.
+
+---
+
+### Why This Matters
+
+Understanding context arithmetic explains *why* the patterns in this guide exist.
+
+* Why hierarchical `groupName` works
+* Why over-segmentation hurts retrieval
+* Why metadata bloat slows everything down
+* Why bulk ingestion and deduplication are not optional
+* Why document size matters more than raw token count
+
+If your context structure aligns with arithmetic rules, retrieval feels “magical.”
+If it doesn’t, no amount of prompt engineering will save you.
+
+---
+
+### A Simple Example
+
+Assume your system contains **50,000 documents**.
+
+A user asks:
+
+> “How do we handle JWT refresh tokens in API v2?”
+
+The effective context computation might look like:
+
+```
+(
+  SemanticMatches("JWT refresh token")
+)
+∩ groupName(["engineering", "backend", "auth"])
+∩ metadata({ version: "v2" })
+− deprecatedDocs
+− supersededVersions
+→ rank → top 5
+```
+
+The model never sees:
+
+* frontend docs
+* marketing material
+* outdated auth specs
+* irrelevant code paths
+
+Not because you filtered manually—but because the **arithmetic worked**.
+
+---
+
+### Context Arithmetic vs Prompt Stuffing
+
+| Prompt Stuffing | Context Arithmetic |
+| --------------- | ------------------ |
+| Static          | Dynamic            |
+| Manual          | Computed           |
+| Token-heavy     | Precision-first    |
+| Fragile         | Composable         |
+| Hard to scale   | Designed for scale |
+
+Prompt stuffing assumes *more tokens = better answers*.
+
+Context arithmetic assumes:
+
+> *Only the right tokens matter.*
+
+---
+
+### Design Principle
+
+> **Structure your context so that correct answers fall out naturally from arithmetic—not from clever prompts.**
+
+If you internalize this section, every pattern below will feel less like a rulebook and more like common sense.

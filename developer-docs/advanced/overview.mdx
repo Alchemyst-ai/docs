@@ -1,0 +1,89 @@
+---
+title: 'Overview'
+description: 'Unlock the full potential of the Alchemyst Platform'
+---
+
+At **Alchemyst AI**, we provide AI applications with the context they need to become **smarter**, more **accurate**, and more **useful**. This page explains the proposed scope and outline for the Context Processor, gives a concise top-level view of how the system works, highlights technical insights and their implications, and shows practical examples and use-cases.
+
+## Introduction
+
+**Alchemyst** automatically converts your data into retrievable **context** that enhances model reasoning, context and memory. The overall platform works as follows:
+
+1. **Ingest:** Bring data from databases, files, user interactions, and external APIs.
+2. **Enrich & Index:** Normalize and enrich data, then index it for fast retrieval by your agents or LLM prompts.
+3. **Serve Context:** Provide contextual snippets and memories to models at inference time.
+4. **Orchestrate:** Chain tools and services to create deterministic workflows and agent behaviors.
+5. **Persist & Evolve:** Store user - or application-level memory that can be updated and audited over time.
+
+## Key Features
+- **Composable Context**: Manage context data with user and organization-level access control, ensuring that your AI agents can compose and maintain context and intent.
+
+- **Granular Access Controls**: Segregate your data by granular access control levels - enabling you to restrict or allow data and control overall data flow for AI agents or applications across your organization.
+
+- **Context Traces**: Trace which data points across your entire organizational data is used for your AI agent, at a query level.
+
+- **Universal Support**: Connect directly to Claude or OpenAI with MCPs, and get started with context-rich responses in minutes.
+
+## When to use Alchemyst
+- When context needs to be reusable.
+- When context is too big to fit inside an LLM's [**effective context window**](https://arxiv.org/abs/2509.21361)
+- When latencies for GenAI powered applications matter
+- When tractability and economic feasibility is of paramount importance
+
+## When NOT to use Alchemyst
+Alchemyst provides a context layer that fares well for most of the use cases one might encounter while using agentic AI. However, there are a few exceptions:
+
+- In scenarios where you have a lot of structured data with IDs/numbers and very sparse information explaining what they are. For example, inventory tables with just IDs. Use a traditional database in those scenarios alongside the context layer, and store the document(s) containing the business logic that connects those IDs in the context layer.
+- Foreign Keys in traditional database tables. One quick hack is to denormalize the data before adding it to the context layer.
+- Information with low semantic density (although then it becomes more a question of business data strategies).
+
+## Quick tips
+- You should have a basic understanding of Context Arithmetic. You can find a comprehensive overview [**here**](/advanced/context-arithmetic)
+- Understand how much data and metadata do you actually need to store for your use case. Metadata bloat is real.
+- Understand what the best case of `similarity_threshold` and `minimum_similarity_threshold` is for your use case.
+- Reduce noise in both data input and search query as much as possible. For data, that can mean extra spaces, ad-hoc symbols, emojis, etc. For search, removing noisy tokens is even more important. A good rule of thumb is to implement up context search as tool/function calls.
+- Bundle bulk requests as much as possible. Adding context is considered as a bulk operation, so sending 10000 documents over 10 bulk requests is advisable over 10000 separate calls.
+- Alchemyst implements deduplication by default over data by context name (implemented as `metadata.fileName`), so ensure that for changes in the same context source (or doc), they are either treated as an AI conversation, or the older version is first deleted and then the new version is added. Otherwise you'll end up with `409: Conflict` status code.
+- Compose context as much as possible, over multiple segregations over namespaces.
+
+<Info>
+  ### How to set up composable context
+  Use `groupName` in the `metadata` tag. The field `metadata.groupName` is an array of strings that works via subset matching.
+
+  To explain in easier terms, let's say that we have 3 data points `A`, `B`, `C`. `A` has `metadata.groupName` as `["group_main", "group1"]`, `B` has `["group_main", "group2"]` and `C` has `["group_main", "group1"]`.
+
+  When you search with `groupName`, the filter values you provide must `ALL` be present in a document's `groupName` array for that document to match.
+
+  **Examples:**
+
+  - **Search with `["group_main"]`**:
+    - Matches: A ✓, B ✓, C ✓
+    - Reason: All three documents contain `"group_main"` in their arrays
+
+  - **Search with `["group_main", "group1"]`**:
+    - Matches: A ✓, C ✓
+    - Does not match: B ✗
+    - Reason: A and C both contain both `"group_main"` AND `"group1"`, but B only has `"group_main"`
+
+  - **Search with `["group1"]`**:
+    - Matches: A ✓, C ✓
+    - Does not match: B ✗
+    - Reason: Only A and C contain `"group1"`
+
+  - **Search with `["group_main", "group3"]`**:
+    - Matches: None
+    - Reason: No document contains both `"group_main"` AND `"group3"`
+
+  **In summary:** Think of the search filter as defining a "scope" - documents must fall within that scope (contain all the specified tags) to be returned.
+
+  See [**Understanding Context Arithmetic**](/advanced/context-arithmetic) for the intuition behind this.
+
+  After that, head over to  [**Advanced Usage**](/advanced/advanced-usage-patterns) for patterns to maximize your benefits by leveraging this system.
+</Info>
+
+
+## Conclusion
+
+**Alchemyst** simplifies the process of giving AI models the right **context** so they can reason **more accurately** using your own data. By transforming raw information into structured, retrievable context, it bridges the gap between static knowledge and dynamic intelligence.
+
+Whether you're enhancing customer support, powering developer tools, or building compliance systems, we can act as the **Organizational Context Layer** that provides a reliable foundation for **context-aware applications**.
