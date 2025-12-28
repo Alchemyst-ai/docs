@@ -22,9 +22,33 @@
     "light": "#f39025",
     "dark": "#151515"
   },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
   "favicon": "/logo/logo.png",
   "navigation": {
     "tabs": [
+      {
+        "tab": "Welcome",
+        "icon": "stars",
+        "groups": [
+          {
+            "group": "Welcome",
+            "pages": [
+              "index"
+            ]
+          }
+        ]
+      },
       {
         "tab": "Guides",
         "icon": "book",
@@ -32,7 +56,7 @@
           {
             "group": "Getting started",
             "pages": [
-              "index",
+              "introduction",
               "quickstart"
             ]
           },
