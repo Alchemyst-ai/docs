@@ -248,17 +248,17 @@
       "anchors": [
         {
           "anchor": "Website",
-          "href": "https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
+          "href": "https://getalchemystai.com?utm_source=docs&utm_campaign=docs&utm_medium=web",
           "icon": "book-open-cover"
         },
         {
           "anchor": "Community",
-          "href": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join",
+          "href": "https://getalchemystai.com/docs/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join",
           "icon": "discord"
         },
         {
           "anchor": "Blog",
-          "href": "https://getalchemystai.com/blog?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
+          "href": "https://getalchemystai.com/blog?utm_source=docs&utm_campaign=docs&utm_medium=web",
           "icon": "newspaper"
         }
       ]
@@ -293,7 +293,7 @@
       "x": "https://x.com/getalchemyst",
       "github": "https://github.com/alchemyst-ai",
       "linkedin": "https://linkedin.com/company/alchemystai",
-      "discord": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
+      "discord": "https://docs/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
     }
   },
   "integrations": {
