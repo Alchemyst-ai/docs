@@ -3,7 +3,6 @@ title: 'Python SDK'
 description: 'Get started with the Alchemyst Python SDK'
 ---
 
-
 ## Installation
 
 <CodeGroup>
@@ -206,18 +205,9 @@ except alchemyst_ai.APIStatusError as e:
     print(e.response)
 ```
 
-Error codes are as follows:
+### Troubleshooting and Errors
 
-| Status Code | Error Type                 |
-| ----------- | -------------------------- |
-| 400         | `BadRequestError`          |
-| 401         | `AuthenticationError`      |
-| 403         | `PermissionDeniedError`    |
-| 404         | `NotFoundError`            |
-| 422         | `UnprocessableEntityError` |
-| 429         | `RateLimitError`           |
-| >=500       | `InternalServerError`      |
-| N/A         | `APIConnectionError`       |
+Errors while adding or searching documents usually relate to payload structure, limits, or permissions. Refer to the **Add Documents** and **Search Context** sections above for correct usage
 
 ### Retries
 
@@ -430,3 +420,6 @@ print(alchemyst_ai.__version__)
 ## Requirements
 
 Python 3.8 or higher.
+
+
+

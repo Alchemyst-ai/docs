@@ -1,0 +1,38 @@
+---
+title: Errors & Platform Limits
+description: Common API errors, their causes, and practical fixes, along with the limits and constraints of the Alchemyst platform.
+---
+
+### Errors While Adding Documents
+
+| Status Code | Error Type | Common Cause | Recommended Fix |
+| :--- | :--- | :--- | :--- |
+| **400** | `BadRequest` | Invalid JSON or missing required fields (e.g., `source`). | Validate your payload against the [schema](/api-reference/endpoint/api/v1/context/add/post). Ensure `documents` array is not empty. |
+| **401** | `Unauthorized` | Invalid or missing `ALCHEMYST_AI_API_KEY`. | Check your `.env` file. Ensure you aren't using a Test key in Prod. |
+| **403** | `Forbidden` | Accessing a `scope` (e.g., `user_123`) you don't have permission for. | Verify the `api_key` or `user_id` matches the authenticated session. Make sure the key is still valid. |
+| **413** | `PayloadTooLarge` | Document exceeds the 50MB limit or batch size > 100. | Split your `documents` array into chunks of 50 and retry. |
+| **429** | `RateLimit` | Exceeded 1000 requests/minute. | Implement exponential backoff (default in SDK). Contact support for limits. |
+| **422** | `Unprocessable` | The file type provided in `metadata` matches `source` but content is unparseable. | Ensure `fileType` matches the actual binary content (e.g., don't send PDF bytes as `text/plain`). |
+
+
+### Errors While Searching Context
+
+| Status Code | Error Type | Common Cause | Recommended Fix |
+| :--- | :--- | :--- | :--- |
+| **400** | `BadRequest` | Missing or malformed search parameters. | Ensure `query` is provided and properly formatted.Validate your payload against the [schema](/api-reference/endpoint/api/v1/context/search) |
+| **401** | `Unauthorized` | Invalid or missing `ALCHEMYST_AI_API_KEY`. | Confirm the request includes a valid API key. |
+| **403** | `Forbidden` | Searching a `scope` you don’t have access to. | Make sure the key is still valid. Ensure the search `scope` is accessible to the current user or org. |
+| **429** | `RateLimit` | Too many search requests. | Add throttling or cache repeated searches. |
+| **422** | `Unprocessable` | Documents were not indexed correctly. | Verify documents were successfully ingested before searching. |
+
+
+### Platform Limits
+
+| Feature | Limit / Specification |
+| :--- | :--- |
+| **Max File Size** | 50 MB per document |
+| **Max Batch Size** | 100 documents per `add()` request |
+| **Supported File Types** | `.pdf`, `.txt`, `.docx`, `.md`, `.json`, `.csv` |
+| **Token Limit** | 8,192 tokens per document chunk |
+| **Metadata Fields** | Max 20 keys per document; Values must be `string` or `number` |
+| **Indexing Speed** | ~120 records/sec (Text), ~5 sec/page (OCR PDF) |

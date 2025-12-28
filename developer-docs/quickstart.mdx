@@ -3,61 +3,303 @@ title: "Quickstart"
 description: "Start building awesome AI systems in minutes"
 ---
 
-## Setting up
+## Add Context to Alchemyst AI
+
+This guide shows you how to **store context in Alchemyst AI and reuse it in your LLM or agent** - step by step.
+
+
+## What you’ll build
+
+By the end of this guide, you will:
+- Store context (memory) in Alchemyst
+- Reuse that context in future requests
+- Retrieve relevant context and feed it to llms
+
+
+## Prerequisites
+
+You’ll need:
+- An Alchemyst AI account - [sign up](https://platform.getalchemystai.com)
+- Your `ALCHEMYST_AI_API_KEY`
+- Python 3.9+ or Node.js 18+
+
+---
+
+## Step 1: Install the SDK
+
+<CodeGroup>
+  ```bash node
+  npm install alchemyst-ai
+  ```
+  ```bash python
+  pip install alchemyst-ai
+  ```
+</CodeGroup>
+
+## Step 2: Initialize the client
+<CodeGroup>
+
+  ```javascript ts
+  import AlchemystAI from '@alchemystai/sdk';
+
+  const client = new AlchemystAI({
+      apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  });
+  ```
+
+  ```python python
+  import os
+  from alchemyst_ai import AlchemystAI
+
+  client = AlchemystAI(
+      api_key=os.environ.get("ALCHEMYST_AI_API_KEY"),
+  )
+  ```
+
+</CodeGroup>
+
+## Step 3 : Create documents array 
+
+The ```documents``` array contains the raw content you want Alchemyst to store - documents, PDFs, and other sources must first be converted into text strings and then uploaded
+
+<CodeGroup>
+
+  ```javascript ts
+
+interface AlchemystDocument {
+  content: string;
+  metadata?: { //optional
+    file_name?: string;
+    file_type?: string;
+    group_name?: string[];
+  };
+}
+
+const docs_array: AlchemystDocument[] = [];
+
+docs_array.push({
+  content: "files content",
+  metadata: {
+    file_name: "file_name",
+    file_type: "pdf/txt/json",
+    group_name: ["group1", "group2"],
+  },
+});
+  ```
+
+  ```python python
+docs_array = []
+
+docs_array.append({
+    "content": "files content",
+    "metadata": {   # optional
+        "file_name": "file_name",
+        "file_type": "pdf/txt/json",
+        "group_name": ["group1", "group2"]
+    }
+})
+```
+
+</CodeGroup>
+
+
+## Step 4: Add context (store memory)
+
+This step adds documents into the context processor which are then turned into nodes.
+
+<CodeGroup>
+
+  ```javascript ts
+  await client.v1.context.add({
+    documents:docs_array,
+    context_type: 'resource',  // one of: resource | conversation | instruction
+    source: 'web-upload',
+    scope: 'internal',     // one of: internal | external       
+      // [OPTIONAL] metadata can be null. Use for filtering later.
+    metadata: { 
+      fileName: 'notes.txt',
+      fileType: 'text/plain',
+      lastModified: new Date().toISOString(),
+      fileSize: 1024,
+      groupName: ['group1', 'group2'],
+    },
+  });
+  console.log("Context successfully added.")
+
+  ```
+
+  ```python python
+  # Add documents to context
+  response = client.v1.context.add(
+      documents=docs_array,
+      source="source of context data",
+      context_type="resource",   # one of: resource | conversation | instruction
+      scope="internal",          # one of: internal | external
+      metadata={                 # optional
+          "file_name": "name of the file",
+          "file_type": "type",
+          "last_modified": "timestamp",
+          "file_size": 1234,   # number
+          "group_name": ["group1", "group2"]
+      }
+  )
+  ```
+
+</CodeGroup>
+
+### What just happened?
+
+- The data was stored in Alchemyst’s [context layer](https://platform.getalchemystai.com/context)
+- It can be used to search query and provide llm with relevant context
+
+
+## Step 5: Search through context 
+
+Retrieve the most relevant stored context before invoking the model.
+
+<CodeGroup>
+
+  ```javascript ts
+    const { contexts } = await client.v1.context.search({
+        query: "user_query",
+        similarity_threshold: 0.8,
+        minimum_similarity_threshold: 0.5,
+        scope: 'internal',
+        metadata: null,
+    });
+  ```
+
+  ```python python
+    results = client.v1.context.search(
+        query=question,
+        similarity_threshold=0.8, 
+        minimum_similarity_threshold = 0.5,
+        scope = "internal",
+        metadata= None,
+    )
+
+    docs = results.contexts or []
+
+  ```
+
+</CodeGroup>
+
+## Step 6 : Ingest the retrieved context into llm prompts
+
+Convert the resolved context into a structured prompt before sending it to the LLM.
+
+<CodeGroup>
+
+  ```javascript ts
+  const promptText = contexts?.length ? `Use the context below to answer the question. If the context is insufficient, say so.
+        ${contexts.map((c, i) => `Context ${i + 1}: ${c.content ?? JSON.stringify(c)}`).join('\n\n')}
+        Question: ${userQuestion}`;
+
+  const result = await model.generateContent(promptText);
+
+  ```
+
+  ```python python
+  if docs:
+    context = "\n\n".join(
+        f"Context {i+1}: {getattr(doc, 'content', str(doc))}"
+        for i, doc in enumerate(docs)
+    )
+    prompt = f"""Use the context below to answer the question. If the context is insufficient, say so.
+        {context}
+        Question: {question}"""
+  else:
+    prompt = question
+    response = model.generate_content(prompt)
+  ```
+
+</CodeGroup>
+
+That's it, you're all set. With context in place, the model can now generate accurate, context-aware responses.
+
+
+#### What Alchemyst does automatically
+
+- Stores context securely
+- Retrieves relevant memory
+- keeps behavior consistent across sessions
+
+#### You don’t need:
+
+- Custom vector stores
+- Manual Prompt stuffing
+- Memory orchestration logic
+
+## Troubleshooting and Errors
+
+Errors while adding or searching documents usually relate to payload structure, limits, or permissions. Refer to the **Add Documents** and **Search Context** sections above for correct usage.
+
+
+## Next Steps: Go Deeper with the SDK & APIs
+
+Get up and running with our dedicated SDKs or integrate directly via our API.
 
 <Columns cols={2}>
   <Card
-    title="Python SDK"
-    icon="python"
-    href="/integrations/sdk/python-sdk"
-    horizontal
+  title="Python SDK"
+  icon="python"
+  href="/integrations/sdk/python-sdk"
+  horizontal
   >
-    Python
-  </Card>
-  <Card
-    title="TypeScript SDK"
-    icon="js"
-    href="/integrations/sdk/typescript-sdk"
-    horizontal
-  >
-    TypeScript
-  </Card>
-    <Card
-    title="AI Tools Setup"
-    icon="robot"
-    href="/mcps/introduction"
-    horizontal
-  >
-    Use Alchemyst with AI Tools
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-    horizontal
-  >
-    Read the API documentation.
-  </Card>
+  Python
+</Card>
+<Card
+title="TypeScript SDK"
+icon="js"
+href="/integrations/sdk/typescript-sdk"
+horizontal
+>
+TypeScript
+</Card>
+<Card
+title="AI Tools Setup"
+icon="robot"
+href="/mcps/introduction"
+horizontal
+>
+Use Alchemyst with AI Tools
+</Card>
+<Card
+title="API documentation"
+icon="terminal"
+href="/api-reference/introduction"
+horizontal
+>
+Read the API documentation.
+</Card>
 </Columns>
 
-## Ready to get started?
+## Cookbooks & Community Examples
 
-Everything you need to create world-class documentation.
+Step-by-step cookbooks and real projects from the community to help you build faster with Alchemyst.
 
 <Columns cols={2}>
   <Card
-    title="Sample Projects"
-    icon="code"
-    href="/example-projects"
+  title="Sample Projects"
+  icon="code"
+  href="https://github.com/alchemyst-ai/awesome-saas"
   >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Cookbook"
-    icon="book"
-    href="https://github.com/alchemyst-ai/awesome-saas"
-  >
-    Explore full fledged projects built on top of our platform.
-  </Card>
+  Add sample code to demonstrate how to use your product.
+</Card>
+<Card
+title="Cookbook"
+icon="utensils"
+href="/example-projects"
+>
+Explore full fledged projects built on top of our platform.
+</Card>
 </Columns>
+
+## Need Help?
+
+If you get stuck or want to share feedback:
+
+- Browse the **Guides** and **API docs** on this site.
+- Search the documentation for targeted answers.
+- Join our [Discord server](https://dub.sh/context-community) for real-time help.
 
