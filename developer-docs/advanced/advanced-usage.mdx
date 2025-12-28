@@ -1,0 +1,1658 @@
+---
+title: 'Advanced Usage'
+description: 'Unlock the full potential of the Alchemyst Platform'
+---
+
+  At **Alchemyst AI**, we provide AI applications with the context they need to become **smarter**, more **accurate**, and more **useful**. This page explains the proposed scope and outline for the Context Processor, gives a concise top-level view of how the system works, highlights technical insights and their implications, and shows practical examples and use-cases.
+
+  ## Overview
+
+  **Alchemyst** automatically converts your data into retrievable **context** that enhances model reasoning, context and memory. The overall platform works as follows:
+
+  1. **Ingest:** Bring data from databases, files, user interactions, and external APIs.
+  2. **Enrich & Index:** Normalize and enrich data, then index it for fast retrieval by your agents or LLM prompts.
+  3. **Serve Context:** Provide contextual snippets and memories to models at inference time.
+  4. **Orchestrate:** Chain tools and services to create deterministic workflows and agent behaviors.
+  5. **Persist & Evolve:** Store user - or application-level memory that can be updated and audited over time.
+
+  ## Key Features
+  - **Composable Context**: Manage context data with user and organization-level access control, ensuring that your AI agents can compose and maintain context and intent.
+
+  - **Granular Access Controls**: Segregate your data by granular access control levels - enabling you to restrict or allow data and control overall data flow for AI agents or applications across your organization.
+
+  - **Context Traces**: Trace which data points across your entire organizational data is used for your AI agent, at a query level.
+
+  - **Universal Support**: Connect directly to Claude or OpenAI with MCPs, and get started with context-rich responses in minutes.
+
+  ## When to use Alchemyst
+  - When context needs to be reusable.
+  - When context is too big to fit inside an LLM's [**effective context window**](https://arxiv.org/abs/2509.21361)
+  - When latencies for GenAI powered applications matter
+  - When tractability and economic feasibility is of paramount importance
+
+  ## When NOT to use Alchemyst
+  Alchemyst provides a context layer that fares well for most of the use cases one might encounter while using agentic AI. However, there are a few exceptions:
+
+  - In scenarios where you have a lot of structured data with IDs/numbers and very sparse information explaining what they are. For example, inventory tables with just IDs. Use a traditional database in those scenarios alongside the context layer, and store the document(s) containing the business logic that connects those IDs in the context layer.
+  - Foreign Keys in traditional database tables. One quick hack is to denormalize the data before adding it to the context layer.
+  - Information with low semantic density (although then it becomes more a question of business data strategies).
+
+  ## Quick tips
+  - Understand how much data and metadata do you actually need to store for your use case. Metadata bloat is real.
+  - Understand what the best case of `similarity_threshold` and `minimum_similarity_threshold` is for your use case.
+  - Reduce noise in both data input and search query as much as possible. For data, that can mean extra spaces, ad-hoc symbols, emojis, etc. For search, removing noisy tokens is even more important. A good rule of thumb is to implement up context search as tool/function calls.
+  - Bundle bulk requests as much as possible. Adding context is considered as a bulk operation, so sending 10000 documents over 10 bulk requests is advisable over 10000 separate calls.
+  - Alchemyst implements deduplication by default over data by context name (implemented as `metadata.fileName`), so ensure that for changes in the same context source (or doc), they are either treated as an AI conversation, or the older version is first deleted and then the new version is added. Otherwise you'll end up with `409: Conflict` status code.
+  - Compose context as much as possible, over multiple segregations over namespaces.
+
+  <Info>
+  ### How to set up composable context
+  Use `groupName` in the `metadata` tag. The field `metadata.groupName` is an array of strings that works via subset matching.
+
+  To explain in easier terms, let's say that we have 3 data points `A`, `B`, `C`. `A` has `metadata.groupName` as `["group_main", "group1"]`, `B` has `["group_main", "group2"]` and `C` has `["group_main", "group1"]`.
+
+  When you search with `groupName`, the filter values you provide must `ALL` be present in a document's `groupName` array for that document to match.
+
+  **Examples:**
+
+  - **Search with `["group_main"]`**:
+    - Matches: A ✓, B ✓, C ✓
+    - Reason: All three documents contain `"group_main"` in their arrays
+
+  - **Search with `["group_main", "group1"]`**:
+    - Matches: A ✓, C ✓
+    - Does not match: B ✗
+    - Reason: A and C both contain both `"group_main"` AND `"group1"`, but B only has `"group_main"`
+
+  - **Search with `["group1"]`**:
+    - Matches: A ✓, C ✓
+    - Does not match: B ✗
+    - Reason: Only A and C contain `"group1"`
+
+  - **Search with `["group_main", "group3"]`**:
+    - Matches: None
+    - Reason: No document contains both `"group_main"` AND `"group3"`
+
+  **In summary:** Think of the search filter as defining a "scope" - documents must fall within that scope (contain all the specified tags) to be returned.
+
+  See [**Advanced Usage**](#advanced-usage-patterns-%26-gotchas) section for patterns to maximize your benefits by leveraging this system.
+  </Info>
+
+  ## Use Cases
+  <Tabs>
+    <Tab title="Customer Support Knowledge Base">
+    ### Customer Support Knowledge Base
+    #### Objective
+    -  Upload product documentation, FAQs, and support tickets
+    -  Get instant, accurate answers with source citations
+    -  Reduce response time and improve consistency
+
+    #### Possible Design Outline
+    ```mermaid
+    sequenceDiagram
+        participant CS as Customer Support Agent
+        participant AI as AI Assistant
+        participant AC as Alchemyst Context
+        participant DS as Data Sources
+
+        Note over DS: Product Docs, FAQs, Tickets
+
+        DS->>AC: Ingest & Index Documents
+        AC->>AC: Enrich with metadata<br/>(product, category, priority)
+
+        CS->>AI: Customer Query:<br/>"How do I reset my password?"
+        AI->>AC: Search Context<br/>groupName: ["support", "auth"]
+        AC->>AC: Filter & Rank Relevant Docs
+        AC->>AI: Return Top 3 Context Snippets<br/>with Source Citations
+        AI->>AI: Generate Response with Context
+        AI->>CS: Answer + Sources:<br/>1. Password Reset Guide (Doc #123)<br/>2. Authentication FAQ (Doc #456)<br/>3. Similar Ticket Resolution (Ticket #789)
+
+        CS->>CS: Verify & Send to Customer
+        CS->>AC: Log Interaction<br/>(for future context)
+
+        Note over AC: Context evolves with<br/>new interactions
+    ```
+
+    #### Data Organization Structure
+    ```mermaid
+    graph TB
+        subgraph "Knowledge Base Structure"
+            A[All Support Content<br/>groupName: support]
+
+            A --> B[Product Documentation<br/>groupName: support, product]
+            A --> C[FAQs<br/>groupName: support, faq]
+            A --> D[Support Tickets<br/>groupName: support, tickets]
+
+            B --> B1[Authentication<br/>groupName: support, product, auth]
+            B --> B2[Features<br/>groupName: support, product, features]
+            B --> B3[Troubleshooting<br/>groupName: support, product, troubleshoot]
+
+            C --> C1[Billing FAQ<br/>groupName: support, faq, billing]
+            C --> C2[Technical FAQ<br/>groupName: support, faq, technical]
+
+            D --> D1[Resolved Tickets<br/>groupName: support, tickets, resolved]
+            D --> D2[Open Tickets<br/>groupName: support, tickets, open]
+        end
+
+        style A fill:#e1f5ff
+        style B fill:#fff4e1
+        style C fill:#fff4e1
+        style D fill:#fff4e1
+    ```
+
+    #### Benefits
+    - **Faster Resolution**: Reduce average response time by 60% with instant context retrieval
+    - **Consistency**: All agents have access to the same up-to-date knowledge base
+    - **Traceability**: Track which documents were used to answer each query
+    - **Continuous Improvement**: Learn from past interactions to improve future responses
+    - **Scalability**: Handle increasing support volume without proportional staff increase
+
+    </Tab>
+    <Tab title="Engineering Code Assistant">
+      ### Engineering Code Assistant
+      #### Objective
+      -  Index code repositories, design docs, and API specifications
+      -  Provide contextual code examples and explanations
+      -  Accelerate developer onboarding and productivity
+
+      #### Possible Design Outline
+      ```mermaid
+      sequenceDiagram
+          participant Dev as Developer
+          participant IDE as IDE/CLI Tool
+          participant AI as AI Code Assistant
+          participant AC as Alchemyst Context
+          participant Repo as Code Repository
+
+          Note over Repo: Codebase, Design Docs,<br/>API Specs, PRs
+
+          Repo->>AC: Sync & Index Repository
+          AC->>AC: Parse & Enrich:<br/>- Function signatures<br/>- Dependencies<br/>- Documentation<br/>- Code patterns
+
+          Dev->>IDE: Write code or ask question:<br/>"How do I implement auth middleware?"
+          IDE->>AI: Developer Query + Current Context<br/>(file path, language, imports)
+
+          AI->>AC: Search Context<br/>groupName: ["codebase", "auth", "middleware"]
+          AC->>AC: Retrieve Relevant:<br/>- Similar implementations<br/>- Design docs<br/>- API specs<br/>- Past PRs
+
+          AC->>AI: Return Context:<br/>1. auth.middleware.ts (line 45-78)<br/>2. Auth Design Doc (section 3.2)<br/>3. PR #234: "Add JWT middleware"<br/>4. API Security Spec (v2.1)
+
+          AI->>AI: Generate Response:<br/>- Code example<br/>- Explanation<br/>- Best practices<br/>- Related patterns
+
+          AI->>IDE: Code Suggestion + Documentation
+          IDE->>Dev: Display inline with citations
+
+          Dev->>Dev: Accept/Modify suggestion
+          Dev->>AC: Log usage pattern<br/>(improve future suggestions)
+
+          Note over AC: Context evolves with<br/>codebase changes
+      ```
+
+      #### Repository Structure & Indexing
+      ```mermaid
+      graph TB
+          subgraph "Code Repository Organization"
+              A[Full Codebase<br/>groupName: codebase, repo_main]
+
+              A --> B[Source Code<br/>groupName: codebase, src]
+              A --> C[Documentation<br/>groupName: codebase, docs]
+              A --> D[Tests<br/>groupName: codebase, tests]
+              A --> E[Configuration<br/>groupName: codebase, config]
+
+              B --> B1[Backend Services<br/>groupName: codebase, src, backend]
+              B --> B2[Frontend Components<br/>groupName: codebase, src, frontend]
+              B --> B3[Shared Libraries<br/>groupName: codebase, src, shared]
+
+              B1 --> B1A[Authentication<br/>groupName: codebase, src, backend, auth]
+              B1 --> B1B[API Endpoints<br/>groupName: codebase, src, backend, api]
+              B1 --> B1C[Database Models<br/>groupName: codebase, src, backend, db]
+
+              C --> C1[API Specs<br/>groupName: codebase, docs, api]
+              C --> C2[Design Docs<br/>groupName: codebase, docs, design]
+              C --> C3[Architecture<br/>groupName: codebase, docs, architecture]
+
+              D --> D1[Unit Tests<br/>groupName: codebase, tests, unit]
+              D --> D2[Integration Tests<br/>groupName: codebase, tests, integration]
+          end
+
+          style A fill:#e1f5ff
+          style B fill:#fff4e1
+          style C fill:#fff4e1
+          style D fill:#fff4e1
+          style E fill:#fff4e1
+          style B1 fill:#f0e1ff
+          style C1 fill:#d4edda
+      ```
+
+      #### Context Enrichment Pipeline
+      ```mermaid
+      flowchart LR
+          A[Raw Code File] --> B[Parse AST]
+          B --> C{Extract Metadata}
+
+          C --> D[Functions & Classes]
+          C --> E[Dependencies]
+          C --> F[Documentation]
+          C --> G[Type Signatures]
+
+          D --> H[Enrichment Layer]
+          E --> H
+          F --> H
+          G --> H
+
+          H --> I[Add Semantic Tags]
+          H --> J[Link Related Files]
+          H --> K[Extract Patterns]
+          H --> L[Generate Embeddings]
+
+          I --> M[Indexed Context]
+          J --> M
+          K --> M
+          L --> M
+
+          M --> N[Vector Store]
+          M --> O[Metadata Store]
+
+          N --> P[Context Retrieval Engine]
+          O --> P
+
+          style A fill:#e1f5ff
+          style H fill:#fff4e1
+          style M fill:#f0e1ff
+          style P fill:#d4edda
+      ```
+
+      #### Developer Interaction Patterns
+      ```mermaid
+      stateDiagram-v2
+          [*] --> Exploration: New feature/codebase
+          [*] --> Implementation: Active coding
+          [*] --> Debugging: Issue encountered
+          [*] --> Review: Code review
+
+          Exploration --> QueryDocs: "How does X work?"
+          Exploration --> FindExamples: "Show similar patterns"
+
+          Implementation --> GetSnippets: "Generate boilerplate"
+          Implementation --> CheckAPIs: "Verify API usage"
+          Implementation --> FindPatterns: "Best practice for Y?"
+
+          Debugging --> SearchIssues: "Similar bugs?"
+          Debugging --> CheckTests: "Related test cases?"
+          Debugging --> TraceFlow: "Call hierarchy?"
+
+          Review --> ComparePatterns: "Is this idiomatic?"
+          Review --> CheckStandards: "Meets style guide?"
+
+          QueryDocs --> ContextRetrieved
+          FindExamples --> ContextRetrieved
+          GetSnippets --> ContextRetrieved
+          CheckAPIs --> ContextRetrieved
+          FindPatterns --> ContextRetrieved
+          SearchIssues --> ContextRetrieved
+          CheckTests --> ContextRetrieved
+          TraceFlow --> ContextRetrieved
+          ComparePatterns --> ContextRetrieved
+          CheckStandards --> ContextRetrieved
+
+          ContextRetrieved --> AIResponse: Process & generate
+          AIResponse --> DeveloperAction: Present solution
+
+          DeveloperAction --> [*]: Task completed
+          DeveloperAction --> Implementation: Continue coding
+          DeveloperAction --> Debugging: Need more info
+      ```
+
+      #### Example: Authentication Middleware Query
+      ```mermaid
+      graph TD
+          A["Developer Query: How do I add JWT auth to my Express routes?"] --> B[Context Search]
+
+          B --> C1[Code: auth.middleware.ts<br/>Relevance: 95%]
+          B --> C2[Doc: Auth Architecture<br/>Relevance: 88%]
+          B --> C3[Code: routes.config.ts<br/>Relevance: 82%]
+          B --> C4[PR: JWT Implementation<br/>Relevance: 78%]
+          B --> C5[Test: auth.test.ts<br/>Relevance: 75%]
+
+          C1 --> D[AI Synthesis]
+          C2 --> D
+          C3 --> D
+          C4 --> D
+          C5 --> D
+
+          D --> E[Generated Response]
+
+          E --> F[Code Example:<br/>app.use'/api', authMiddleware]
+          E --> G[Explanation:<br/>How JWT validation works]
+          E --> H[Best Practices:<br/>Token refresh, error handling]
+          E --> I[Related Resources:<br/>Links to docs & tests]
+
+          F --> J[Developer Reviews]
+          G --> J
+          H --> J
+          I --> J
+
+          J --> K{Helpful?}
+          K -->|Yes| L[Implement Solution]
+          K -->|Partial| M[Request Refinement]
+          K -->|No| N[Try Different Approach]
+
+          L --> O[Log Success Pattern]
+          M --> B
+          N --> B
+
+          style A fill:#e1f5ff
+          style D fill:#fff4e1
+          style E fill:#d4edda
+          style O fill:#f0e1ff
+      ```
+
+      #### Benefits
+      - **Faster Onboarding**: New developers become productive 3x faster with contextual code guidance
+      - **Consistency**: Ensure team follows established patterns and best practices across the codebase
+      - **Knowledge Preservation**: Capture institutional knowledge from design docs, PRs, and code comments
+      - **Reduced Context Switching**: Get answers without leaving the IDE or reading through multiple files
+      - **Living Documentation**: Code examples stay up-to-date as the repository evolves
+      - **Smart Code Reuse**: Discover existing solutions before writing duplicate code
+      - **Cross-Team Learning**: Share patterns and practices across different teams and projects
+
+      #### Key Features for Engineering Teams
+      - **IDE Integration**: Works seamlessly with VS Code, IntelliJ, and terminal workflows
+      - **Language Agnostic**: Supports Python, JavaScript/TypeScript, Java, Go, Rust, and more
+      - **Real-time Sync**: Repository changes automatically update the context index
+      - **Privacy Controls**: Keep sensitive code within team boundaries using `groupName` filters
+      - **Audit Trails**: Track which code snippets and docs are referenced for compliance
+      - **Custom Queries**: Define team-specific search patterns and code templates
+      </Tab>
+      <Tab title="Content Summarization Agent">
+      ### Content Summarization Agent
+    #### Objective
+    -  Process long-form content across multiple documents
+    -  Generate executive summaries with source attributions
+    -  Maintain consistent messaging across teams
+
+    #### Possible Design Outline
+    ```mermaid
+    sequenceDiagram
+        participant User as Content Manager
+        participant Agent as Summarization Agent
+        participant AC as Alchemyst Context
+        participant Sources as Content Sources
+
+        Note over Sources: Reports, Articles,<br/>Meeting Notes, Emails
+
+        Sources->>AC: Ingest Documents
+        AC->>AC: Extract & Structure:<br/>- Key points<br/>- Entities<br/>- Themes<br/>- Citations
+
+        User->>Agent: Request Summary:<br/>"Summarize Q4 marketing<br/>performance across all channels"
+
+        Agent->>AC: Query Context<br/>groupName: ["marketing", "q4", "performance"]
+        AC->>AC: Retrieve Relevant:<br/>- Campaign reports (5 docs)<br/>- Analytics dashboards (3 docs)<br/>- Meeting notes (8 docs)<br/>- Email threads (12 docs)
+
+        AC->>Agent: Return Ranked Documents<br/>with metadata & excerpts
+
+        Agent->>Agent: Process Content:<br/>1. Identify key themes<br/>2. Extract metrics<br/>3. Detect trends<br/>4. Consolidate insights
+
+        Agent->>Agent: Generate Summary:<br/>- Executive overview<br/>- Key findings (5-7 points)<br/>- Supporting data<br/>- Source attributions
+
+        Agent->>User: Deliver Summary with:<br/>- Main insights<br/>- Visual highlights<br/>- Full source list<br/>- Confidence scores
+
+        User->>User: Review & Refine
+
+        User->>Agent: "Add details about email campaign ROI"
+        Agent->>AC: Targeted search:<br/>groupName: ["marketing", "q4", "email", "roi"]
+        AC->>Agent: Return specific sections
+        Agent->>User: Updated summary with<br/>expanded email ROI section
+
+        User->>AC: Save Final Summary<br/>as reference document
+
+        Note over AC: Summary becomes<br/>searchable context
+    ```
+
+    #### Processing Pipeline
+    ```mermaid
+    flowchart TD
+        A[Start: Summarization Request] --> B[Parse Request Intent]
+
+        B --> C{Scope Identification}
+        C -->|Single Topic| D[Focused Search]
+        C -->|Multiple Topics| E[Multi-faceted Search]
+        C -->|Time-based| F[Temporal Search]
+        C -->|Comparative| G[Cross-sectional Search]
+
+        D --> H[Retrieve Documents]
+        E --> H
+        F --> H
+        G --> H
+
+        H --> I{Document Count?}
+        I -->|1-5 docs| J[Detailed Extraction]
+        I -->|6-20 docs| K[Balanced Extraction]
+        I -->|21+ docs| L[High-level Extraction]
+
+        J --> M[Content Analysis]
+        K --> M
+        L --> M
+
+        M --> N[Identify Themes]
+        M --> O[Extract Key Points]
+        M --> P[Detect Patterns]
+        M --> Q[Flag Contradictions]
+
+        N --> R[Synthesis Engine]
+        O --> R
+        P --> R
+        Q --> R
+
+        R --> S{Summary Type?}
+        S -->|Executive| T[High-level: 3-5 paragraphs]
+        S -->|Detailed| U[In-depth: 2-3 pages]
+        S -->|Bullet Points| V[Structured: Key takeaways]
+        S -->|Narrative| W[Story-form: Chronological]
+
+        T --> X[Add Source Citations]
+        U --> X
+        V --> X
+        W --> X
+
+        X --> Y[Generate Confidence Scores]
+        Y --> Z[Quality Check]
+
+        Z --> AA{Meets Standards?}
+        AA -->|Yes| AB[Deliver Summary]
+        AA -->|No| AC[Flag for Review]
+
+        AB --> AD[Log & Learn]
+        AC --> AD
+        AD --> AE[End]
+
+        style A fill:#d4edda
+        style H fill:#e1f5ff
+        style R fill:#fff4e1
+        style X fill:#f0e1ff
+        style AB fill:#d4edda
+        style AE fill:#d4edda
+    ```
+
+    #### Content Organization Structure
+    ```mermaid
+    graph TB
+        subgraph "Content Repository"
+            A[All Content<br/>groupName: content]
+
+            A --> B[By Department<br/>groupName: content, dept_X]
+            A --> C[By Content Type<br/>groupName: content, type_X]
+            A --> D[By Time Period<br/>groupName: content, period_X]
+            A --> E[By Project<br/>groupName: content, project_X]
+
+            B --> B1[Marketing<br/>groupName: content, marketing]
+            B --> B2[Sales<br/>groupName: content, sales]
+            B --> B3[Product<br/>groupName: content, product]
+
+            B1 --> B1A[Q4 2024<br/>groupName: content, marketing, q4_2024]
+            B1 --> B1B[Campaigns<br/>groupName: content, marketing, campaigns]
+            B1 --> B1C[Analytics<br/>groupName: content, marketing, analytics]
+
+            C --> C1[Reports<br/>groupName: content, reports]
+            C --> C2[Meeting Notes<br/>groupName: content, meetings]
+            C --> C3[Emails<br/>groupName: content, emails]
+            C --> C4[Presentations<br/>groupName: content, presentations]
+
+            D --> D1[Q3 2024<br/>groupName: content, q3_2024]
+            D --> D2[Q4 2024<br/>groupName: content, q4_2024]
+            D --> D3[Annual<br/>groupName: content, annual_2024]
+
+            E --> E1[Product Launch<br/>groupName: content, product_launch_alpha]
+            E --> E2[Rebranding<br/>groupName: content, rebrand_2024]
+        end
+
+        style A fill:#e1f5ff
+        style B fill:#fff4e1
+        style C fill:#fff4e1
+        style D fill:#fff4e1
+        style E fill:#fff4e1
+        style B1 fill:#f0e1ff
+        style C1 fill:#d4edda
+    ```
+
+    #### Multi-Document Synthesis Strategy
+    ```mermaid
+    flowchart LR
+        A[Document Set<br/>28 documents] --> B{Clustering}
+
+        B --> C1[Theme 1: Performance<br/>12 documents]
+        B --> C2[Theme 2: Budget<br/>8 documents]
+        B --> C3[Theme 3: Strategy<br/>6 documents]
+        B --> C4[Theme 4: Challenges<br/>9 documents]
+
+        C1 --> D1[Extract Key Metrics]
+        C2 --> D2[Consolidate Financials]
+        C3 --> D3[Identify Initiatives]
+        C4 --> D4[List Issues & Solutions]
+
+        D1 --> E[Synthesis Layer]
+        D2 --> E
+        D3 --> E
+        D4 --> E
+
+        E --> F[Cross-reference]
+        E --> G[Validate Consistency]
+        E --> H[Resolve Conflicts]
+        E --> I[Rank by Importance]
+
+        F --> J[Unified Summary]
+        G --> J
+        H --> J
+        I --> J
+
+        J --> K[Executive Overview]
+        J --> L[Key Findings]
+        J --> M[Supporting Details]
+        J --> N[Source Map]
+
+        style A fill:#e1f5ff
+        style E fill:#fff4e1
+        style J fill:#f0e1ff
+        style K fill:#d4edda
+    ```
+
+    #### Summary Output Structure
+    ```mermaid
+    graph TD
+        A[Generated Summary] --> B[Executive Overview<br/>2-3 sentences]
+        A --> C[Key Findings Section]
+        A --> D[Supporting Evidence]
+        A --> E[Metadata & Attribution]
+
+        C --> C1[Finding 1<br/>Source: Doc A, Para 3]
+        C --> C2[Finding 2<br/>Source: Doc B, Slide 7]
+        C --> C3[Finding 3<br/>Source: Doc C, Meeting notes]
+        C --> C4[Finding 4<br/>Source: Docs D, E, F]
+
+        D --> D1[Charts & Metrics]
+        D --> D2[Quote Excerpts]
+        D --> D3[Timeline of Events]
+        D --> D4[Comparative Analysis]
+
+        E --> E1[Source Documents: 28]
+        E --> E2[Confidence Score: 87%]
+        E --> E3[Date Range: Oct-Dec 2024]
+        E --> E4[Generated: Dec 29, 2025]
+        E --> E5[Version: 1.2]
+
+        style A fill:#e1f5ff
+        style B fill:#d4edda
+        style C fill:#fff4e1
+        style D fill:#f0e1ff
+        style E fill:#ffe1e1
+    ```
+
+    #### Agent State Machine
+    ```mermaid
+    stateDiagram-v2
+        [*] --> Idle
+
+        Idle --> ReceiveRequest: User submits query
+
+        ReceiveRequest --> AnalyzeIntent: Parse request
+        AnalyzeIntent --> QueryContext: Identify search criteria
+
+        QueryContext --> RetrieveDocuments: Execute search
+        RetrieveDocuments --> ValidateResults: Check document count
+
+        ValidateResults --> ProcessContent: Sufficient results
+        ValidateResults --> RefineQuery: Insufficient results
+
+        RefineQuery --> QueryContext: Broaden search
+
+        ProcessContent --> ExtractContent: Parse documents
+        ExtractContent --> IdentifyThemes: Analyze patterns
+        IdentifyThemes --> ConsolidateInsights: Group related info
+
+        ConsolidateInsights --> GenerateSummary: Create output
+
+        GenerateSummary --> QualityCheck: Validate summary
+
+        QualityCheck --> DeliverSummary: Passes checks
+        QualityCheck --> FlagIssues: Fails checks
+
+        FlagIssues --> HumanReview: Request manual review
+        HumanReview --> GenerateSummary: Revise
+
+        DeliverSummary --> AwaitFeedback: Present to user
+
+        AwaitFeedback --> Idle: Task complete
+        AwaitFeedback --> RefineRequest: User requests changes
+
+        RefineRequest --> ProcessContent: Adjust focus
+    ```
+
+    #### Example: Quarterly Performance Summary
+    ```mermaid
+    graph TD
+        A["User Request:<br/>'Summarize Q4 2024<br/>marketing performance'"] --> B[Context Search]
+
+        B --> C1[Campaign Reports<br/>5 documents<br/>Relevance: 98%]
+        B --> C2[Analytics Dashboards<br/>3 documents<br/>Relevance: 95%]
+        B --> C3[Meeting Notes<br/>8 documents<br/>Relevance: 88%]
+        B --> C4[Email Threads<br/>12 documents<br/>Relevance: 75%]
+        B --> C5[Budget Reports<br/>2 documents<br/>Relevance: 82%]
+
+        C1 --> D[Theme Analysis]
+        C2 --> D
+        C3 --> D
+        C4 --> D
+        C5 --> D
+
+        D --> E1[Theme: ROI Performance<br/>Sources: C1, C2, C5]
+        D --> E2[Theme: Channel Mix<br/>Sources: C1, C2]
+        D --> E3[Theme: Team Feedback<br/>Sources: C3, C4]
+        D --> E4[Theme: Budget Variance<br/>Sources: C5, C1]
+
+        E1 --> F[Synthesis Engine]
+        E2 --> F
+        E3 --> F
+        E4 --> F
+
+        F --> G[Generated Summary]
+
+        G --> H1["Executive Overview:<br/>'Q4 exceeded targets by 23%<br/>with strong digital performance'"]
+        G --> H2["Key Finding 1:<br/>Email campaigns ROI: 340%<br/>Source: Campaign Report Q4"]
+        G --> H3["Key Finding 2:<br/>Social media spend up 15%<br/>Source: Budget Report, Analytics"]
+        G --> H4["Key Finding 3:<br/>Team recommends doubling<br/>video content budget<br/>Source: 3 meeting notes"]
+
+        H1 --> I[Deliver to User]
+        H2 --> I
+        H3 --> I
+        H4 --> I
+
+        I --> J[User Actions]
+
+        J --> K[Share with executives]
+        J --> L[Export to presentation]
+        J --> M[Request detailed breakdown]
+        J --> N[Save as template]
+
+        style A fill:#e1f5ff
+        style D fill:#fff4e1
+        style F fill:#f0e1ff
+        style G fill:#d4edda
+    ```
+
+    #### Consistency & Version Control
+    ```mermaid
+    flowchart TD
+        A[Summary Version 1.0] --> B{Detect Content Update}
+
+        B -->|New Document Added| C[Incremental Analysis]
+        B -->|Existing Doc Modified| D[Delta Processing]
+        B -->|No Changes| E[Maintain Current]
+
+        C --> F[Identify Impact]
+        D --> F
+
+        F --> G{Significance?}
+        G -->|Major| H[Regenerate Summary<br/>Version 1.1]
+        G -->|Minor| I[Add Footnote<br/>Version 1.0.1]
+        G -->|Negligible| E
+
+        H --> J[Track Changes]
+        I --> J
+        E --> J
+
+        J --> K[Version History]
+
+        K --> L[Version 1.0: Dec 1<br/>Source docs: 20]
+        K --> M[Version 1.0.1: Dec 15<br/>Added: Budget update]
+        K --> N[Version 1.1: Dec 29<br/>Major revision: New data]
+
+        L --> O[Audit Trail]
+        M --> O
+        N --> O
+
+        O --> P[Maintain Consistency<br/>Across Teams]
+
+        style A fill:#e1f5ff
+        style F fill:#fff4e1
+        style H fill:#f0e1ff
+        style K fill:#d4edda
+    ```
+
+    #### Benefits
+    - **Time Savings**: Reduce summary creation time from hours to minutes
+    - **Comprehensive Coverage**: Never miss key information across multiple documents
+    - **Source Transparency**: Full attribution ensures credibility and traceability
+    - **Consistency**: Maintain unified messaging across departments and stakeholders
+    - **Version Control**: Track how summaries evolve as new information arrives
+    - **Scalability**: Process hundreds of documents simultaneously
+    - **Multi-format Output**: Generate executive briefs, detailed reports, or bullet points
+    - **Living Summaries**: Automatically update as source documents change
+
+    #### Key Features for Content Teams
+    - **Smart Deduplication**: Identify and consolidate redundant information
+    - **Conflict Detection**: Flag contradictory statements across documents
+    - **Confidence Scoring**: Indicate reliability based on source quality and consensus
+    - **Custom Templates**: Define organization-specific summary formats
+    - **Multi-language Support**: Summarize content across different languages
+    - **Sentiment Analysis**: Capture tone and emotional context
+    - **Trend Identification**: Highlight patterns across time periods
+    - **Collaborative Refinement**: Allow teams to iterate on summaries together
+
+    #### Use Case Scenarios
+    - **Executive Briefings**: Distill 50+ documents into 2-page executive summaries
+    - **Meeting Preparation**: Synthesize pre-read materials for strategic sessions
+    - **Project Retrospectives**: Consolidate learnings from project documentation
+    - **Market Research**: Aggregate insights from multiple research reports
+    - **Competitive Analysis**: Summarize intelligence across competitor activities
+    - **Quarterly Reviews**: Compile performance data across all departments
+    - **Crisis Communication**: Rapidly synthesize information during incidents
+    </Tab>
+  </Tabs>
+
+  ## Advanced Usage Patterns & Gotchas
+
+  ### Pattern 1: Hierarchical groupName Design
+
+  #### The Problem
+  Flat groupName structures become unmanageable at scale. You end up with searches that are either too broad (returning 1000+ documents) or too narrow (returning nothing).
+
+  #### The Solution: Think in Layers
+  Design your groupName hierarchy like a file system - broad categories at the top, specific tags as you go deeper.
+
+  ```javascript
+  // ❌ Flat structure - Hard to query effectively
+  {
+    "groupName": ["marketing_q4_2024_campaign_email_newsletter_product_launch"]
+  }
+
+  // ✅ Hierarchical structure - Composable and flexible
+  {
+    "groupName": ["marketing", "q4_2024", "campaign", "email"]
+  }
+  ```
+
+  #### Three-Layer Strategy
+
+  **Layer 1: Organization/Domain** (Required for all documents)
+  - `"engineering"`, `"marketing"`, `"sales"`, `"support"`
+  - Purpose: Top-level access control
+
+  **Layer 2: Category/Time** (Recommended)
+  - `"q4_2024"`, `"product_alpha"`, `"codebase"`, `"customer_tickets"`
+  - Purpose: Logical grouping and temporal filtering
+
+  **Layer 3: Specifics** (Optional, use sparingly)
+  - `"auth"`, `"api"`, `"campaign"`, `"billing"`
+  - Purpose: Fine-grained filtering
+
+  ##### Example: Engineering Team
+
+  ```javascript
+  // Base document - accessible to all engineering
+  {
+    "groupName": ["engineering"],
+    "content": "Company-wide coding standards..."
+  }
+
+  // Backend auth code - specific team access
+  {
+    "groupName": ["engineering", "backend", "auth"],
+    "content": "JWT middleware implementation..."
+  }
+
+  // Frontend component - specific project
+  {
+    "groupName": ["engineering", "frontend", "project_redesign"],
+    "content": "Button component with new design system..."
+  }
+  ```
+
+  #### Query Patterns
+
+  ```javascript
+  // Broad: All engineering docs (might return 10,000+ docs)
+  search({ groupName: ["engineering"] })
+
+  // Focused: Backend authentication (returns ~50 docs)
+  search({ groupName: ["engineering", "backend", "auth"] })
+
+  // Specific: Auth docs in current project (returns ~10 docs)
+  search({
+    groupName: ["engineering", "backend", "auth"],
+    metadata: { project: "api_v2" }
+  })
+  ```
+  <Info>
+  #### 💡 Pro Tip: The 3-5-10 Rule
+  - Maximum 3 groupName layers for 90% of queries
+  - Maximum 5 tags in any single groupName array
+  - Maximum 10 unique tag combinations per user query pattern
+
+  ### ⚠️ Common Mistake: Over-nesting
+  ```javascript
+  // ❌ Too deep - queries become fragile
+  ["engineering", "backend", "api", "v2", "endpoints", "user", "auth", "login"]
+
+  // ✅ Better - use metadata for the specifics
+  groupName: ["engineering", "backend", "api"]
+  metadata: {
+    version: "v2",
+    category: "auth",
+    endpoint: "login"
+  }
+  ```
+  </Info>
+  ---
+
+  ### Pattern 2: Handling Document Updates
+
+  #### The Deduplication Gotcha
+
+  Alchemyst uses `metadata.fileName` as the deduplication key. This means:
+  1. Same fileName = Alchemyst treats it as an update attempt
+  2. Update attempts without delete = **409 Conflict error**
+  3. This is **by design** to prevent accidental duplicates
+
+  #### Three Update Strategies
+
+  ##### Strategy A: Delete-Then-Add (Recommended for true updates)
+
+  ```javascript
+  // Document has changed - replace it entirely
+  async function updateDocument(fileName, newContent) {
+    // Step 1: Find and delete old version
+    const existing = await alchemyst.search({
+      metadata: { fileName: fileName }
+    });
+
+    if (existing.results.length > 0) {
+      await alchemyst.delete(existing.results[0].id);
+    }
+
+    // Step 2: Add new version
+    await alchemyst.add({
+      content: newContent,
+      metadata: { fileName: fileName }
+    });
+  }
+
+  // Use case: Documentation that gets edited
+  // "user-guide.pdf" updated from v1 to v2
+  ```
+
+  ##### Strategy B: Versioned FileNames (Keep history)
+
+  ```javascript
+  // Track document evolution over time
+  await alchemyst.add({
+    content: quarterlyReport,
+    metadata: {
+      fileName: "q4-report-v1.pdf",
+      version: "1.0",
+      status: "draft"
+    }
+  });
+
+  await alchemyst.add({
+    content: quarterlyReportFinal,
+    metadata: {
+      fileName: "q4-report-v2.pdf",  // Different fileName!
+      version: "2.0",
+      status: "final",
+      supersedes: "q4-report-v1.pdf"
+    }
+  });
+
+  // Use case: Legal documents, contracts, specs where history matters
+  ```
+
+  ##### Strategy C: Conversational Updates (Incremental context)
+
+  ```javascript
+  // For chat-like interactions where context accumulates
+  await alchemyst.addToConversation({
+    conversationId: "support-ticket-1234",
+    content: "Customer reported login issue...",
+    metadata: {
+      timestamp: "2024-12-29T10:00:00Z",
+      speaker: "customer"
+    }
+  });
+
+  await alchemyst.addToConversation({
+    conversationId: "support-ticket-1234",
+    content: "Resolved by resetting password...",
+    metadata: {
+      timestamp: "2024-12-29T10:15:00Z",
+      speaker: "agent"
+    }
+  });
+
+  // Use case: Support tickets, chat logs, ongoing projects
+  ```
+
+  #### Decision Tree: Which Strategy?
+
+  ```
+  Is the new content completely replacing the old?
+  ├─ YES → Use Strategy A (Delete-Then-Add)
+  │
+  ├─ NO → Does history matter?
+      ├─ YES → Use Strategy B (Versioned FileNames)
+      │
+      └─ NO → Is this part of a conversation/thread?
+          ├─ YES → Use Strategy C (Conversational)
+          └─ NO → Use Strategy B with cleanup job
+  ```
+
+  #### 🔧 Advanced: Batch Updates
+
+  ```javascript
+  // ❌ Don't do this - 100 sequential operations
+  for (const doc of documents) {
+    await alchemyst.delete(doc.id);
+    await alchemyst.add(doc.updated);
+  }
+  // Time: ~30-60 seconds
+
+  // ✅ Do this - bulk operations
+  const deleteIds = documents.map(d => d.id);
+  await alchemyst.bulkDelete(deleteIds);
+
+  await alchemyst.bulkAdd(
+    documents.map(d => d.updated)
+  );
+  // Time: ~3-5 seconds
+  ```
+
+  <Warning>
+  ##### ⚠️ Warning: The Race Condition
+
+  ```javascript
+  // ❌ Dangerous - race condition in concurrent environments
+  async function updateDoc(fileName, content) {
+    await alchemyst.delete({ fileName });  // ⚠️ Might not be done yet
+    await alchemyst.add({ fileName, content });  // ⚠️ Might conflict
+  }
+
+  // ✅ Safe - wait for confirmation
+  async function updateDocSafe(fileName, content) {
+    const deleteResponse = await alchemyst.delete({ fileName });
+
+    if (!deleteResponse.success) {
+      throw new Error("Delete failed");
+    }
+
+    // Small delay to ensure propagation (100-200ms)
+    await new Promise(resolve => setTimeout(resolve, 150));
+
+    return await alchemyst.add({ fileName, content });
+  }
+  ```
+  </Warning>
+  ---
+
+  ### Pattern 3: Composable Context Strategies
+
+  #### The Dilemma
+  Should you store one big document or many small ones? This affects retrieval quality, performance, and maintenance.
+
+  #### Rule of Thumb: Split by Access Pattern
+
+  ##### When to COMBINE contexts:
+
+  **Scenario 1: Tightly Coupled Information**
+  ```javascript
+  // ✅ Good - store together
+  {
+    groupName: ["product", "api_spec"],
+    content: `
+      Authentication Endpoint
+      POST /api/auth/login
+
+      Request Body:
+      - email: string (required)
+      - password: string (required)
+
+      Response:
+      - token: JWT string
+      - expiresIn: number (seconds)
+
+      Error Codes:
+      - 401: Invalid credentials
+      - 429: Rate limited
+    `
+  }
+
+  // ❌ Bad - unnecessarily fragmented
+  // Document 1: "POST /api/auth/login"
+  // Document 2: "Request body fields"
+  // Document 3: "Response format"
+  // Document 4: "Error codes"
+  // Problem: User query "how to login" needs all 4 docs
+  ```
+
+  **Scenario 2: Always Retrieved Together**
+  ```javascript
+  // If users always need A, B, and C together, combine them
+  // Example: Product onboarding guide (overview + setup + first steps)
+  ```
+
+  #### When to SPLIT contexts:
+
+  **Scenario 1: Different Access Patterns**
+  ```javascript
+  // ✅ Good - separate by access control
+  // Public documentation
+  {
+    groupName: ["docs", "public"],
+    content: "How to use our API..."
+  }
+
+  // Internal implementation notes
+  {
+    groupName: ["docs", "internal"],
+    content: "Rate limiting implementation details..."
+  }
+  ```
+
+  **Scenario 2: Different Update Frequencies**
+  ```javascript
+  // ✅ Good - separate by volatility
+  // Static content (rarely changes)
+  {
+    fileName: "company-history.md",
+    content: "Founded in 2020..."
+  }
+
+  // Dynamic content (changes daily)
+  {
+    fileName: "daily-metrics-2024-12-29.json",
+    content: "Today's sales: $45,231..."
+  }
+  ```
+
+  **Scenario 3: Size Optimization**
+  ```javascript
+  // One 50,000-word document:
+  // ❌ Slow to retrieve
+  // ❌ Wastes tokens on irrelevant sections
+  // ❌ Hard to rank relevance
+
+  // Split into 10 logical sections:
+  // ✅ Fast retrieval
+  // ✅ Only relevant sections retrieved
+  // ✅ Better semantic ranking
+  ```
+
+  #### The Goldilocks Size: 500-2000 words per document
+
+  ```javascript
+  // ❌ Too small (100 words)
+  // Problem: Loses context, requires many docs for complete answer
+  {
+    content: "JWT tokens expire after 24 hours"
+  }
+
+  // ❌ Too large (10,000 words)
+  // Problem: Retrieves too much irrelevant content
+  {
+    content: "Entire authentication system documentation..."
+  }
+
+  // ✅ Just right (800 words)
+  // Problem: Single cohesive topic with enough context
+  {
+    content: `
+      JWT Token Management
+
+      Overview: Our JWT implementation uses...
+
+      Token Lifecycle:
+      1. Generation: POST /auth/login
+      2. Validation: Automatic on each request
+      3. Refresh: POST /auth/refresh
+      4. Expiration: 24 hours default
+
+      [Full details with examples...]
+    `
+  }
+  ```
+<Info>
+  #### 💡 Pro Tip: The Chapter Pattern
+
+  Structure large content like a book:
+
+  ```javascript
+  // Parent metadata for navigation
+  const bookMetadata = {
+    book: "employee-handbook",
+    totalChapters: 12
+  };
+
+  // Chapter 1: Welcome
+  await alchemyst.add({
+    groupName: ["hr", "handbook"],
+    metadata: { ...bookMetadata, chapter: 1, title: "Welcome" },
+    content: "Chapter 1: Welcome to the company..."
+  });
+
+  // Chapter 2: Benefits
+  await alchemyst.add({
+    groupName: ["hr", "handbook"],
+    metadata: { ...bookMetadata, chapter: 2, title: "Benefits" },
+    content: "Chapter 2: Health insurance options..."
+  });
+
+  // Query: Get specific chapter or search across all
+  // "Tell me about health insurance"
+  // → Retrieves Chapter 2 specifically
+  ```
+</Info>
+
+  #### Advanced: Cross-References
+
+  ```javascript
+  // Document with references to related content
+  {
+    groupName: ["engineering", "backend", "auth"],
+    metadata: {
+      relatedDocs: ["api-security-guide", "user-model-schema"],
+      prerequisites: ["basic-auth-concepts"]
+    },
+    content: "Advanced authentication patterns..."
+  }
+
+  // Your application can fetch related docs for deeper context
+  ```
+
+  ---
+
+  ### Pattern 4: Bulk Operations at Scale
+
+  #### The Performance Cliff
+
+  ```javascript
+  // ❌ Sequential adds: ~30 seconds for 1000 docs
+  for (let i = 0; i < 1000; i++) {
+    await alchemyst.add(documents[i]);
+  }
+
+  // ✅ Bulk adds: ~3 seconds for 1000 docs (10x faster!)
+  await alchemyst.bulkAdd(documents);
+  ```
+
+  #### Optimal Batch Sizes
+
+  Based on production usage patterns:
+
+  | Documents | Batches | Time | Recommendation |
+  |-----------|---------|------|----------------|
+  | 100 | 1 batch | ~0.5s | ✅ Single call |
+  | 1,000 | 1 batch | ~3s | ✅ Single call |
+  | 10,000 | 10 batches | ~35s | ✅ Optimal |
+  | 10,000 | 100 batches | ~90s | ⚠️ Too fragmented |
+  | 100,000 | 100 batches | ~6min | ✅ Good with progress tracking |
+
+  #### The 1000-Document Sweet Spot
+
+  ```javascript
+  // Process 10,000 documents efficiently
+  async function bulkIngest(documents) {
+    const BATCH_SIZE = 1000;
+    const batches = [];
+
+    // Split into batches of 1000
+    for (let i = 0; i < documents.length; i += BATCH_SIZE) {
+      batches.push(documents.slice(i, i + BATCH_SIZE));
+    }
+
+    // Process batches with progress tracking
+    const results = [];
+    for (let i = 0; i < batches.length; i++) {
+      console.log(`Processing batch ${i + 1}/${batches.length}`);
+
+      const result = await alchemyst.bulkAdd(batches[i]);
+      results.push(result);
+
+      // Optional: Small delay between batches to avoid rate limits
+      if (i < batches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+
+    return results;
+  }
+  ```
+
+  #### 🚀 Advanced: Parallel Processing with Limits
+
+  ```javascript
+  // Process multiple batches in parallel (but not too many!)
+  async function parallelBulkIngest(documents) {
+    const BATCH_SIZE = 1000;
+    const MAX_CONCURRENT = 3; // Don't overwhelm the API
+
+    const batches = [];
+    for (let i = 0; i < documents.length; i += BATCH_SIZE) {
+      batches.push(documents.slice(i, i + BATCH_SIZE));
+    }
+
+    // Process 3 batches at a time
+    const results = [];
+    for (let i = 0; i < batches.length; i += MAX_CONCURRENT) {
+      const chunk = batches.slice(i, i + MAX_CONCURRENT);
+      const chunkResults = await Promise.all(
+        chunk.map(batch => alchemyst.bulkAdd(batch))
+      );
+      results.push(...chunkResults);
+
+      console.log(`Completed ${Math.min(i + MAX_CONCURRENT, batches.length)}/${batches.length} batches`);
+    }
+
+    return results;
+  }
+  ```
+
+  #### Error Handling in Bulk Operations
+
+  ```javascript
+  async function robustBulkIngest(documents) {
+    const BATCH_SIZE = 1000;
+    const MAX_RETRIES = 3;
+
+    const batches = chunkArray(documents, BATCH_SIZE);
+    const results = [];
+    const failures = [];
+
+    for (let i = 0; i < batches.length; i++) {
+      let attempt = 0;
+      let success = false;
+
+      while (attempt < MAX_RETRIES && !success) {
+        try {
+          const result = await alchemyst.bulkAdd(batches[i]);
+          results.push(result);
+          success = true;
+        } catch (error) {
+          attempt++;
+          console.warn(`Batch ${i} failed (attempt ${attempt}/${MAX_RETRIES}):`, error.message);
+
+          if (attempt < MAX_RETRIES) {
+            // Exponential backoff: 1s, 2s, 4s
+            await new Promise(resolve =>
+              setTimeout(resolve, 1000 * Math.pow(2, attempt - 1))
+            );
+          } else {
+            // Final failure - log and continue
+            failures.push({ batchIndex: i, error: error.message });
+          }
+        }
+      }
+    }
+
+    if (failures.length > 0) {
+      console.error(`${failures.length} batches failed after retries:`, failures);
+    }
+
+    return { results, failures };
+  }
+  ```
+
+  #### 💡 Pro Tip: Progress Tracking for Large Ingests
+
+  ```javascript
+  // For 100K+ documents, give users feedback
+  async function ingestWithProgress(documents, onProgress) {
+    const BATCH_SIZE = 1000;
+    const batches = chunkArray(documents, BATCH_SIZE);
+
+    let completed = 0;
+
+    for (const batch of batches) {
+      await alchemyst.bulkAdd(batch);
+      completed += batch.length;
+
+      onProgress({
+        completed,
+        total: documents.length,
+        percentage: (completed / documents.length * 100).toFixed(1)
+      });
+    }
+  }
+
+  // Usage in UI
+  await ingestWithProgress(allDocs, (progress) => {
+    console.log(`Progress: ${progress.percentage}% (${progress.completed}/${progress.total})`);
+    // Update progress bar, etc.
+  });
+  ```
+
+  ---
+
+  ### Anti-Pattern 1: Over-segmentation
+
+  #### The Problem
+  Creating too many small, fragmented contexts that should be combined.
+
+  #### Real Example: Support Ticket System
+
+  ```javascript
+  // ❌ Anti-pattern: One document per field
+  // Ticket #1234 split into 6 documents:
+  {
+    groupName: ["support", "ticket_1234", "subject"],
+    content: "Cannot login to dashboard"
+  }
+  {
+    groupName: ["support", "ticket_1234", "description"],
+    content: "User reports error message..."
+  }
+  {
+    groupName: ["support", "ticket_1234", "priority"],
+    content: "High"
+  }
+  {
+    groupName: ["support", "ticket_1234", "agent"],
+    content: "John Doe"
+  }
+  {
+    groupName: ["support", "ticket_1234", "resolution"],
+    content: "Password reset required"
+  }
+  {
+    groupName: ["support", "ticket_1234", "timestamp"],
+    content: "2024-12-29T10:00:00Z"
+  }
+
+  // Problems:
+  // 1. Query "login issues" retrieves 6 fragments
+  // 2. LLM needs to reassemble the ticket
+  // 3. Costs 6x the storage and retrieval
+  // 4. Loses contextual relationships
+  ```
+
+  ```javascript
+  // ✅ Correct: One cohesive document
+  {
+    groupName: ["support", "tickets", "resolved"],
+    metadata: {
+      ticketId: "1234",
+      priority: "high",
+      agent: "John Doe",
+      resolvedAt: "2024-12-29T10:15:00Z"
+    },
+    content: `
+      Ticket #1234: Cannot login to dashboard
+
+      Description:
+      User reports error message "Invalid credentials" when attempting
+      to log in with correct password. Account verified as active.
+
+      Resolution:
+      Issue caused by expired password (90-day policy). Password reset
+      link sent to user. User confirmed successful login after reset.
+
+      Root Cause: Password expiration notification system failed to
+      send warning emails.
+    `
+  }
+
+  // Benefits:
+  // 1. Single retrieval gets complete context
+  // 2. LLM can understand full story
+  // 3. 6x cost reduction
+  // 4. Preserves semantic relationships
+  ```
+
+  #### The Acid Test: Query Simulation
+
+  Ask yourself: "What will my users search for?"
+
+  ```javascript
+  // User query: "How do we handle login issues?"
+
+  // With over-segmentation:
+  // → Retrieves 47 fragments across 8 tickets
+  // → LLM confused by incomplete pieces
+  // → Answer: Generic, not helpful
+
+  // With proper documents:
+  // → Retrieves 3-4 complete ticket resolutions
+  // → LLM sees full context and patterns
+  // → Answer: "Based on tickets #1234, #1456, we typically..."
+  ```
+
+  #### 💡 Rule: The Paragraph Test
+
+  If your document content is less than a paragraph (< 100 words), you're probably over-segmenting.
+
+  **Exception:** Structured data with high retrieval value
+  ```javascript
+  // This is OK even though it's short
+  {
+    groupName: ["company", "contacts"],
+    metadata: { department: "engineering", role: "cto" },
+    content: "Jane Smith - CTO - jane@company.com - ext. 1234"
+  }
+  ```
+
+  ---
+
+  ### Anti-Pattern 2: Metadata Bloat
+
+  #### The Problem
+  Storing too much or redundant information in metadata, slowing down queries and wasting storage.
+
+  #### Real Example: Product Catalog
+
+  ```javascript
+  // ❌ Metadata bloat
+  {
+    groupName: ["products", "electronics"],
+    metadata: {
+      productId: "PROD-12345",
+      productName: "Wireless Mouse",
+      productDescription: "Ergonomic wireless mouse with 6 buttons",
+      productCategory: "Electronics",
+      productSubcategory: "Computer Accessories",
+      productSubSubcategory: "Input Devices",
+      productBrand: "TechCorp",
+      productBrandId: "BRAND-789",
+      productBrandCountry: "USA",
+      productPrice: 29.99,
+      productPriceCurrency: "USD",
+      productPriceFormatted: "$29.99",
+      productStock: 150,
+      productStockStatus: "in_stock",
+      productStockWarehouse: "warehouse_3",
+      productWeight: "0.2kg",
+      productDimensions: "12x8x4cm",
+      productColor: "black",
+      productColorHex: "#000000",
+      productRating: 4.5,
+      productReviewCount: 234,
+      productSKU: "MOUSE-WL-BK-001",
+      productUPC: "123456789012",
+      productManufacturer: "TechCorp Electronics Ltd",
+      productOriginCountry: "China",
+      productWarranty: "2 years",
+      productReleaseDate: "2024-01-15",
+      productLastUpdated: "2024-12-29T10:00:00Z",
+      productCreatedAt: "2024-01-01T00:00:00Z",
+      productCreatedBy: "admin@company.com",
+      productUpdatedBy: "inventory@company.com",
+      productTags: ["wireless", "ergonomic", "6-button", "usb-receiver"],
+      productIsActive: true,
+      productIsFeatured: false,
+      productIsDiscounted: false
+      // ... 15 more fields
+    },
+    content: "TechCorp Wireless Mouse - Ergonomic design with 6 programmable buttons..."
+  }
+
+  // Problems:
+  // 1. 90% of metadata never used in queries
+  // 2. Duplicates info already in content
+  // 3. Slows down indexing and retrieval
+  // 4. Harder to maintain consistency
+  ```
+
+  ```javascript
+  // ✅ Lean metadata - only what you query/filter by
+  {
+    groupName: ["products", "electronics", "accessories"],
+    metadata: {
+      productId: "PROD-12345",
+      category: "input_devices",
+      price: 29.99,
+      inStock: true,
+      brand: "TechCorp"
+    },
+    content: `
+      TechCorp Wireless Mouse (SKU: MOUSE-WL-BK-001)
+
+      Ergonomic wireless mouse with 6 programmable buttons
+      Price: $29.99 | Rating: 4.5/5 (234 reviews)
+      Color: Black | Weight: 0.2kg | Dimensions: 12x8x4cm
+
+      Features:
+      - 2.4GHz wireless with USB receiver
+      - Ergonomic design for all-day comfort
+      - 6 programmable buttons
+      - 2-year warranty
+
+      Stock: 150 units available at Warehouse 3
+      Origin: Made in China | Released: January 2024
+    `
+  }
+
+  // Benefits:
+  // 1. 80% less metadata storage
+  // 2. Faster queries (fewer fields to scan)
+  // 3. Easier to maintain
+  // 4. Full info still retrievable from content
+  ```
+
+  #### Decision Framework: Metadata vs Content
+
+  **Store in METADATA if:**
+  - ✅ You filter or sort by it (`price`, `inStock`, `category`)
+  - ✅ You need exact matching (`productId`, `sku`)
+  - ✅ It's used for access control (`department`, `classification`)
+  - ✅ It changes frequently and independently (`stock`, `price`)
+
+  **Store in CONTENT if:**
+  - ✅ It's descriptive text (`description`, `features`)
+  - ✅ It's rarely filtered (`dimensions`, `weight`)
+  - ✅ It's only needed when document is retrieved (`warranty`, `origin`)
+  - ✅ It's part of the semantic meaning (`reviews`, `specifications`)
+
+<Info>
+  #### 💡 Pro Tip: The 5-Field Rule
+
+  Start with maximum 5 metadata fields. Add more ONLY when you have a specific query pattern that requires it.
+
+  ```javascript
+  // Starter template - covers 90% of use cases
+  {
+    groupName: ["domain", "category"],
+    metadata: {
+      id: "unique-identifier",        // For updates/deletes
+      status: "active",                // For filtering
+      lastModified: "2024-12-29",      // For freshness
+      owner: "team-name",              // For access control
+      priority: "high"                 // For ranking (optional)
+    },
+    content: "..." // Everything else goes here
+  }
+  ```
+</Info>
+<Warning>
+  #### ⚠️ Common Mistake: Duplicating Content in Metadata
+
+  ```javascript
+  // ❌ Don't do this
+  {
+    metadata: {
+      title: "Q4 Sales Report",  // Duplicated
+      summary: "Sales increased by 23%..."  // Duplicated
+    },
+    content: `
+      Q4 Sales Report
+
+      Summary: Sales increased by 23%...
+    `
+  }
+
+  // ✅ Do this
+  {
+    metadata: {
+      documentType: "sales_report",
+      quarter: "q4_2024"
+    },
+    content: `
+      Q4 Sales Report
+
+      Summary: Sales increased by 23%...
+    `
+  }
+  ```
+</Warning>
+
+  #### Real Impact: Before & After
+
+  **Before optimization (metadata bloat):**
+  - Storage: 2.3GB for 10,000 products
+  - Query time: 450ms average
+  - Index time: 12 minutes
+  - Maintenance: 3 fields out of sync per 100 updates
+
+  **After optimization (lean metadata):**
+  - Storage: 0.8GB for 10,000 products (65% reduction)
+  - Query time: 180ms average (60% faster)
+  - Index time: 4 minutes (67% faster)
+  - Maintenance: Consistency issues eliminated
+
+  ---
+
+  ### Quick Reference: Pattern Selection
+
+  ```
+  Choose Pattern 1 (Hierarchical groupName) when:
+  → You have multiple teams/departments
+  → Access control matters
+  → Your data has natural categories
+
+  Choose Pattern 2 (Document Updates) when:
+  → Delete-then-add: Content genuinely changes
+  → Versioning: History matters (legal, compliance)
+  → Conversational: Building context over time
+
+  Choose Pattern 3 (Composable Context) when:
+  → Combine: Info always retrieved together
+  → Split: Different access patterns or update frequencies
+  → Target 500-2000 words per document
+
+  Choose Pattern 4 (Bulk Operations) when:
+  → Ingesting 1000+ documents
+  → Batch size: 1000 documents per call
+  → Use retries and progress tracking
+
+  Avoid Anti-Pattern 1 (Over-segmentation) by:
+  → Keeping related info together
+  → Passing the "paragraph test"
+  → Simulating real user queries
+
+  Avoid Anti-Pattern 2 (Metadata Bloat) by:
+  → Starting with 5 fields max
+  → Only storing what you filter/sort by
+  → Keeping descriptions in content
+  ```
+
+
+  ## Conclusion
+
+  **Alchemyst** simplifies the process of giving AI models the right **context** so they can reason **more accurately** using your own data. By transforming raw information into structured, retrievable context, it bridges the gap between static knowledge and dynamic intelligence.
+
+  Whether you're enhancing customer support, powering developer tools, or building compliance systems, we can act as the **Organizational Context Layer** that provides a reliable foundation for **context-aware applications**.

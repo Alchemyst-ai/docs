@@ -60,8 +60,8 @@
           {
             "group": "Getting started",
             "pages": [
-              "introduction",
-              "quickstart"
+              "getting-started/index",
+              "getting-started/quickstart"
             ]
           },
           {
@@ -85,9 +85,10 @@
             ]
           },
           {
-            "group": "Troubleshoot",
+            "group": "Advanced",
             "pages": [
-              "tutorials/troubleshoot"
+              "advanced/advanced-usage",
+              "advanced/troubleshooting"
             ]
           }
         ]
