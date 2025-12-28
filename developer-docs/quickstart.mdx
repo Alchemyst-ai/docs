@@ -8,7 +8,7 @@ description: "Start building awesome AI systems in minutes"
 This guide shows you how to **store context in Alchemyst AI and reuse it in your LLM or agent** - step by step.
 
 
-## What you’ll build
+## What you'll build
 
 By the end of this guide, you will:
 - Store context (memory) in Alchemyst
@@ -18,8 +18,8 @@ By the end of this guide, you will:
 
 ## Prerequisites
 
-You’ll need:
-- An Alchemyst AI account - [sign up](https://platform.getalchemystai.com)
+You'll need:
+- An Alchemyst AI account - [**sign up**](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=quickstart&utm_medium=quickstart_article&utm_content=quickstart_prerequisites_cta)
 - Your `ALCHEMYST_AI_API_KEY`
 - Python 3.9+ or Node.js 18+
 
@@ -29,10 +29,10 @@ You’ll need:
 
 <CodeGroup>
   ```bash node
-  npm install alchemyst-ai
+  npm install @alchemystai/sdk
   ```
   ```bash python
-  pip install alchemyst-ai
+  pip install alchemystai
   ```
 </CodeGroup>
 
@@ -58,7 +58,7 @@ You’ll need:
 
 </CodeGroup>
 
-## Step 3 : Create documents array 
+## Step 3 : Create documents array
 
 The ```documents``` array contains the raw content you want Alchemyst to store - documents, PDFs, and other sources must first be converted into text strings and then uploaded
 
@@ -114,9 +114,9 @@ This step adds documents into the context processor which are then turned into n
     documents:docs_array,
     context_type: 'resource',  // one of: resource | conversation | instruction
     source: 'web-upload',
-    scope: 'internal',     // one of: internal | external       
+    scope: 'internal',     // one of: internal | external
       // [OPTIONAL] metadata can be null. Use for filtering later.
-    metadata: { 
+    metadata: {
       fileName: 'notes.txt',
       fileType: 'text/plain',
       lastModified: new Date().toISOString(),
@@ -149,11 +149,11 @@ This step adds documents into the context processor which are then turned into n
 
 ### What just happened?
 
-- The data was stored in Alchemyst’s [context layer](https://platform.getalchemystai.com/context)
+- The data was stored in Alchemyst's [context layer](https://platform.getalchemystai.com/context)
 - It can be used to search query and provide llm with relevant context
 
 
-## Step 5: Search through context 
+## Step 5: Search through context
 
 Retrieve the most relevant stored context before invoking the model.
 
@@ -172,7 +172,7 @@ Retrieve the most relevant stored context before invoking the model.
   ```python python
     results = client.v1.context.search(
         query=question,
-        similarity_threshold=0.8, 
+        similarity_threshold=0.8,
         minimum_similarity_threshold = 0.5,
         scope = "internal",
         metadata= None,
@@ -224,7 +224,7 @@ That's it, you're all set. With context in place, the model can now generate acc
 - Retrieves relevant memory
 - keeps behavior consistent across sessions
 
-#### You don’t need:
+#### You don't need:
 
 - Custom vector stores
 - Manual Prompt stuffing

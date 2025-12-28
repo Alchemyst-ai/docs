@@ -20,7 +20,7 @@
   "colors": {
     "primary": "#f59025",
     "light": "#f39025",
-    "dark": "#151515"
+    "dark": "#252525"
   },
   "contextual": {
     "options": [
@@ -33,6 +33,10 @@
       "cursor",
       "vscode"
     ]
+  },
+  "banner": {
+    "content": "🚀 Alchemyst is now the Pareto Frontier for AI Context! [Learn more](https://getalchemystai.com/benchmarks?utm_source=docs&utm_campaign=pareto_frontier_announcement&utm_medium=announcement&utm_content=alchemyst_is_now_pareto_frontier)",
+    "dismissible": false
   },
   "favicon": "/logo/logo.png",
   "navigation": {
@@ -170,10 +174,10 @@
             "expanded": false
           },
           {
-            "group": "LLM Proxy",
+            "group": "Context Proxy",
             "pages": [
-              "integrations/llm-proxy/anthropic",
-              "integrations/llm-proxy/openai"
+              "integrations/context-proxy/anthropic",
+              "integrations/context-proxy/openai"
             ]
           }
         ]
@@ -285,7 +289,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://platform.getalchemystai.com"
+      "href": "https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=docs_dashboard_button&utm_medium=button&utm_content=dashboard_button"
     }
   },
   "footer": {
@@ -293,7 +297,7 @@
       "x": "https://x.com/getalchemyst",
       "github": "https://github.com/alchemyst-ai",
       "linkedin": "https://linkedin.com/company/alchemystai",
-      "discord": "https://docs/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
+      "discord": "https://getalchemystai.com/docs/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
     }
   },
   "integrations": {

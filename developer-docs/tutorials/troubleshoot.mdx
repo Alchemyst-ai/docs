@@ -21,7 +21,7 @@ description: Common API errors, their causes, and practical fixes, along with th
 | :--- | :--- | :--- | :--- |
 | **400** | `BadRequest` | Missing or malformed search parameters. | Ensure `query` is provided and properly formatted.Validate your payload against the [schema](/api-reference/endpoint/api/v1/context/search) |
 | **401** | `Unauthorized` | Invalid or missing `ALCHEMYST_AI_API_KEY`. | Confirm the request includes a valid API key. |
-| **403** | `Forbidden` | Searching a `scope` you don’t have access to. | Make sure the key is still valid. Ensure the search `scope` is accessible to the current user or org. |
+| **403** | `Forbidden` | Searching a `scope` you don't have access to. | Make sure the key is still valid. Ensure the search `scope` is accessible to the current user or org. |
 | **429** | `RateLimit` | Too many search requests. | Add throttling or cache repeated searches. |
 | **422** | `Unprocessable` | Documents were not indexed correctly. | Verify documents were successfully ingested before searching. |
 

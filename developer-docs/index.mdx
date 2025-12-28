@@ -1,98 +1,115 @@
 ---
-title: "Welcome to Alchemyst AI"
-description: "The universal memory layer for your AI stack. Choose a path to start building."
+title: "Introduction - Alchemyst AI Docs"
+description: "The universal context layer for your AI stack. Choose a path to start building."
 mode: "custom"
 ---
 
-<div className="mx-auto w-screen max-w-[60vw] my-5 py-6 text-center justify-around">
-Alchemyst AI provides your agents and LLMs with persistent, high-fidelity context. <br />By bridging the gap between your proprietary data and model reasoning, we eliminate AI "amnesia."
+{/* Hero Section */}
+<div className="mx-auto w-screen max-w-[60vw] my-5 py-6 text-center">
+  <h1 className="text-7xl sm:text-5xl font-bold my-3 dark:text-white text-[#f49025]">Alchemyst AI</h1>
+  <p>
+    Persistent, high-fidelity context for agents and LLMs - powered by your data.
+  </p>
 </div>
 
+{/* Choose Your Journey Section */}
 <div className="mx-auto w-screen max-w-[60vw]">
-<h3 className="text-center text-4xl my-3">Choose your journey</h3>
-<CardGroup cols={3} >
-  <Card
-    title="Browser Extension"
-    img="https://mintcdn.com/mem0/IgK_-_LC-m9nelcL/images/docs%20thumbnails/Mem0%20Platform.png?w=2500&fit=max&auto=format&n=IgK_-_LC-m9nelcL&q=85&s=1a1e0317d467b1e26bc9fedd00ef4bf4"
-    href="/integrations/extensions/chrome"
-  >
-    Instant memory for ChatGPT, Claude, and Gemini. **No coding required.**
-  </Card>
-  <Card
-    title="Developer SDK"
-    icon="code"
-    href="/integrations/sdk/typescript-sdk"
-  >
-    Build context-aware agents using our Python or TypeScript SDKs.
-  </Card>
-  <Card
-    title="API Reference"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Direct REST API access for custom integrations and high-scale applications.
-  </Card>
-</CardGroup>
-</div>
-<h3 className="text-center text-4xl py-3 mt-3">Integrations</h3>
-<div className="mx-auto w-screen max-w-[60vw] my-5 py-6 text-center">Integrate Alchemyst's memory into the tools and frameworks you already use.</div>
-<div className="mx-auto w-screen max-w-[60vw]">
-<CardGroup cols={2}>
-  <Card
-    title="LLM Frameworks"
-    icon="microchip"
-    href="/integrations/third-party/introduction"
-  >
-    Native support for **LangChain, LlamaIndex, Agno,** and **Vercel AI SDK**.
-  </Card>
-  <Card
-    title="Model Context Protocol"
-    icon="bolt"
-    href="/mcps/introduction"
-  >
-    Connect Alchemyst as an **MCP Server** to Cursor, Claude Desktop, and VS Code.
-  </Card>
-</CardGroup>
+  {/* <h3 className="text-center text-4xl my-3">Choose your journey</h3> */}
+  <CardGroup cols={2}>
+    <Card
+      title="For users"
+      img="images/chrome_ext.png"
+      icon="message"
+      href="/integrations/extensions/chrome"
+    >
+      Give conversational memory to your AI tools instantly. **No coding required.**
+    </Card>
+    <Card
+      title="For Developers"
+      img="images/dashboard.png"
+      icon="code"
+      href="/integrations/introduction"
+    >
+      Build context-aware agents with your favourite tech stack in minutes.
+    </Card>
+  </CardGroup>
 </div>
 
-## Getting Started
+{/* Developer Resources Section */}
+<div className="mx-auto w-screen max-w-[60vw] my-5 py-6">
+  <h3 className="text-center text-4xl sm:text-2xl py-3 mt-3">Developer Resources</h3>
+  <p className="text-center">
+    Integrate context into the tools and frameworks you already use.
+  </p>
 
-<Steps>
-  <Step title="Get your API Key">
-    Sign up at [Alchemyst Platform](https://platform.getalchemystai.com) and grab your secret key from the dashboard.
-  </Step>
-  <Step title="Install the SDK">
-    ```bash
-    npm install alchemyst-ai # or pip install alchemyst-ai
-    ```
-  </Step>
-  <Step title="Add your first Context">
-    Push data to your namespace to make it immediately available to your agents.
-  </Step>
-</Steps>
+  {/* Getting Started */}
+  <h4 className="text-center text-2xl sm:text-xl mt-6">Getting started</h4>
+  <Steps>
+    <Step title="Get your API Key">
+      Sign up at [**Alchemyst Platform**](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=getting_started&utm_medium=welcome_page&utm_content=getting_started_link) and grab your secret key from the dashboard.
+    </Step>
+    <Step title="Install the SDK">
+    <Tabs>
+<Tab title="javascript">
+      ```bash
+      npm install @alchemystai/sdk
+      ```
+      </Tab>
+      <Tab title="python">
+      ```bash
+      pip install alchemystai
+      ```
+      </Tab>
+      </Tabs>
+    </Step>
+    <Step title="Integrate with your tech stack">
+      Push data to your namespace to make it immediately available to your agents.
+    </Step>
+  </Steps>
 
----
+  {/* Resource Cards */}
+  <CardGroup cols={2}>
+    <Card
+      title="LLM Frameworks"
+      icon="microchip"
+      href="/integrations/third-party/introduction"
+    >
+      Native support for **LangChain, LlamaIndex, Agno,** and **Vercel AI SDK**.
+    </Card>
+    <Card
+      title="Model Context Protocol"
+      icon="bolt"
+      href="/mcps/introduction"
+    >
+      Connect Alchemyst as an **MCP Server** to Cursor, Claude Desktop, and VS Code.
+    </Card>
+    <Card
+      title="Concepts"
+      icon="lightbulb"
+      href="/ai-context/what-is-ai-context"
+    >
+      Learn how Semantic Retrieval and Context Engineering work under the hood.
+    </Card>
+    <Card
+      title="Sample Projects"
+      icon="github"
+      href="https://github.com/alchemyst-ai/awesome-saas"
+    >
+      Blueprints for newsletter generators, support bots, and research agents.
+    </Card>
+  </CardGroup>
+</div>
 
-## Explore the Platform
-
-<CardGroup cols={2}>
-  <Card
-    title="Concepts"
-    icon="lightbulb"
-    href="/ai-context/what-is-ai-context"
-  >
-    Learn how Semantic Retrieval and Context Engineering work under the hood.
-  </Card>
-  <Card
-    title="Sample Projects"
-    icon="github"
-    href="https://github.com/alchemyst-ai/awesome-saas"
-  >
-    Blueprints for newsletter generators, support bots, and research agents.
-  </Card>
-</CardGroup>
-
-### Need help?
-Join our community to share your projects or get technical support.
-- [Join our Discord](https://dub.sh/context-community)
-- [Submit a Feature Request](https://github.com/Alchemyst-ai/docs/issues)
+{/* Help Section */}
+<div className="mx-auto w-screen max-w-[60vw] my-5 py-6 text-center">
+  <h3 className="text-2xl font-semibold mb-3">Need help?</h3>
+  <p className="mb-4">Join our community to share your projects or get technical support.</p>
+  <CardGroup cols={2}>
+    <Card title="Join our Discord" icon="discord" href="https://dub.sh/context-community">
+      Connect with the community.
+    </Card>
+    <Card title="Submit a Feature Request" icon="github" href="https://github.com/Alchemyst-ai/docs/issues">
+      Request new features or report issues.
+    </Card>
+  </CardGroup>
+</div>

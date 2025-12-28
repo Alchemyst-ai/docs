@@ -12,18 +12,18 @@ description: Build a Context-Aware CLI tool that answers questions using stored 
 This pattern is ideal for **developer tools, internal assistants, and debugging workflows**.
 
 ### Repo link
-The full source code for this CLI agent is also available in our public repository.  
+The full source code for this CLI agent is also available in our public repository.
 It includes this **Node.js implementation** as well as a **Python version** of the same context-aware agent.
 
 If you prefer Python, you can use that implementation directly or adapt it to your workflow.
 
-View the repository: 
+View the repository:
 - [python](https://github.com/Alchemyst-ai/awesome-saas/tree/main/agents/alchemystai-python-SDK)
 - [typescript](https://github.com/Alchemyst-ai/awesome-saas/tree/main/agents/alchemystai-ts-SDK)
 
 ## Prerequisites
 
-You’ll need:
+You'll need:
 - Node.js 18+
 - An Alchemyst AI API key
 - A Google Gemini API key
@@ -39,10 +39,10 @@ export GEMINI_API_KEY=your_key_here
 
 The flow is simple:
 
-- **Accept a user question** from the CLI  
-- **Search Alchemyst** for relevant context  
-- **Inject retrieved context** into the LLM prompt  
-- **Generate and display** the response  
+- **Accept a user question** from the CLI
+- **Search Alchemyst** for relevant context
+- **Inject retrieved context** into the LLM prompt
+- **Generate and display** the response
 
 If no relevant context is found, the agent falls back to general model knowledge.
 
@@ -149,7 +149,7 @@ node index.js
 
 ## Build Beyond the CLI
 
-You’ve built a foundational context-aware agent, but this is just the beginning. The Alchemyst AI platform is designed to be the "brain" of your larger systems. From here, you can extend this pattern to:
+You've built a foundational context-aware agent, but this is just the beginning. The Alchemyst AI platform is designed to be the "brain" of your larger systems. From here, you can extend this pattern to:
 
 **Persistent Memory**: Enable long-term recall by saving user preferences in dedicated namespaces.
 
