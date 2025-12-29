@@ -1,9 +1,16 @@
 ---
 title: Errors & Platform Limits
-description: Common API errors, their causes, and practical fixes, along with the limits and constraints of the Alchemyst platform.
+description: "Understanding common issues you might face, while building with Alchemyst"
 ---
+## Quick Diagnosis
+- Can't upload? [Jump to Upload Errors](#common-errors-add)
+- Search not working? [Jump to Search Errors](#common-errors-search)
+- Slow performance? [Jump to Performance Issues](#performance-troubleshooting)
+- Wrong results? [Jump to Retrieval Quality](#retrieval-quality-issues)
 
-### Errors While Adding Documents
+## API Errors
+
+### Common errors (Add)
 
 | Status Code | Error Type | Common Cause | Recommended Fix |
 | :--- | :--- | :--- | :--- |
@@ -15,7 +22,7 @@ description: Common API errors, their causes, and practical fixes, along with th
 | **422** | `Unprocessable` | The file type provided in `metadata` matches `source` but content is unparseable. | Ensure `fileType` matches the actual binary content (e.g., don't send PDF bytes as `text/plain`). |
 
 
-### Errors While Searching Context
+### Common errors (Search)
 
 | Status Code | Error Type | Common Cause | Recommended Fix |
 | :--- | :--- | :--- | :--- |
@@ -25,6 +32,87 @@ description: Common API errors, their causes, and practical fixes, along with th
 | **429** | `RateLimit` | Too many search requests. | Add throttling or cache repeated searches. |
 | **422** | `Unprocessable` | Documents were not indexed correctly. | Verify documents were successfully ingested before searching. |
 
+
+## Application-Level Issues
+
+### Performance issues : Slow Searches (> 1 second)
+
+**Quick Checks:**
+```javascript
+// Measure your query time
+const start = Date.now();
+const result = await alchemyst.v1.context.search({
+  groupName: ["a", "b", "c", "d", "e", "f", "g"] // 7 filters!
+});
+console.log(`Search took ${Date.now() - start}ms`);
+```
+
+**Common Causes:**
+- 7+ groupName tags (exponential overhead)
+- No minimum_similarity_threshold set
+- 10K+ documents in scope
+
+**Solutions:**
+1. Reduce to 3-5 groupName tags max
+2. Set minimum_similarity_threshold: 0.5
+3. Use namespaces to shard data
+
+---
+
+
+### Retrieval Quality Issues : No Results Returned
+
+**Quick Checks:**
+```javascript
+// 1. Verify documents exist
+const docs = await alchemyst.v1.context.view();
+console.log(`Total docs: ${docs.length}`);
+
+// 2. Try broader search
+const result = await alchemyst.v1.context.search({
+  query: "your query",
+  similarity_threshold: 0.5, // Lower threshold
+  groupName: ["broad_tag"] // Fewer filters
+});
+```
+
+**Common Causes:**
+- High minimum_similarity_threshold set
+- groupnames don't intersect
+- Query is not relevant or very specific
+
+**Solutions :**
+1. Verify documents exist : [platform](https://platform.getalchemystai.com/context)
+2. Reduce similarity_threshold from 0.6-0.7 to 0.5-0.6
+3. Remove overly specific groupNames
+4. Try with a general query, make sure it's not too specific
+
+
+### Common Scenarios
+#### Scenario: Getting 409 Conflict Errors
+**Problem:** `POST /context/add` returns 409
+**Cause:** Document with same fileName already exists
+**Solution:** See [Pattern 2: Document Updates](/docs/advanced/usage-patterns#pattern-2)
+
+
+#### Scenario: Queries Return Too Many Fragments
+**Problem:** Search returns 50+ small chunks
+**Cause:** Over-segmentation (see Anti-Pattern 1)
+**Solution:** Combine related content into cohesive documents
+
+#### Scenario 3: Metadata Bloat Symptoms
+[From Anti-Pattern 2]
+
+**Symptom: Ingestion is slow**
+[Solutions with code examples]
+
+**Symptom: Wrong results returned**
+[Debugging flow]
+
+## Debugging Tools
+- Context traces API
+- Verbose SDK logging
+- Health check endpoints
 
 ### Platform Limits
 
@@ -36,3 +124,7 @@ description: Common API errors, their causes, and practical fixes, along with th
 | **Token Limit** | 8,192 tokens per document chunk |
 | **Metadata Fields** | Max 20 keys per document; Values must be `string` or `number` |
 | **Indexing Speed** | ~120 records/sec (Text), ~5 sec/page (OCR PDF) |
+
+## Still Stuck?
+- Check our [Discord](https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join) for community help
+- Contact support at support@getalchemystai.com
