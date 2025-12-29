@@ -1,12 +1,13 @@
 ---
 title: Errors & Platform Limits
 description: "Understanding common issues you might face, while building with Alchemyst"
+keywords: ['errors', 'issues', 'troubleshoot']
 ---
 ## Quick Diagnosis
-- Can't upload? [Jump to Upload Errors](#common-errors-add)
-- Search not working? [Jump to Search Errors](#common-errors-search)
-- Slow performance? [Jump to Performance Issues](#performance-troubleshooting)
-- Wrong results? [Jump to Retrieval Quality](#retrieval-quality-issues)
+- Can't upload? [see Upload Errors](#common-errors-add)
+- Search not working? [go to Search Errors](#common-errors-search)
+- Slow performance? [look at Performance Issues](#performance-issues)
+- Wrong results? [Check Retrieval Quality](#retrieval-quality-issues)
 
 ## API Errors
 
@@ -17,9 +18,10 @@ description: "Understanding common issues you might face, while building with Al
 | **400** | `BadRequest` | Invalid JSON or missing required fields (e.g., `source`). | Validate your payload against the [schema](/api-reference/endpoint/api/v1/context/add/post). Ensure `documents` array is not empty. |
 | **401** | `Unauthorized` | Invalid or missing `ALCHEMYST_AI_API_KEY`. | Check your `.env` file. Ensure you aren't using a Test key in Prod. |
 | **403** | `Forbidden` | Accessing a `scope` (e.g., `user_123`) you don't have permission for. | Verify the `api_key` or `user_id` matches the authenticated session. Make sure the key is still valid. |
+| **409** | `Conflict` | Document with the same `fileName` already exists. | Follow [Pattern 2: Document Updates](/advanced/usage-patterns#pattern-2%3A-handling-document-updates) to update or replace existing documents safely. |
 | **413** | `PayloadTooLarge` | Document exceeds the 50MB limit or batch size > 100. | Split your `documents` array into chunks of 50 and retry. |
-| **429** | `RateLimit` | Exceeded 1000 requests/minute. | Implement exponential backoff (default in SDK). Contact support for limits. |
-| **422** | `Unprocessable` | The file type provided in `metadata` matches `source` but content is unparseable. | Ensure `fileType` matches the actual binary content (e.g., don't send PDF bytes as `text/plain`). |
+| **429** | `RateLimit` | Exceeded 1000 requests/minute. | Implement exponential backoff (default in SDK). Contact support for higher limits. |
+| **422** | `Unprocessable` | The file type provided in `metadata` matches `source` but content is unparseable. | Ensure `fileType` matches the actual binary content (e.g., don’t send PDF bytes as `text/plain`). |
 
 
 ### Common errors (Search)
@@ -35,7 +37,35 @@ description: "Understanding common issues you might face, while building with Al
 
 ## Application-Level Issues
 
-### Performance issues : Slow Searches (> 1 second)
+### Performance issues 
+
+#### Slow Ingestion
+
+**Diagnosis:**
+```javascript
+// ❌ Sequential adds: ~30 seconds for 1000 docs
+for (let i = 0; i < 1000; i++) {
+  await alchemyst.add(documents[i]);
+}
+
+// ✅ Bulk adds: ~3 seconds for 1000 docs (10x faster!)
+await alchemyst.bulkAdd(documents);
+```
+
+**Common Causes:**
+- Document size > 50MB (max file size - 50MB)
+- Large number of documents uploaded sequentially
+- Token limit reached
+
+**Solutions :**
+1. Make sure the doc size is less then 50MB
+2. Upload documents via bulkAdd (faster)
+3. Check if you have sufficent tokens
+4. For bulk operations read [here](/advanced/usage-patterns#pattern-4%3A-bulk-operations-at-scale)
+
+---
+
+#### Slow Searches (> 1 second)
 
 **Quick Checks:**
 ```javascript
@@ -60,7 +90,9 @@ console.log(`Search took ${Date.now() - start}ms`);
 ---
 
 
-### Retrieval Quality Issues : No Results Returned
+### Retrieval Quality Issues  
+
+#### No Results Returned
 
 **Quick Checks:**
 ```javascript
@@ -87,31 +119,27 @@ const result = await alchemyst.v1.context.search({
 3. Remove overly specific groupNames
 4. Try with a general query, make sure it's not too specific
 
+---
 
 ### Common Scenarios
-#### Scenario: Getting 409 Conflict Errors
-**Problem:** `POST /context/add` returns 409
-**Cause:** Document with same fileName already exists
-**Solution:** See [Pattern 2: Document Updates](/docs/advanced/usage-patterns#pattern-2)
-
 
 #### Scenario: Queries Return Too Many Fragments
-**Problem:** Search returns 50+ small chunks
-**Cause:** Over-segmentation (see Anti-Pattern 1)
-**Solution:** Combine related content into cohesive documents
 
-#### Scenario 3: Metadata Bloat Symptoms
-[From Anti-Pattern 2]
+- **Problem:** Search returns 50+ small chunks
+- **Cause:** Over-segmentation (see [Anti-Pattern 1](/advanced/usage-patterns#anti-pattern-1%3A-over-segmentation))
+- **Solution:** Combine related content into cohesive documents
 
-**Symptom: Ingestion is slow**
-[Solutions with code examples]
 
-**Symptom: Wrong results returned**
-[Debugging flow]
+#### Scenario : Metadata Bloat Symptoms
+
+- **Problem:** Storing too much or redundant information in metadata
+- **Cause:** Metadata bloating (see [Anti-Pattern 2](/advanced/usage-patterns#anti-pattern-2%3A-metadata-bloat))
+- **Solution:** Limit metadata to only what you query/filter by, pass all the other things in the content itself.
+
 
 ## Debugging Tools
-- Context traces API
-- Verbose SDK logging
+- Context traces [API](/api-reference/endpoint/api/v1/context/traces/get) or [Platform](https://platform.getalchemystai.com/traces)
+- Verbose SDK [logging](/integrations/sdk/python-sdk#logging)
 - Health check endpoints
 
 ### Platform Limits
@@ -127,4 +155,3 @@ const result = await alchemyst.v1.context.search({
 
 ## Still Stuck?
 - Check our [Discord](https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join) for community help
-- Contact support at support@getalchemystai.com
