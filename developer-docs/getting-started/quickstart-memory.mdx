@@ -75,7 +75,7 @@ const { textStream } = await streamTextWithMemory({
   model: "anthropic/claude-sonnet-4.5",
   prompt: 'Explain quantum mechanics',
   userId: "user_123",
-  conversationId: "convo_789",
+  sessionId: "convo_789",
 });
 
 // Process the stream
@@ -91,7 +91,7 @@ const { text } = await generateTextWithMemory({
   model: "google/gemini-3-flash",
   prompt: 'What is gravity?',
   userId: "user_123",              // Required: identifies the user
-  conversationId: "convo_456",     // Required: groups related messages
+  sessionId: "convo_456",     // Required: groups related messages
 });
 
 console.log(text);
@@ -102,7 +102,7 @@ console.log(text);
 ### What just happened?
 
 - The conversation was automatically stored in Alchemyst's [**memory layer**](https://platform.getalchemystai.com/context)
-- Future queries from the same `userId` and `conversationId` will have access to this context
+- Future queries from the same `userId` and `sessionId` will have access to this context
 - Memory retrieval happens automatically on subsequent calls
 
 ## Step 4: Continue conversations with context
@@ -117,7 +117,7 @@ const { textStream: followUpStream } = await streamTextWithMemory({
   model: "anthropic/claude-sonnet-4.5",
   prompt: 'How does it relate to Einstein?',
   userId: "user_123",
-  conversationId: "convo_789",
+  sessionId: "convo_789",
 });
 
 // Process the stream
@@ -133,7 +133,7 @@ const { text: followUp } = await generateTextWithMemory({
   model: "google/gemini-3-flash",
   prompt: 'How does it relate to Einstein?',
   userId: "user_123",
-  conversationId: "convo_456",  // Same conversation
+  sessionId: "convo_456",  // Same conversation
 });
 
 // The AI now has context about gravity from the previous exchange
@@ -158,7 +158,7 @@ const { textStream } = await streamTextWithMemory({
   model: "google/gemini-3-flash",
   prompt: 'Explain quantum mechanics',
   userId: "user_123",
-  conversationId: "convo_789",
+  sessionId: "convo_789",
 });
 
 // Process the stream
@@ -181,7 +181,7 @@ const client = new AlchemystAI({
 // Update a specific memory
 await client.v1.context.memory.update({
   userId: "user_123",
-  conversationId: "convo_456",
+  sessionId: "convo_456",
   messageId: "msg_001",
   content: "Updated content",
 });
@@ -189,157 +189,19 @@ await client.v1.context.memory.update({
 // Delete entire conversation
 await client.v1.context.memory.delete({
   userId: "user_123",
-  conversationId: "convo_456",
+  sessionId: "convo_456",
 });
 ```
 
 That's it, you're all set. With memory in place, your AI can now maintain context across conversations and sessions.
 
-## User Profiling for AI Consumer Applications
+<Note>
+**Want to learn about user profiling for AI consumer applications?**
 
-Alchemyst's memory layer enables sophisticated user profiling that enhances personalization in AI consumer applications. By automatically tracking and retrieving user interactions, preferences, and behavioral patterns, you can build AI experiences that truly understand and adapt to each user.
+Alchemyst's memory layer enables sophisticated user profiling that enhances personalization - tracking preferences, adapting communication styles, and building rich user profiles across sessions.
 
-### How Memory Powers User Profiling
-
-Alchemyst automatically builds rich user profiles through conversation history, enabling your AI to:
-
-**Understand User Preferences**: Track topics of interest, communication style, preferred level of detail, and recurring questions to tailor responses.
-
-**Maintain Context Across Sessions**: Users can pick up conversations days or weeks later without repeating themselves, creating a seamless experience.
-
-**Personalize Recommendations**: Leverage past interactions to suggest relevant content, features, or actions that align with user interests.
-
-**Adapt Communication Style**: Learn whether users prefer technical explanations, casual tone, brief answers, or detailed responses.
-
-**Track User Journey**: Understand feature adoption, pain points, and engagement patterns to improve product experience.
-
-### Building User Profiles with Memory
-
-Store user-specific information that persists across conversations:
-
-<Tabs>
-  <Tab title="AI SDK v5">
-```javascript
-// Initial interaction - establishing preferences
-await generateTextWithMemory({
-  model: "anthropic/claude-sonnet-4.5",
-  prompt: 'I prefer detailed technical explanations with code examples',
-  userId: "user_alice",
-  conversationId: "preferences_setup",
-  metadata: {
-    profileType: 'preferences',
-    category: 'communication_style'
-  }
-});
-
-// Later interaction - AI adapts based on stored preferences
-await generateTextWithMemory({
-  model: "anthropic/claude-sonnet-4.5",
-  prompt: 'Explain API authentication',
-  userId: "user_alice",
-  conversationId: "technical_help_001",
-});
-// Response automatically includes detailed technical explanations with code
-```
-  </Tab>
-  <Tab title="AI SDK v6">
-```javascript
-// Initial interaction - establishing preferences
-await generateTextWithMemory({
-  model: "google/gemini-3-flash",
-  prompt: 'I prefer detailed technical explanations with code examples',
-  userId: "user_alice",
-  conversationId: "preferences_setup",
-  metadata: {
-    profileType: 'preferences',
-    category: 'communication_style'
-  }
-});
-
-// Later interaction - AI adapts based on stored preferences
-await generateTextWithMemory({
-  model: "google/gemini-3-flash",
-  prompt: 'Explain API authentication',
-  userId: "user_alice",
-  conversationId: "technical_help_001",
-});
-// Response automatically includes detailed technical explanations with code
-```
-  </Tab>
-</Tabs>
-
-### Real-World User Profiling Examples
-
-**Fitness Apps**: Track workout preferences, fitness goals, injury history, and preferred exercise types to generate personalized workout plans.
-
-**Learning Platforms**: Remember completed lessons, difficulty level, learning pace, and topics of interest to customize curriculum and pacing.
-
-**Shopping Assistants**: Store style preferences, size information, budget ranges, and past purchases to provide relevant product recommendations.
-
-**Health & Wellness**: Maintain dietary restrictions, health goals, medication schedules, and symptom tracking for personalized health guidance.
-
-**Content Platforms**: Learn content preferences, reading habits, favorite topics, and engagement patterns to curate personalized feeds.
-
-### Retrieving User Profile Data
-
-Query stored user information to build comprehensive profiles:
-
-```javascript
-import AlchemystAI from '@alchemystai/sdk';
-
-const client = new AlchemystAI({
-  apiKey: process.env.ALCHEMYST_AI_API_KEY,
-});
-
-// Search user's conversation history
-const userProfile = await client.v1.context.memory.search({
-  userId: "user_alice",
-  query: "preferences and interests",
-  similarityThreshold: 0.7,
-});
-
-// Analyze patterns from retrieved memories
-const preferences = userProfile.results.filter(
-  memory => memory.metadata?.profileType === 'preferences'
-);
-```
-
-### Privacy-First Profiling
-
-Alchemyst's user profiling respects privacy by design:
-
-- **User-scoped data**: Each userId's data is isolated and secure
-- **Granular deletion**: Remove specific memories or entire user profiles
-- **Transparent storage**: Users can see what information is stored
-- **Compliance-ready**: Built for GDPR, CCPA, and privacy regulations
-
-```javascript
-// Delete user profile on request
-await client.v1.context.memory.delete({
-  userId: "user_alice",
-  // Deletes all conversations for this user
-});
-
-// Or delete specific conversation threads
-await client.v1.context.memory.delete({
-  userId: "user_alice",
-  conversationId: "preferences_setup",
-});
-```
-
-### Best Practices for User Profiling
-
-**Start Simple**: Begin with basic preferences and gradually build richer profiles as users engage more.
-
-**Be Transparent**: Inform users about what data is being stored and how it improves their experience.
-
-**Provide Control**: Give users the ability to view, edit, or delete their profile data.
-
-**Balance Personalization**: Avoid making users feel "watched" - use profiling to be helpful, not intrusive.
-
-**Regular Updates**: User preferences change over time - weight recent interactions more heavily.
-
-**Segment Thoughtfully**: Use metadata to categorize different types of profile information (preferences, history, goals).
+To learn more about implementing user profiling with memory, check out our [**User Profiling Guide**](/advanced-usage/user-profiling?utm_source=quickstart_memory_article&utm_medium=blog&utm_campaign=quickstart_memory_article_note&utm_content=user_profiling_guide_note).
+</Note>
 
 ## Advanced: Multi-user conversations
 
@@ -353,7 +215,7 @@ await generateTextWithMemory({
   model: "anthropic/claude-sonnet-4.5",
   prompt: 'What are the best practices for React?',
   userId: "user_alice",
-  conversationId: "team_discussion_001",
+  sessionId: "team_discussion_001",
 });
 
 // User 2 follows up
@@ -361,7 +223,7 @@ await generateTextWithMemory({
   model: "anthropic/claude-sonnet-4.5",
   prompt: 'Can you elaborate on hooks?',
   userId: "user_bob",
-  conversationId: "team_discussion_001",  // Same conversation
+  sessionId: "team_discussion_001",  // Same conversation
 });
 
 // Both users' messages are stored in the same conversation context
@@ -374,7 +236,7 @@ await generateTextWithMemory({
   model: "google/gemini-3-flash",
   prompt: 'What are the best practices for React?',
   userId: "user_alice",
-  conversationId: "team_discussion_001",
+  sessionId: "team_discussion_001",
 });
 
 // User 2 follows up
@@ -382,7 +244,7 @@ await generateTextWithMemory({
   model: "google/gemini-3-flash",
   prompt: 'Can you elaborate on hooks?',
   userId: "user_bob",
-  conversationId: "team_discussion_001",  // Same conversation
+  sessionId: "team_discussion_001",  // Same conversation
 });
 
 // Both users' messages are stored in the same conversation context
@@ -431,13 +293,13 @@ const generateTextWithMemory = withAlchemyst(generateText, {
 
 ## Troubleshooting and Errors
 
-**Error: Missing userId or conversationId**
-- Both `userId` and `conversationId` are required for memory operations
+**Error: Missing userId or sessionId**
+- Both `userId` and `sessionId` are required for memory operations
 - Solution: Always provide both parameters when calling wrapped functions
 
 **Error: Memory not retrieving**
 - Check that `similarityThreshold` isn't set too high
-- Verify the same `userId` and `conversationId` are used
+- Verify the same `userId` and `sessionId` are used
 - Use `client.v1.context.memory.search()` to test retrieval directly
 
 **Error: Too much context retrieved**
