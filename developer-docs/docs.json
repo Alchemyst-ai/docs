@@ -155,29 +155,35 @@
               "integrations/sdk/typescript-sdk"
             ]
           },
-          {
-            "group": "Third-party integrations",
-            "pages": [
-              "integrations/third-party/introduction",
-              "integrations/third-party/aisdk",
-              "integrations/third-party/agnoagi",
-              {
-                "group": "LangChain",
-                "pages": [
-                  "integrations/third-party/langchain/python",
-                  "integrations/third-party/langchain/js"
-                ]
-              },
-              {
-                "group": "LLamaIndex (coming soon)",
-                "pages": [
-                  "integrations/third-party/llamaindex/python",
-                  "integrations/third-party/llamaindex/js"
-                ]
-              }
-            ],
-            "expanded": false
-          },
+            {
+              "group": "Third-party integrations",
+              "pages": [
+                "integrations/third-party/introduction",
+                {
+                  "group": "Vercel AI SDK",
+                  "pages": [
+                    "integrations/third-party/aisdk/middleware",
+                    "integrations/third-party/aisdk/tools"
+                  ]
+                },
+                "integrations/third-party/agnoagi",
+                {
+                  "group": "LangChain",
+                  "pages": [
+                    "integrations/third-party/langchain/python",
+                    "integrations/third-party/langchain/js"
+                  ]
+                },
+                {
+                  "group": "LLamaIndex (coming soon)",
+                  "pages": [
+                    "integrations/third-party/llamaindex/python",
+                    "integrations/third-party/llamaindex/js"
+                  ]
+                }
+              ],
+              "expanded": false
+            },
           {
             "group": "Context Proxy",
             "pages": [
