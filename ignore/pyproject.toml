@@ -1,0 +1,11 @@
+[project]
+name = "ignore"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alchemystai>=0.7.0",
+    "openai>=2.8.1",
+    "python-dotenv>=1.2.1",
+]

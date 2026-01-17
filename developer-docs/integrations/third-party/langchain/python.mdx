@@ -2,13 +2,14 @@
 title: 'Langchain Python Integration'
 description: "Integrate Alchemyst's memory with Langchain in Python"
 icon: "python"
+keywords: ['python','memory', 'lang-chain', 'integration']
 ---
 
 ## What is LangChain?
 
 LangChain is a framework that helps developers build applications powered by large language models (LLMs) such as OpenAI or Anthropic. It provides useful building blocks like prompts, chains, agents, and memory to manage conversations, connect data sources, and perform reasoning over multiple steps.
 
-Normally, LangChain’s built-in memory (like ConversationBufferMemory) stores information only during a single runtime session. Once the app stops, all past context is lost.
+Normally, LangChain's built-in memory (like ConversationBufferMemory) stores information only during a single runtime session. Once the app stops, all past context is lost.
 This is where Alchemyst Memory becomes valuable — it provides persistent, long-term memory that allows your LLM applications to remember and reuse context across sessions.
 
 ## Installation
@@ -190,10 +191,11 @@ if __name__ == "__main__":
 
 ## Summary
 
-By combining LangChain’s workflow capabilities with Alchemyst’s persistent memory, developers can build intelligent agents that:
+By combining LangChain's workflow capabilities with Alchemyst's persistent memory, developers can build intelligent agents that:
 
 - Retain user context and preferences
 - Continue conversations across sessions
 - Improve personalization over time
 
 This simple integration makes your LLM applications more human-like and contextually aware — without losing information after every run.
+

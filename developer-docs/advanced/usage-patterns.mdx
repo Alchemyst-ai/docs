@@ -1,0 +1,915 @@
+---
+title: "Usage Patterns Primer"
+description: "Advanced usage patterns to let you take full advantage of context arithmetic"
+keywords: ['usage', 'advance', 'patterns']
+---
+## Prerequisites
+- Understanding of [**Context Arithmetic**](/advanced/context-arithmetic)
+- Data to contextualize
+- Familiarity with the Alchemyst SDKs and APIs.
+
+## Introduction
+Context Arithmetic is a very simple but powerful tool. Leveraging that system, we can derive context spaces, merge them, segregate them, or even apply access controls on top of them - all while maintaining the tractability and other benefits that Alchemyst offers.
+
+In an agentic environment where non-determinism exists not as a byproduct, but as a foundational principle, it offers verifiability across large systems. This gives enterprise teams control over their data usage and governance patterns and scopes.
+
+In this section we explore patterns that you can leverage to build robust context-aware AI systems using context arithmetic.
+
+## Pattern 1: Hierarchical groupName Design
+
+### The Problem
+Flat groupName structures become unmanageable at scale. You end up with searches that are either too broad (returning 1000+ documents) or too narrow (returning nothing).
+
+### The Solution: Think in Layers
+Design your groupName hierarchy like a file system - broad categories at the top, specific tags as you go deeper.
+
+```javascript
+// ❌ Flat structure - Hard to query effectively
+{
+  "groupName": ["marketing_q4_2024_campaign_email_newsletter_product_launch"]
+}
+
+// ✅ Hierarchical structure - Composable and flexible
+{
+  "groupName": ["marketing", "q4_2024", "campaign", "email"]
+}
+```
+
+### Three-Layer Strategy
+
+**Layer 1: Organization/Domain** (Required for all documents)
+- `"engineering"`, `"marketing"`, `"sales"`, `"support"`
+- Purpose: Top-level access control
+
+**Layer 2: Category/Time** (Recommended)
+- `"q4_2024"`, `"product_alpha"`, `"codebase"`, `"customer_tickets"`
+- Purpose: Logical grouping and temporal filtering
+
+**Layer 3: Specifics** (Optional, use sparingly)
+- `"auth"`, `"api"`, `"campaign"`, `"billing"`
+- Purpose: Fine-grained filtering
+
+#### Example: Engineering Team
+
+```javascript
+// Base document - accessible to all engineering
+{
+  "groupName": ["engineering"],
+  "content": "Company-wide coding standards..."
+}
+
+// Backend auth code - specific team access
+{
+  "groupName": ["engineering", "backend", "auth"],
+  "content": "JWT middleware implementation..."
+}
+
+// Frontend component - specific project
+{
+  "groupName": ["engineering", "frontend", "project_redesign"],
+  "content": "Button component with new design system..."
+}
+```
+
+### Query Patterns
+
+```javascript
+// Broad: All engineering docs (might return 10,000+ docs)
+search({ groupName: ["engineering"] })
+
+// Focused: Backend authentication (returns ~50 docs)
+search({ groupName: ["engineering", "backend", "auth"] })
+
+// Specific: Auth docs in current project (returns ~10 docs)
+search({
+  groupName: ["engineering", "backend", "auth"],
+  metadata: { project: "api_v2" }
+})
+```
+<Info>
+### 💡 Pro Tip: The 3-5-10 Rule
+- Maximum 3 groupName layers for 90% of queries
+- Maximum 5 tags in any single groupName array
+- Maximum 10 unique tag combinations per user query pattern
+
+## ⚠️ Common Mistake: Over-nesting
+```javascript
+// ❌ Too deep - queries become fragile
+["engineering", "backend", "api", "v2", "endpoints", "user", "auth", "login"]
+
+// ✅ Better - use metadata for the specifics
+groupName: ["engineering", "backend", "api"]
+metadata: {
+  version: "v2",
+  category: "auth",
+  endpoint: "login"
+}
+```
+</Info>
+---
+
+## Pattern 2: Handling Document Updates
+
+### The Deduplication Gotcha
+
+Alchemyst uses `metadata.fileName` as the deduplication key. This means:
+1. Same fileName = Alchemyst treats it as an update attempt
+2. Update attempts without delete = **409 Conflict error**
+3. This is **by design** to prevent accidental duplicates
+
+### Three Update Strategies
+
+#### Strategy A: Delete-Then-Add (Recommended for true updates)
+
+```javascript
+// Document has changed - replace it entirely
+async function updateDocument(fileName, newContent) {
+  // Step 1: Find and delete old version
+  const existing = await alchemyst.search({
+    metadata: { fileName: fileName }
+  });
+
+  if (existing.results.length > 0) {
+    await alchemyst.delete(existing.results[0].id);
+  }
+
+  // Step 2: Add new version
+  await alchemyst.add({
+    content: newContent,
+    metadata: { fileName: fileName }
+  });
+}
+
+// Use case: Documentation that gets edited
+// "user-guide.pdf" updated from v1 to v2
+```
+
+#### Strategy B: Versioned FileNames (Keep history)
+
+```javascript
+// Track document evolution over time
+await alchemyst.add({
+  content: quarterlyReport,
+  metadata: {
+    fileName: "q4-report-v1.pdf",
+    version: "1.0",
+    status: "draft"
+  }
+});
+
+await alchemyst.add({
+  content: quarterlyReportFinal,
+  metadata: {
+    fileName: "q4-report-v2.pdf",  // Different fileName!
+    version: "2.0",
+    status: "final",
+    supersedes: "q4-report-v1.pdf"
+  }
+});
+
+// Use case: Legal documents, contracts, specs where history matters
+```
+
+#### Strategy C: Conversational Updates (Incremental context)
+
+```javascript
+// For chat-like interactions where context accumulates
+await alchemyst.addToConversation({
+  conversationId: "support-ticket-1234",
+  content: "Customer reported login issue...",
+  metadata: {
+    timestamp: "2024-12-29T10:00:00Z",
+    speaker: "customer"
+  }
+});
+
+await alchemyst.addToConversation({
+  conversationId: "support-ticket-1234",
+  content: "Resolved by resetting password...",
+  metadata: {
+    timestamp: "2024-12-29T10:15:00Z",
+    speaker: "agent"
+  }
+});
+
+// Use case: Support tickets, chat logs, ongoing projects
+```
+
+### Decision Tree: Which Strategy?
+
+```
+Is the new content completely replacing the old?
+├─ YES → Use Strategy A (Delete-Then-Add)
+│
+├─ NO → Does history matter?
+    ├─ YES → Use Strategy B (Versioned FileNames)
+    │
+    └─ NO → Is this part of a conversation/thread?
+        ├─ YES → Use Strategy C (Conversational)
+        └─ NO → Use Strategy B with cleanup job
+```
+
+### 🔧 Advanced: Batch Updates
+
+```javascript
+// ❌ Don't do this - 100 sequential operations
+for (const doc of documents) {
+  await alchemyst.delete(doc.id);
+  await alchemyst.add(doc.updated);
+}
+// Time: ~30-60 seconds
+
+// ✅ Do this - bulk operations
+const deleteIds = documents.map(d => d.id);
+await alchemyst.bulkDelete(deleteIds);
+
+await alchemyst.bulkAdd(
+  documents.map(d => d.updated)
+);
+// Time: ~3-5 seconds
+```
+
+<Warning>
+#### ⚠️ Warning: The Race Condition
+
+```javascript
+// ❌ Dangerous - race condition in concurrent environments
+async function updateDoc(fileName, content) {
+  await alchemyst.delete({ fileName });  // ⚠️ Might not be done yet
+  await alchemyst.add({ fileName, content });  // ⚠️ Might conflict
+}
+
+// ✅ Safe - wait for confirmation
+async function updateDocSafe(fileName, content) {
+  const deleteResponse = await alchemyst.delete({ fileName });
+
+  if (!deleteResponse.success) {
+    throw new Error("Delete failed");
+  }
+
+  // Small delay to ensure propagation (100-200ms)
+  await new Promise(resolve => setTimeout(resolve, 150));
+
+  return await alchemyst.add({ fileName, content });
+}
+```
+</Warning>
+---
+
+## Pattern 3: Composable Context Strategies
+
+### The Dilemma
+Should you store one big document or many small ones? This affects retrieval quality, performance, and maintenance.
+
+### Rule of Thumb: Split by Access Pattern
+
+#### When to COMBINE contexts:
+
+**Scenario 1: Tightly Coupled Information**
+```javascript
+// ✅ Good - store together
+{
+  groupName: ["product", "api_spec"],
+  content: `
+    Authentication Endpoint
+    POST /api/auth/login
+
+    Request Body:
+    - email: string (required)
+    - password: string (required)
+
+    Response:
+    - token: JWT string
+    - expiresIn: number (seconds)
+
+    Error Codes:
+    - 401: Invalid credentials
+    - 429: Rate limited
+  `
+}
+
+// ❌ Bad - unnecessarily fragmented
+// Document 1: "POST /api/auth/login"
+// Document 2: "Request body fields"
+// Document 3: "Response format"
+// Document 4: "Error codes"
+// Problem: User query "how to login" needs all 4 docs
+```
+
+**Scenario 2: Always Retrieved Together**
+```javascript
+// If users always need A, B, and C together, combine them
+// Example: Product onboarding guide (overview + setup + first steps)
+```
+
+### When to SPLIT contexts:
+
+**Scenario 1: Different Access Patterns**
+```javascript
+// ✅ Good - separate by access control
+// Public documentation
+{
+  groupName: ["docs", "public"],
+  content: "How to use our API..."
+}
+
+// Internal implementation notes
+{
+  groupName: ["docs", "internal"],
+  content: "Rate limiting implementation details..."
+}
+```
+
+**Scenario 2: Different Update Frequencies**
+```javascript
+// ✅ Good - separate by volatility
+// Static content (rarely changes)
+{
+  fileName: "company-history.md",
+  content: "Founded in 2020..."
+}
+
+// Dynamic content (changes daily)
+{
+  fileName: "daily-metrics-2024-12-29.json",
+  content: "Today's sales: $45,231..."
+}
+```
+
+**Scenario 3: Size Optimization**
+```javascript
+// One 50,000-word document:
+// ❌ Slow to retrieve
+// ❌ Wastes tokens on irrelevant sections
+// ❌ Hard to rank relevance
+
+// Split into 10 logical sections:
+// ✅ Fast retrieval
+// ✅ Only relevant sections retrieved
+// ✅ Better semantic ranking
+```
+
+### The Goldilocks Size: 500-2000 words per document
+
+```javascript
+// ❌ Too small (100 words)
+// Problem: Loses context, requires many docs for complete answer
+{
+  content: "JWT tokens expire after 24 hours"
+}
+
+// ❌ Too large (10,000 words)
+// Problem: Retrieves too much irrelevant content
+{
+  content: "Entire authentication system documentation..."
+}
+
+// ✅ Just right (800 words)
+// Problem: Single cohesive topic with enough context
+{
+  content: `
+    JWT Token Management
+
+    Overview: Our JWT implementation uses...
+
+    Token Lifecycle:
+    1. Generation: POST /auth/login
+    2. Validation: Automatic on each request
+    3. Refresh: POST /auth/refresh
+    4. Expiration: 24 hours default
+
+    [Full details with examples...]
+  `
+}
+```
+<Info>
+### 💡 Pro Tip: The Chapter Pattern
+
+Structure large content like a book:
+
+```javascript
+// Parent metadata for navigation
+const bookMetadata = {
+  book: "employee-handbook",
+  totalChapters: 12
+};
+
+// Chapter 1: Welcome
+await alchemyst.add({
+  groupName: ["hr", "handbook"],
+  metadata: { ...bookMetadata, chapter: 1, title: "Welcome" },
+  content: "Chapter 1: Welcome to the company..."
+});
+
+// Chapter 2: Benefits
+await alchemyst.add({
+  groupName: ["hr", "handbook"],
+  metadata: { ...bookMetadata, chapter: 2, title: "Benefits" },
+  content: "Chapter 2: Health insurance options..."
+});
+
+// Query: Get specific chapter or search across all
+// "Tell me about health insurance"
+// → Retrieves Chapter 2 specifically
+```
+</Info>
+
+### Advanced: Cross-References
+
+```javascript
+// Document with references to related content
+{
+  groupName: ["engineering", "backend", "auth"],
+  metadata: {
+    relatedDocs: ["api-security-guide", "user-model-schema"],
+    prerequisites: ["basic-auth-concepts"]
+  },
+  content: "Advanced authentication patterns..."
+}
+
+// Your application can fetch related docs for deeper context
+```
+
+---
+
+## Pattern 4: Bulk Operations at Scale
+
+### The Performance Cliff
+
+```javascript
+// ❌ Sequential adds: ~30 seconds for 1000 docs
+for (let i = 0; i < 1000; i++) {
+  await alchemyst.add(documents[i]);
+}
+
+// ✅ Bulk adds: ~3 seconds for 1000 docs (10x faster!)
+await alchemyst.bulkAdd(documents);
+```
+
+### Optimal Batch Sizes
+
+Based on production usage patterns:
+
+| Documents | Batches | Time | Recommendation |
+|-----------|---------|------|----------------|
+| 100 | 1 batch | ~0.5s | ✅ Single call |
+| 1,000 | 1 batch | ~3s | ✅ Single call |
+| 10,000 | 10 batches | ~35s | ✅ Optimal |
+| 10,000 | 100 batches | ~90s | ⚠️ Too fragmented |
+| 100,000 | 100 batches | ~6min | ✅ Good with progress tracking |
+
+### The 1000-Document Sweet Spot
+
+```javascript
+// Process 10,000 documents efficiently
+async function bulkIngest(documents) {
+  const BATCH_SIZE = 1000;
+  const batches = [];
+
+  // Split into batches of 1000
+  for (let i = 0; i < documents.length; i += BATCH_SIZE) {
+    batches.push(documents.slice(i, i + BATCH_SIZE));
+  }
+
+  // Process batches with progress tracking
+  const results = [];
+  for (let i = 0; i < batches.length; i++) {
+    console.log(`Processing batch ${i + 1}/${batches.length}`);
+
+    const result = await alchemyst.bulkAdd(batches[i]);
+    results.push(result);
+
+    // Optional: Small delay between batches to avoid rate limits
+    if (i < batches.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+
+  return results;
+}
+```
+
+### 🚀 Advanced: Parallel Processing with Limits
+
+```javascript
+// Process multiple batches in parallel (but not too many!)
+async function parallelBulkIngest(documents) {
+  const BATCH_SIZE = 1000;
+  const MAX_CONCURRENT = 3; // Don't overwhelm the API
+
+  const batches = [];
+  for (let i = 0; i < documents.length; i += BATCH_SIZE) {
+    batches.push(documents.slice(i, i + BATCH_SIZE));
+  }
+
+  // Process 3 batches at a time
+  const results = [];
+  for (let i = 0; i < batches.length; i += MAX_CONCURRENT) {
+    const chunk = batches.slice(i, i + MAX_CONCURRENT);
+    const chunkResults = await Promise.all(
+      chunk.map(batch => alchemyst.bulkAdd(batch))
+    );
+    results.push(...chunkResults);
+
+    console.log(`Completed ${Math.min(i + MAX_CONCURRENT, batches.length)}/${batches.length} batches`);
+  }
+
+  return results;
+}
+```
+
+### Error Handling in Bulk Operations
+
+```javascript
+async function robustBulkIngest(documents) {
+  const BATCH_SIZE = 1000;
+  const MAX_RETRIES = 3;
+
+  const batches = chunkArray(documents, BATCH_SIZE);
+  const results = [];
+  const failures = [];
+
+  for (let i = 0; i < batches.length; i++) {
+    let attempt = 0;
+    let success = false;
+
+    while (attempt < MAX_RETRIES && !success) {
+      try {
+        const result = await alchemyst.bulkAdd(batches[i]);
+        results.push(result);
+        success = true;
+      } catch (error) {
+        attempt++;
+        console.warn(`Batch ${i} failed (attempt ${attempt}/${MAX_RETRIES}):`, error.message);
+
+        if (attempt < MAX_RETRIES) {
+          // Exponential backoff: 1s, 2s, 4s
+          await new Promise(resolve =>
+            setTimeout(resolve, 1000 * Math.pow(2, attempt - 1))
+          );
+        } else {
+          // Final failure - log and continue
+          failures.push({ batchIndex: i, error: error.message });
+        }
+      }
+    }
+  }
+
+  if (failures.length > 0) {
+    console.error(`${failures.length} batches failed after retries:`, failures);
+  }
+
+  return { results, failures };
+}
+```
+
+### 💡 Pro Tip: Progress Tracking for Large Ingests
+
+```javascript
+// For 100K+ documents, give users feedback
+async function ingestWithProgress(documents, onProgress) {
+  const BATCH_SIZE = 1000;
+  const batches = chunkArray(documents, BATCH_SIZE);
+
+  let completed = 0;
+
+  for (const batch of batches) {
+    await alchemyst.bulkAdd(batch);
+    completed += batch.length;
+
+    onProgress({
+      completed,
+      total: documents.length,
+      percentage: (completed / documents.length * 100).toFixed(1)
+    });
+  }
+}
+
+// Usage in UI
+await ingestWithProgress(allDocs, (progress) => {
+  console.log(`Progress: ${progress.percentage}% (${progress.completed}/${progress.total})`);
+  // Update progress bar, etc.
+});
+```
+
+---
+
+## Anti-Pattern 1: Over-segmentation
+
+### The Problem
+Creating too many small, fragmented contexts that should be combined.
+
+### Real Example: Support Ticket System
+
+```javascript
+// ❌ Anti-pattern: One document per field
+// Ticket #1234 split into 6 documents:
+{
+  groupName: ["support", "ticket_1234", "subject"],
+  content: "Cannot login to dashboard"
+}
+{
+  groupName: ["support", "ticket_1234", "description"],
+  content: "User reports error message..."
+}
+{
+  groupName: ["support", "ticket_1234", "priority"],
+  content: "High"
+}
+{
+  groupName: ["support", "ticket_1234", "agent"],
+  content: "John Doe"
+}
+{
+  groupName: ["support", "ticket_1234", "resolution"],
+  content: "Password reset required"
+}
+{
+  groupName: ["support", "ticket_1234", "timestamp"],
+  content: "2024-12-29T10:00:00Z"
+}
+
+// Problems:
+// 1. Query "login issues" retrieves 6 fragments
+// 2. LLM needs to reassemble the ticket
+// 3. Costs 6x the storage and retrieval
+// 4. Loses contextual relationships
+```
+
+```javascript
+// ✅ Correct: One cohesive document
+{
+  groupName: ["support", "tickets", "resolved"],
+  metadata: {
+    ticketId: "1234",
+    priority: "high",
+    agent: "John Doe",
+    resolvedAt: "2024-12-29T10:15:00Z"
+  },
+  content: `
+    Ticket #1234: Cannot login to dashboard
+
+    Description:
+    User reports error message "Invalid credentials" when attempting
+    to log in with correct password. Account verified as active.
+
+    Resolution:
+    Issue caused by expired password (90-day policy). Password reset
+    link sent to user. User confirmed successful login after reset.
+
+    Root Cause: Password expiration notification system failed to
+    send warning emails.
+  `
+}
+
+// Benefits:
+// 1. Single retrieval gets complete context
+// 2. LLM can understand full story
+// 3. 6x cost reduction
+// 4. Preserves semantic relationships
+```
+
+### The Acid Test: Query Simulation
+
+Ask yourself: "What will my users search for?"
+
+```javascript
+// User query: "How do we handle login issues?"
+
+// With over-segmentation:
+// → Retrieves 47 fragments across 8 tickets
+// → LLM confused by incomplete pieces
+// → Answer: Generic, not helpful
+
+// With proper documents:
+// → Retrieves 3-4 complete ticket resolutions
+// → LLM sees full context and patterns
+// → Answer: "Based on tickets #1234, #1456, we typically..."
+```
+
+### 💡 Rule: The Paragraph Test
+
+If your document content is less than a paragraph (< 100 words), you're probably over-segmenting.
+
+**Exception:** Structured data with high retrieval value
+```javascript
+// This is OK even though it's short
+{
+  groupName: ["company", "contacts"],
+  metadata: { department: "engineering", role: "cto" },
+  content: "Jane Smith - CTO - jane@company.com - ext. 1234"
+}
+```
+
+---
+
+## Anti-Pattern 2: Metadata Bloat
+
+### The Problem
+Storing too much or redundant information in metadata, slowing down queries and wasting storage.
+
+### Real Example: Product Catalog
+
+```javascript
+// ❌ Metadata bloat
+{
+  groupName: ["products", "electronics"],
+  metadata: {
+    productId: "PROD-12345",
+    productName: "Wireless Mouse",
+    productDescription: "Ergonomic wireless mouse with 6 buttons",
+    productCategory: "Electronics",
+    productSubcategory: "Computer Accessories",
+    productSubSubcategory: "Input Devices",
+    productBrand: "TechCorp",
+    productBrandId: "BRAND-789",
+    productBrandCountry: "USA",
+    productPrice: 29.99,
+    productPriceCurrency: "USD",
+    productPriceFormatted: "$29.99",
+    productStock: 150,
+    productStockStatus: "in_stock",
+    productStockWarehouse: "warehouse_3",
+    productWeight: "0.2kg",
+    productDimensions: "12x8x4cm",
+    productColor: "black",
+    productColorHex: "#000000",
+    productRating: 4.5,
+    productReviewCount: 234,
+    productSKU: "MOUSE-WL-BK-001",
+    productUPC: "123456789012",
+    productManufacturer: "TechCorp Electronics Ltd",
+    productOriginCountry: "China",
+    productWarranty: "2 years",
+    productReleaseDate: "2024-01-15",
+    productLastUpdated: "2024-12-29T10:00:00Z",
+    productCreatedAt: "2024-01-01T00:00:00Z",
+    productCreatedBy: "admin@company.com",
+    productUpdatedBy: "inventory@company.com",
+    productTags: ["wireless", "ergonomic", "6-button", "usb-receiver"],
+    productIsActive: true,
+    productIsFeatured: false,
+    productIsDiscounted: false
+    // ... 15 more fields
+  },
+  content: "TechCorp Wireless Mouse - Ergonomic design with 6 programmable buttons..."
+}
+
+// Problems:
+// 1. 90% of metadata never used in queries
+// 2. Duplicates info already in content
+// 3. Slows down indexing and retrieval
+// 4. Harder to maintain consistency
+```
+
+```javascript
+// ✅ Lean metadata - only what you query/filter by
+{
+  groupName: ["products", "electronics", "accessories"],
+  metadata: {
+    productId: "PROD-12345",
+    category: "input_devices",
+    price: 29.99,
+    inStock: true,
+    brand: "TechCorp"
+  },
+  content: `
+    TechCorp Wireless Mouse (SKU: MOUSE-WL-BK-001)
+
+    Ergonomic wireless mouse with 6 programmable buttons
+    Price: $29.99 | Rating: 4.5/5 (234 reviews)
+    Color: Black | Weight: 0.2kg | Dimensions: 12x8x4cm
+
+    Features:
+    - 2.4GHz wireless with USB receiver
+    - Ergonomic design for all-day comfort
+    - 6 programmable buttons
+    - 2-year warranty
+
+    Stock: 150 units available at Warehouse 3
+    Origin: Made in China | Released: January 2024
+  `
+}
+
+// Benefits:
+// 1. 80% less metadata storage
+// 2. Faster queries (fewer fields to scan)
+// 3. Easier to maintain
+// 4. Full info still retrievable from content
+```
+
+### Decision Framework: Metadata vs Content
+
+**Store in METADATA if:**
+- ✅ You filter or sort by it (`price`, `inStock`, `category`)
+- ✅ You need exact matching (`productId`, `sku`)
+- ✅ It's used for access control (`department`, `classification`)
+- ✅ It changes frequently and independently (`stock`, `price`)
+
+**Store in CONTENT if:**
+- ✅ It's descriptive text (`description`, `features`)
+- ✅ It's rarely filtered (`dimensions`, `weight`)
+- ✅ It's only needed when document is retrieved (`warranty`, `origin`)
+- ✅ It's part of the semantic meaning (`reviews`, `specifications`)
+
+<Info>
+### 💡 Pro Tip: The 5-Field Rule
+
+Start with maximum 5 metadata fields. Add more ONLY when you have a specific query pattern that requires it.
+
+```javascript
+// Starter template - covers 90% of use cases
+{
+  groupName: ["domain", "category"],
+  metadata: {
+    id: "unique-identifier",        // For updates/deletes
+    status: "active",                // For filtering
+    lastModified: "2024-12-29",      // For freshness
+    owner: "team-name",              // For access control
+    priority: "high"                 // For ranking (optional)
+  },
+  content: "..." // Everything else goes here
+}
+```
+</Info>
+<Warning>
+### ⚠️ Common Mistake: Duplicating Content in Metadata
+
+```javascript
+// ❌ Don't do this
+{
+  metadata: {
+    title: "Q4 Sales Report",  // Duplicated
+    summary: "Sales increased by 23%..."  // Duplicated
+  },
+  content: `
+    Q4 Sales Report
+
+    Summary: Sales increased by 23%...
+  `
+}
+
+// ✅ Do this
+{
+  metadata: {
+    documentType: "sales_report",
+    quarter: "q4_2024"
+  },
+  content: `
+    Q4 Sales Report
+
+    Summary: Sales increased by 23%...
+  `
+}
+```
+</Warning>
+
+### Real Impact: Before & After
+
+**Before optimization (metadata bloat):**
+- Storage: 2.3GB for 10,000 products
+- Query time: 450ms average
+- Index time: 12 minutes
+- Maintenance: 3 fields out of sync per 100 updates
+
+**After optimization (lean metadata):**
+- Storage: 0.8GB for 10,000 products (65% reduction)
+- Query time: 180ms average (60% faster)
+- Index time: 4 minutes (67% faster)
+- Maintenance: Consistency issues eliminated
+
+---
+
+## Quick Reference: Pattern Selection
+
+```
+Choose Pattern 1 (Hierarchical groupName) when:
+→ You have multiple teams/departments
+→ Access control matters
+→ Your data has natural categories
+
+Choose Pattern 2 (Document Updates) when:
+→ Delete-then-add: Content genuinely changes
+→ Versioning: History matters (legal, compliance)
+→ Conversational: Building context over time
+
+Choose Pattern 3 (Composable Context) when:
+→ Combine: Info always retrieved together
+→ Split: Different access patterns or update frequencies
+→ Target 500-2000 words per document
+
+Choose Pattern 4 (Bulk Operations) when:
+→ Ingesting 1000+ documents
+→ Batch size: 1000 documents per call
+→ Use retries and progress tracking
+
+Avoid Anti-Pattern 1 (Over-segmentation) by:
+→ Keeping related info together
+→ Passing the "paragraph test"
+→ Simulating real user queries
+
+Avoid Anti-Pattern 2 (Metadata Bloat) by:
+→ Starting with 5 fields max
+→ Only storing what you filter/sort by
+→ Keeping descriptions in content
+```

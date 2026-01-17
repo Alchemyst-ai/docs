@@ -1,0 +1,328 @@
+---
+title: 'AI SDK Middleware'
+description: "Integrate Alchemyst's memory management as middleware with Vercel AI SDK"
+icon: "brain"
+keywords: ['ai-sdk', 'vercel', 'integration', 'memory', 'middleware']
+---
+
+## About Vercel AI SDK with Memory
+
+[Vercel AI SDK](https://ai-sdk.dev) is an open-source toolkit from the team behind Vercel and Next.js. It provides a **unified developer experience** for building AI-powered applications with memory capabilities.
+
+### Key Features for Memory Integration
+
+- Easy integration with multiple model providers (OpenAI, Anthropic, etc.)
+- Support for **streaming responses** for real-time chat UIs
+- Type-safe APIs with excellent **TypeScript support**
+- Built-in support for persistent user preferences and conversation history
+- Ready-to-use React/Next.js hooks for managing conversation state
+
+By using the AI SDK with Alchemyst memory, you can avoid handling low-level APIs directly and focus on creating seamless AI-driven experiences with persistent context.
+
+---
+
+## How Memory Works
+
+The AI SDK memory integration allows you to:
+
+- **Store user preferences**: Keep track of user-specific settings and preferences
+- **Maintain conversation context**: Remember important details across sessions
+- **Personalize experiences**: Build applications that adapt to individual users
+- **Enable long-term memory**: Create AI assistants that recall past interactions
+
+The Alchemyst memory tools work seamlessly with the AI SDK's modular architecture:
+
+- **Core API**: A unified way to call LLMs and handle outputs
+- **Provider Adapters**: Packages like `@ai-sdk/openai` let you plug in specific providers
+- **Memory Tools**: Add, retrieve, and manage user memories
+- **UI Utilities**: Hooks such as `useChat` make it easy to build interactive experiences
+
+---
+
+## Memory Management Examples
+
+### Basic Memory Setup
+
+This example shows how to configure memory-only tools with proper groupName structure:
+
+```ts memorySetup.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// Configure with memory tools only
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Remember my preferences",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true), // context: false, memory: true
+  // Memory uses hierarchical groupName: ["user_preferences", "user_123"]
+});
+```
+
+<Tip>
+**Best Practice**: Use hierarchical groupName structure like `["domain", "category", "specific"]` for better organization. Maximum 3 layers for 90% of queries.
+</Tip>
+
+### Storing User Preferences
+
+This example demonstrates storing user preferences in memory:
+
+```ts storePreferences.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+const userId = "user_123";
+const memoryId = `memory_${userId}`;
+
+// Store user preferences in memory
+const storeMemory = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: `Remember that user ${userId} prefers:
+    - Dark mode interface
+    - Email notifications disabled
+    - Preferred language: English
+    - Timezone: IST`,
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true) // Only memory, no context
+});
+
+const toolCalls = await storeMemory.toolCalls;
+if (toolCalls && toolCalls.length > 0) {
+  console.log('\n\nTool calls made:');
+  for (const toolCall of toolCalls) {
+    console.log(`- ${toolCall.toolName}:`, JSON.stringify(toolCall, null, 2));
+  }
+}
+
+await storeMemory.text;
+```
+
+### Retrieving User Preferences
+
+Later, retrieve and use the stored memory:
+
+```ts retrievePreferences.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+const userId = "user_123";
+
+// Retrieve user preferences from memory
+const retrieveMemory = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: `What are the preferences for user ${userId}?`,
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true)
+});
+
+for await (const chunk of retrieveMemory.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+### Personalized Chat Assistant
+
+A complete example using memory for personalization:
+
+```ts personalizedAssistant.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+async function personalizedChat(userMessage: string, userId: string) {
+  const result = await streamText({
+    model: openai('gpt-4o-mini'),
+    messages: [
+      {
+        role: 'system',
+        content: `You are a helpful assistant that remembers user preferences. 
+                  The current user is ${userId}.`
+      },
+      {
+        role: 'user',
+        content: userMessage
+      }
+    ],
+    tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true) // Memory only
+  });
+
+  // Stream the response
+  let response = '';
+  for await (const chunk of result.textStream) {
+    process.stdout.write(chunk);
+    response += chunk;
+  }
+
+  // Check for tool calls
+  const toolCalls = await result.toolCalls;
+  if (toolCalls) {
+    console.log('\n\n[Memory operations:', toolCalls.map(t => t.toolName).join(', '), ']');
+  }
+
+  return response;
+}
+
+// Example: Store preferences
+await personalizedChat(
+  "I prefer dark mode and want notifications disabled", 
+  "user_123"
+);
+
+// Example: Use stored preferences
+await personalizedChat(
+  "What are my current settings?", 
+  "user_123"
+);
+```
+
+### Memory with Streaming
+
+Handle streaming responses while managing memory:
+
+```ts memoryStreaming.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Remember that I love TypeScript and Next.js",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true)
+});
+
+// Stream the text response
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+
+// Handle memory operations if any were made
+const toolCalls = await result.toolCalls;
+if (toolCalls && toolCalls.length > 0) {
+  console.log('\n\nMemory operations made:');
+  for (const toolCall of toolCalls) {
+    console.log(`- ${toolCall.toolName}:`, toolCall.args);
+  }
+}
+
+// Get the full text result
+const fullText = await result.text;
+console.log('\n\nFull response:', fullText);
+```
+
+---
+
+## Bulk Memory Operations
+
+For storing multiple user preferences efficiently, use bulk operations:
+
+```ts bulkMemoryOperations.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// Store preferences for multiple users efficiently
+const users = [
+  { userId: "user_123", prefs: "Dark mode, English, IST timezone" },
+  { userId: "user_456", prefs: "Light mode, Spanish, EST timezone" },
+  { userId: "user_789", prefs: "Auto theme, French, CET timezone" }
+];
+
+// Process in batches of 1000 (optimal batch size)
+const BATCH_SIZE = 1000;
+for (let i = 0; i < users.length; i += BATCH_SIZE) {
+  const batch = users.slice(i, i + BATCH_SIZE);
+  
+  for (const user of batch) {
+    await streamText({
+      model: openai('gpt-4o-mini'),
+      prompt: `Remember for ${user.userId}: ${user.prefs}`,
+      tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true)
+    });
+  }
+  
+  console.log(`Processed ${Math.min(i + BATCH_SIZE, users.length)}/${users.length} users`);
+}
+```
+
+<Warning>
+**Performance Tip**: For 1000+ operations, batch in groups of 1000 for optimal performance. Sequential operations for 1000 docs take ~30s, while batched operations take ~3s (10x faster).
+</Warning>
+
+### Error Handling for Bulk Operations
+
+```ts robustBulkMemory.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+async function storeUserPreferences(users: Array<{userId: string, prefs: string}>) {
+  const MAX_RETRIES = 3;
+  const failures = [];
+  
+  for (const user of users) {
+    let attempt = 0;
+    let success = false;
+    
+    while (attempt < MAX_RETRIES && !success) {
+      try {
+        await streamText({
+          model: openai('gpt-4o-mini'),
+          prompt: `Remember for ${user.userId}: ${user.prefs}`,
+          tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true)
+        });
+        success = true;
+      } catch (error) {
+        attempt++;
+        console.warn(`Failed for ${user.userId} (attempt ${attempt}/${MAX_RETRIES})`);
+        
+        if (attempt < MAX_RETRIES) {
+          // Exponential backoff: 1s, 2s, 4s
+          await new Promise(resolve => 
+            setTimeout(resolve, 1000 * Math.pow(2, attempt - 1))
+          );
+        } else {
+          failures.push({ userId: user.userId, error: error.message });
+        }
+      }
+    }
+  }
+  
+  if (failures.length > 0) {
+    console.error(`${failures.length} users failed after retries:`, failures);
+  }
+  
+  return { failures };
+}
+```
+
+---
+
+## When to Use Memory
+
+Use Vercel AI SDK with Alchemyst memory when you need to:
+
+- **Build personalized experiences**: Remember user preferences, settings, and habits
+- **Create multi-session applications**: Maintain context across different sessions
+- **Implement user profiles**: Store and retrieve user-specific information
+- **Enable conversation continuity**: Remember previous interactions and context
+- **Track user journey**: Keep a history of user interactions and decisions
+
+For more details, check out the official [**Vercel AI SDK documentation**](https://ai-sdk.dev/docs/introduction)
+
+---
+
+## Tool Configuration
+
+```ts
+// Memory tools only (add, delete, retrieve memory)
+const memoryOnly = alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true);
+
+// Use in your application
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Your prompt here",
+  tools: memoryOnly
+});
+```
+
+If you don't have an Alchemyst API Key, you can get one in the [**Alchemyst Settings page**](https://platform.getalchemystai.com/settings)

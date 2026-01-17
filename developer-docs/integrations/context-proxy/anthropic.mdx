@@ -1,11 +1,12 @@
 ---
 title: 'Anthropic'
-description: "Proxy server for routing requests to Anthropic’s LLM API"
+description: "Proxy server for routing requests to Anthropic's LLM API"
+keywords: ['anthropic', 'proxy-server', 'integration']
 ---
 
 ## Why use the proxy server ?
 
-By simply changing the `baseURL`, you can instantly add a memory layer to your LLM calls without altering your existing code. The proxy automatically handles storing and retrieving context across conversations, making your LLM smarter and more context-aware. Instead of managing memory, state, or custom logic in your app, the proxy does the heavy lifting, so your model responses feel coherent, continuous, and truly conversational.  
+By simply changing the `baseURL`, you can instantly add a memory layer to your LLM calls without altering your existing code. The proxy automatically handles storing and retrieving context across conversations, making your LLM smarter and more context-aware. Instead of managing memory, state, or custom logic in your app, the proxy does the heavy lifting, so your model responses feel coherent, continuous, and truly conversational.
 
 ## Get the AlchemystAI API key.
 
@@ -19,7 +20,7 @@ export ALCHEMYST_AI_API_KEY="your_api_key_here"
 
 ## Quickstart
 
-```ts 
+```ts
 import Anthropic from '@anthropic-ai/sdk';
 
 const anthropicURL = "https://api.anthropic.com" ;

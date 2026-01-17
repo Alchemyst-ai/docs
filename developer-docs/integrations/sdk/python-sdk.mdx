@@ -1,8 +1,8 @@
 ---
 title: 'Python SDK'
 description: 'Get started with the Alchemyst Python SDK'
+keywords: ['python-sdk', 'sdk', 'integration']
 ---
-
 
 ## Installation
 
@@ -206,18 +206,9 @@ except alchemyst_ai.APIStatusError as e:
     print(e.response)
 ```
 
-Error codes are as follows:
+### Troubleshooting and Errors
 
-| Status Code | Error Type                 |
-| ----------- | -------------------------- |
-| 400         | `BadRequestError`          |
-| 401         | `AuthenticationError`      |
-| 403         | `PermissionDeniedError`    |
-| 404         | `NotFoundError`            |
-| 422         | `UnprocessableEntityError` |
-| 429         | `RateLimitError`           |
-| >=500       | `InternalServerError`      |
-| N/A         | `APIConnectionError`       |
+Errors while adding or searching documents usually relate to payload structure, limits, or permissions. Refer to the **Add Documents** and **Search Context** sections above for correct usage
 
 ### Retries
 
@@ -230,13 +221,13 @@ You can use the `max_retries` option to configure or disable retry settings:
 ```python
 from alchemyst_ai import AlchemystAI
 
-# Configure the default for all requests:
+# Configure the default for all requests
 client = AlchemystAI(
     # default is 2
     max_retries=0,
 )
 
-# Or, configure per-request:
+# Or, configure per-request
 client.with_options(max_retries=5).v1.context.add()
 ```
 
@@ -248,18 +239,18 @@ which accepts a float or an [`httpx.Timeout`](https://www.python-httpx.org/advan
 ```python
 from alchemyst_ai import AlchemystAI
 
-# Configure the default for all requests:
+# Configure the default for all requests
 client = AlchemystAI(
     # 20 seconds (default is 1 minute)
     timeout=20.0,
 )
 
-# More granular control:
+# More granular control
 client = AlchemystAI(
     timeout=httpx.Timeout(60.0, read=5.0, write=10.0, connect=2.0),
 )
 
-# Override per-request:
+# Override per-request
 client.with_options(timeout=5.0).v1.context.add()
 ```
 
@@ -430,3 +421,10 @@ print(alchemyst_ai.__version__)
 ## Requirements
 
 Python 3.8 or higher.
+
+## Troubleshooting and Errors
+
+If you encounter unexpected behavior or specific API errors, please refer to our [Troubleshooting Guide](/advanced/troubleshooting) for detailed solutions and error code definitions.
+
+
+

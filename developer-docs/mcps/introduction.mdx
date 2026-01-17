@@ -1,45 +1,130 @@
-# What is Alchemyst AI and it's memory/context layer?
+---
+title: "MCPs and Context"
+description: "MCP Compatibility : how Tools Connect to Alchemyst"
+keywords: ['mcp', 'claude', 'cursor', 'vs-code', 'context']
+---
 
-Alchemyst is the context cloud for LLMs and AI Agents, purpose-built to serve as the connective tissue of your entire AI stack. It provides a unified memory layer that bridges data ingestion, context management, orchestration, inference, and deployment.
 
-By acting as a central hub for context and knowledge, Alchemyst enables your AI systems to access, share, and persist information across tools, sessions, and workflows.
+## The Context Layer as Infrastructure
 
-The memory/context layer essentially behaves like an MCP (Model Context Protocol) server: it offers structured interfaces (APIs or tools) that can be connected to your preferred Tools - such as **VS Code**, **Cursor**, or **Claude Desktop** -so external tools can store, fetch, and use “context” reliably.
+At its core, Alchemyst functions as a **centralized context service**.
 
-# What is the MCP (Model Context Protocol)?
+Instead of embedding documents, files, or historical interactions directly into prompts, Alchemyst stores context externally and exposes it through structured interfaces. These interfaces allow AI tools and agents to retrieve only the **most relevant information** at the moment it is needed.
 
-MCP (Model Context Protocol) is an open-source standard for connecting AI applications to external systems.
-Using MCP, AI applications like Claude or ChatGPT can connect to data sources (e.g. local files, databases), tools (e.g. search engines, calculators) and workflows (e.g. specialized prompts)—enabling them to access key information and perform tasks.
+This approach decouples:
+- context storage from model execution  
+- memory from individual tools  
+- knowledge from single-session interactions  
 
-### Benefits of MCP server integration
+The result is AI behavior that is more consistent, scalable, and reliable over time.
 
-- It remembers our team's unique coding style and project rules, ensuring our work is always consistent, day in and day out.
-- Faster completion of tasks since the AI already “knows” relevant background (files, APIs, previous code).
-- It's like working with a teammate who's already caught up. You don't have to waste time re-explaining the project's history or context for every new task.
-- Same memory/context is available across different tools/editors (VS Code, Cursor, Claude Desktop, etc.).
+---
 
-# How can Alchemyst AI’s MCP supercharge your workflow?
+## MCP Compatibility: How Tools Connect to Alchemyst
 
-Let's say you are using any ai tool like Cursor, claude desktop , vscode etc. and you are stuck some where in between and ai is not
-aware of what to do next. and you don't have any idea about the thing in this situation you might need to train ai with the relavent data or build your own ai model. just joking you don't need to do all that rather what ypou can do is use upload the relavent docs or relavent files which you have regarding the concept where ai is stuck and upload them to the context processor in the alchemystai platform and then you can use them locally by integrating our mcp to the tool you are using now ai have the context and the memory it needs to perform better and serv you with better results.
+Alchemyst’s memory layer behaves like an **MCP (Model Context Protocol) server**.
 
-Imagine you’re working in an AI-powered tool like Cursor, Claude Desktop, or VS Code and suddenly hit a roadblock. The AI doesn’t have the context to help, and you’re stuck.
+It exposes well-defined APIs and tool interfaces that can be connected to MCP-compatible clients such as:
+- VS Code
+- Cursor
+- Claude Desktop
+- Custom agents or internal tooling
 
-With Alchemyst AI, you don’t need complex training or custom models. Just upload your relevant files or docs to our context processor, connect via MCP, and your AI instantly gains the knowledge it needs.
+Through MCP, external tools can:
+- store context (documents, conversations, instructions)
+- fetch relevant memory at query time
+- reuse the same context across multiple environments
 
-### Alchemyst AI + MCP = Smarter Workflows
+This ensures that context is **portable**, not locked to a single editor or AI product.
 
-Don’t get stuck when your AI runs out of context.
-Upload your files, connect via MCP, and watch your AI deliver sharper, faster answers—right inside the tools you already use.
+---
 
-# Prerequisites
+## What Is MCP (Model Context Protocol)?
 
-Here’s what a user needs before starting Alchemyst AI + MCP integration.
-| **Tasks** | **Details / Checklist** |
-| :--- | :--- |
-| **Alchemyst AI account / API access** | Ensure you have a working API key, or all other credential is needed.|
-| **Endpoint(s) for memory / context layer** | As memory is provided through a server or service, note its URL/command, port, any API paths. for local, note how it's launched. |
-| **Development environment / tool versions** | Make sure your editor (VS Code, Cursor, Claude Desktop) is up to date and supports MCP or custom external tool integrations. |
-| **Permissions** | If using APIs or external services, ensure that the necessary permissions or scopes are granted (read/write to memory store, fetching relevant data, etc.). |
-| **Environment variables & secrets management** | Don’t hard-code keys. Use `.env` files, editor secret storage, or OS environment variables. Ensure safe storage. |
-| **Local tools / dependencies** | If the memory/tool-server is local, you might need e.g. Node.js, Python, etc. For transports like stdio, ensure you can run commands locally. For HTTP/SSE, ensure network access is available. |
+**MCP (Model Context Protocol)** is an open-source standard for connecting AI applications to external systems.
+
+It defines how AI tools can securely interact with:
+- data sources (files, databases, APIs)
+- external tools (search, computation, automation)
+- workflows and long-lived memory systems
+
+Using MCP, AI applications like Claude or Cursor can operate with **shared, persistent context** instead of isolated, stateless prompts.
+
+---
+
+## Benefits of MCP-Based Context Integration
+
+Integrating Alchemyst via MCP provides several practical advantages:
+
+- **Persistent project knowledge**  
+  Coding conventions, architectural decisions, and domain rules remain consistent across sessions.
+
+- **Faster iteration**  
+  The AI no longer needs repeated explanations of APIs, schemas, or prior decisions.
+
+- **Cross-tool continuity**  
+  The same memory is available in VS Code, Cursor, Claude Desktop, and other MCP-enabled tools.
+
+- **Reduced prompt overhead**  
+  Context is retrieved dynamically instead of being manually injected into every prompt.
+
+Conceptually, this is like working with a teammate who already understands the project—without constant re-onboarding.
+
+---
+
+## How Alchemyst + MCP Improves Real Workflows
+
+Consider a common scenario:  
+You’re working inside an AI-powered editor and hit a point where the model lacks sufficient context to help you move forward.
+
+Without a context layer, your options are limited:
+- re-explain the problem
+- paste large files into prompts
+- accept shallow or incorrect responses
+
+With Alchemyst, the workflow changes.
+
+You upload the relevant files, documents, or references to Alchemyst’s context processor. Once connected via MCP, the AI tool can retrieve that information on demand—locally, inside the editor.
+
+No retraining.  
+No custom models.  
+No prompt stuffing.
+
+The AI simply has access to the context it was missing.
+
+---
+
+## Design Principle
+
+> **Context should be stored once, retrieved selectively, and reused everywhere.**
+
+Alchemyst operationalizes this principle by treating memory as shared infrastructure rather than transient prompt data.
+
+---
+
+## Prerequisites
+
+Before integrating Alchemyst with an MCP-enabled tool, ensure the following:
+
+| **Requirement** | **Details** |
+|-----------------|-------------|
+| **Alchemyst API access** | A valid API key and required credentials |
+| **Context service endpoint** | URL or command to access the memory layer (local or hosted) |
+| **Supported editor or tool** | VS Code, Cursor, Claude Desktop, or another MCP-compatible client |
+| **Permissions & scopes** | Read/write access to the context store as needed |
+| **Secrets management** | API keys stored securely via environment variables or editor secrets |
+| **Local dependencies** | Node.js, Python, or other runtime if running services locally |
+| **Network access** | Required for HTTP/SSE-based MCP transports |
+
+---
+
+## Summary
+
+Alchemyst provides a shared, persistent context layer for AI systems.  
+MCP provides the protocol that allows tools to use it.
+
+Together, they enable AI workflows that are:
+- context-aware
+- tool-agnostic
+- scalable
+- and far more reliable than prompt-based approaches

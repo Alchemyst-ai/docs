@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "aspen",
+  "theme": "mint",
   "api": {
     "openapi": "https://platform-backend.getalchemystai.com/api/openapi.json"
   },
@@ -18,42 +18,57 @@
   },
   "name": "Alchemyst AI Docs",
   "colors": {
-    "primary": "#f49025",
-    "light": "#e8a916",
-    "dark": "#151515"
+    "primary": "#f59025",
+    "light": "#f39025",
+    "dark": "#252525"
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "banner": {
+    "content": "🚀 Alchemyst is now the Pareto Frontier for AI Context! [Learn more](https://getalchemystai.com/benchmarks?utm_source=docs&utm_campaign=pareto_frontier_announcement&utm_medium=announcement&utm_content=alchemyst_is_now_pareto_frontier)",
+    "dismissible": false
   },
   "favicon": "/logo/logo.png",
   "navigation": {
     "tabs": [
       {
+        "tab": "Welcome",
+        "icon": "stars",
+        "groups": [
+          {
+            "group": "Welcome",
+            "pages": [
+              "index"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Guides",
         "icon": "book",
         "groups": [
           {
-            "group": "AI Memory",
-            "pages": []
-          },
-          {
-            "group": "AI Context",
-            "pages": [
-              "ai-context/what-is-ai-context",
-              "ai-context/why-you-need-ai-context",
-              "ai-context/how-alchemyst-works"
-            ]
-          },
-          {
             "group": "Getting started",
             "pages": [
-              "index",
-              "quickstart"
+              "getting-started/index",
+              "getting-started/quickstart",
+              "getting-started/quickstart-memory"
             ]
           },
           {
             "group": "Tutorials",
             "pages": [
               "tutorials/mcp-setup",
-              "tutorials/typescript-agent",
-              "tutorials/python-agent",
               "tutorials/chrome-extension",
               "tutorials/n8n-automation"
             ]
@@ -71,30 +86,42 @@
             ]
           },
           {
+            "group": "Advanced Usage",
+            "pages": [
+              "advanced/overview",
+              "advanced/context-arithmetic",
+              "advanced/usage-patterns",
+              "advanced/realworld-use-cases",
+              "advanced/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Cookbook",
+        "icon": "utensils",
+        "groups": [
+          {
+            "group": "By our team",
+            "expanded": true,
+            "pages": [
+              "example-projects/team/cli-chatbot",
+              "example-projects/team/syllabai",
+              "example-projects/team/zendocs"
+            ]
+          },
+          {
+            "group": "By our community",
+            "pages": [
+              "example-projects/community/discord-bot",
+              "example-projects/community/b2b-newsletter-writer"
+            ]
+          },
+          {
             "group": "Contributions",
             "pages": [
               "contribution/contributing",
               "contribution/awesome-saas-repo"
-            ]
-          },
-          {
-            "group": "Sample Projects",
-            "pages": [
-              {
-                "group": "By our team",
-                "expanded": true,
-                "pages": [
-                  "example-projects/team/syllabai",
-                  "example-projects/team/zendocs"
-                ]
-              },
-              {
-                "group": "By our community",
-                "pages": [
-                  "example-projects/community/discord-bot",
-                  "example-projects/community/b2b-newsletter-writer"
-                ]
-              }
             ]
           }
         ]
@@ -128,34 +155,40 @@
               "integrations/sdk/typescript-sdk"
             ]
           },
+            {
+              "group": "Third-party integrations",
+              "pages": [
+                "integrations/third-party/introduction",
+                {
+                  "group": "Vercel AI SDK",
+                  "pages": [
+                    "integrations/third-party/aisdk/middleware",
+                    "integrations/third-party/aisdk/tools"
+                  ]
+                },
+                "integrations/third-party/agnoagi",
+                {
+                  "group": "LangChain",
+                  "pages": [
+                    "integrations/third-party/langchain/python",
+                    "integrations/third-party/langchain/js"
+                  ]
+                },
+                {
+                  "group": "LLamaIndex (coming soon)",
+                  "pages": [
+                    "integrations/third-party/llamaindex/python",
+                    "integrations/third-party/llamaindex/js"
+                  ]
+                }
+              ],
+              "expanded": false
+            },
           {
-            "group": "Third-party integrations",
+            "group": "Context Proxy",
             "pages": [
-              "integrations/third-party/introduction",
-              "integrations/third-party/aisdk",
-              "integrations/third-party/agnoagi",
-              {
-                "group": "LangChain",
-                "pages": [
-                  "integrations/third-party/langchain/python",
-                  "integrations/third-party/langchain/js"
-                ]
-              },
-              {
-                "group": "LLamaIndex (coming soon)",
-                "pages": [
-                  "integrations/third-party/llamaindex/python",
-                  "integrations/third-party/llamaindex/js"
-                ]
-              }
-            ],
-            "expanded": false
-          },
-          {
-            "group": "LLM Proxy",
-            "pages": [
-              "integrations/llm-proxy/anthropic",
-              "integrations/llm-proxy/openai"
+              "integrations/context-proxy/anthropic",
+              "integrations/context-proxy/openai"
             ]
           }
         ]
@@ -230,17 +263,17 @@
       "anchors": [
         {
           "anchor": "Website",
-          "href": "https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
+          "href": "https://getalchemystai.com?utm_source=docs&utm_campaign=docs&utm_medium=web",
           "icon": "book-open-cover"
         },
         {
           "anchor": "Community",
-          "href": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join",
+          "href": "https://getalchemystai.com/docs/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join",
           "icon": "discord"
         },
         {
           "anchor": "Blog",
-          "href": "https://getalchemystai.com/blog?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web",
+          "href": "https://getalchemystai.com/blog?utm_source=docs&utm_campaign=docs&utm_medium=web",
           "icon": "newspaper"
         }
       ]
@@ -254,8 +287,8 @@
     }
   ],
   "logo": {
-    "light": "/logo/logo-light-2.png",
-    "dark": "/logo/logo-dark.png"
+    "light": "/logo/logo-full-light.jpeg",
+    "dark": "/logo/logo-full.webp"
   },
   "navbar": {
     "links": [
@@ -267,7 +300,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://platform.getalchemystai.com"
+      "href": "https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=docs_dashboard_button&utm_medium=button&utm_content=dashboard_button"
     }
   },
   "footer": {
@@ -275,7 +308,7 @@
       "x": "https://x.com/getalchemyst",
       "github": "https://github.com/alchemyst-ai",
       "linkedin": "https://linkedin.com/company/alchemystai",
-      "discord": "https://docs.getalchemystai.com/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
+      "discord": "https://getalchemystai.com/docs/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join"
     }
   },
   "integrations": {

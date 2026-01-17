@@ -1,7 +1,22 @@
 ---
 title: Chrome
-description: Use Alchemyst AI’s memory inside AI models through our Chrome extension.
+description: Use Alchemyst AI's memory inside AI models through our Chrome extension.
+keywords: ['chrome-extension', 'memory-llm', 'integration']
 ---
+
+## Installation and setup
+
+To install and configure the Chrome extension, follow the step-by-step guide:
+
+**[Chrome Extension Tutorial](/tutorials/chrome-extension)**
+
+The tutorial covers:
+- Installing the extension
+- Connecting it to your Alchemyst workspace
+- Capturing memory and context
+- Using memory inside supported AI models
+
+
 ## Why memory at all?
 
 LLMs are stateless by design — every time you press **Send**, the model starts from a blank slate. When it lacks past interactions, domain facts, or user preferences, it can only guess at the bigger picture, producing answers that feel generic or even contradictory from turn to turn. Persistent **memory** solves this problem by:
@@ -12,109 +27,70 @@ LLMs are stateless by design — every time you press **Send**, the model starts
 
 Without this layered memory architecture, even the smartest model repeats itself, forgets goals, and forces you to copy-paste context manually. With it, AI can reason over time, reference earlier work, and finish complex tasks without starting from zero.
 
-## Why Alchemyst?
+## How the Chrome extension works
 
-Alchemyst turns the abstract idea of “AI memory” into a drop-in reality for any web-based LLM:
+The extension acts as a lightweight memory layer between you and the model:
 
-* **Automated capture & classification** - a single shortcut lets you save any snippet as long-lived *Memory* or task-scoped *Context*; no manual prompt-stuffing.
-* **Intelligent context manager** - before you submit a prompt, Alchemyst filters, trims, and formats only the relevant pieces so you stay within token budgets while still giving each model exactly what it needs.
-* **Model-agnostic injection** - the same memory layer follows you from ChatGPT to Claude to Gemini, eliminating tab-hopping and preventing “context drift.”
-* **Enterprise-grade security** - all data is AES-256-encrypted on-device, with optional end-to-end-encrypted cloud sync and full audit trails.
+1. You capture context or memory directly from the browser
+2. Alchemyst stores and indexes it securely
+3. Relevant memory is automatically injected when you interact with an AI model
+4. The model responds with awareness of past information and intent
 
-## Alchemyst AI Chrome Extension
 
-Bring **Alchemyst AI’s memory** directly into your AI model such as chatGPT, claude using our [Chrome extension](https://github.com/Alchemyst-ai/chrome-extension). This extension seamlessly connects AI model with your **Alchemyst AI account**, letting your assistant remember context you add across chats.
+## When to use the Chrome extension
 
-{/* <iframe
-  width="560"
-  height="315"
-  src="https://www.youtube.com/embed/IUJU5vqMaW4?si=pYVT5RfO5V4dQxs-"
-  title="YouTube video 2"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-  referrerpolicy="strict-origin-when-cross-origin"
-  allowfullscreen
-></iframe> */}
-import { VideoCarousel } from '/snippets/video-carousel.mdx';
+The Chrome extension is ideal when you:
+- Work directly in browser-based LLMs
+- Want memory without building custom integrations
+- Need consistent context across tools and sessions
+- Prefer a no-code way to use Alchemyst
 
-<VideoCarousel urls={[
-  {
-    url: "https://www.youtube.com/embed/oubWqp9uLYE?list=PLTnYaGyWE7dGlzullvvE_7tXd1cLx9iYg",
-    title: "Integrating Alchemyst AI with ChatGPT & Claude"
-  },
-  ]}
-/>
+If you later need deeper control or automation, you can move seamlessly to the SDKs and APIs.
 
-## Installation
+## Use Cases
 
-1. **Add the Chrome Extension**
-    from the Chrome Web Store [click here](https://chromewebstore.google.com/detail/alchemyst-ai/aihninjmajjplfkgioojlgfdmagcmgkk?utm_campaign=docs&utm_source=docs.getalchemystai.com&utm_medium=web).
+As you are all set to use the extension let's now look and some of the cool stuff you can do with it.
 
----
+### **For Everyone :**
 
-## Set Up Your API Key
+#### **1. AI Models that actually remembers you**
 
-1. Visit **Alchemyst AI**: [Platform](https://platform.getalchemystai.com/settings)
+Tired of AI models forgetting who you are every time you open a new chat? With Alchemyst AI memory, you can make it remember your preferences, goals, or habits. Whether it's your fitness routine, favorite food, or daily schedule, AI Model will keep it in mind and talk like it actually knows you.
 
-2. Copy your **API Key** from the settings page.
+#### **2. Continuous learning buddy**
 
-3. Open the **AI Model** you are using in your browser, such as chatGPT, claude and click the **Alchemyst AI extension icon**.
+If you are learning a new skill, language, or preparing for exams, you don't need to start from scratch every session. AI Model will remember your progress, weak areas, and even your previous questions so it can build on them next time you open it.
 
-4. Paste your **API Key** into the input field and click save (Refresh the page after saving).
+#### **3. Personal journal and reflection space**
+
+Want to track your thoughts or daily reflections? You can use memory to keep your past entries. AI Model can summarize your week, analyze your writing tone, or give you insights on how your mindset has changed over time.
+
+#### **4. Smarter recommendations**
+
+Every suggestion becomes better with memory. From movies, recipes, or books, AI Model will personalize recommendations based on what you've liked before, without you needing to remind it every time.
 
 ---
 
-## Enable Alchemyst AI Memory
+### **For Developers :**
 
-After entering your key, look for the **Alchemyst AI memory toggle icon** inside the **message box**.
-Flip the switch to **ON** - and that’s it!
+#### **1. Your AI coding partner with context**
 
-Your Chat sessions will now be enhanced with **Alchemyst AI’s memory** - preserving important context across conversations.
+Developers can finally stop re-explaining their stack, framework, and project setup in every session. Once AI Model remembers your project details, it can help you faster and more accurately the next time you ask for help.
 
-<Frame>
-  <img
-    src="/images/gpt-extension-toggle.png"
-    alt="Screenshot showing extension enabled successfully"
-    style={{ borderRadius: "0.5rem" }}
-  />
-</Frame>
+#### **2. Smarter debugging sessions**
 
-_Example view of the memory toggle icon in ChatGPT._
+No more “start from zero” debugging. AI Model will recall your previous error logs from alchemyst's memory, the fixes you tried, and what worked or didn't, so you can pick up where you left off seamlessly.
 
----
+#### **3. Technical writing made easier**
 
-## Saving context to the Alchemyst AI
+If you often write documentation, commit messages, or changelogs, adding a single reference doc on the platform can help gpt remember your team's writing style and project tone. It can help you generate consistent documentation without having to guide it repeatedly.
 
-- We can now save our conversations with chatGPT and Claude to Alchemyst's memory.
-- to save the context.
-    1. go to chatGPT or Claude conversation you want to save.
-    2. click the extension icon in the browser toolbar.
-    3. click the save context button in the extension popup.
+#### **4. Shared team memory**
 
-- this will save the context to the Alchemyst AI memory.
-- we can then use this context in our future conversations with chatGPT and Claude.
-
----
-## Usage Tips
-
-- You can **turn memory ON or OFF** anytime by using the toggle in the message box.
-- Upload any relevant context or documents you want to store as memory on the [Platform](https://platform.getalchemystai.com)
-- If you update your API key, simply re-enter it through the extension popup.
+Teams can share one memory setup for a project so every member gets the same context inside AI Model. Perfect for consistent onboarding, documentation, and communication across dev teams.
 
 ---
 
-## Troubleshooting
+With Alchemyst AI's Chrome extension, AI models becomes more than just a chatbot. It becomes your personal assistant, teacher, or coding partner that actually remembers what matters to you.
 
-- **Memory not activating?**
-  Double-check your API key and ensure the extension is **enabled** in Chrome.
 
-- **Can’t see the icon?**
-  Refresh the LLM page after installation.
-
----
-
-### That’s it!
-
-You’re now running ChatGPT with **Alchemyst AI memory integration** - a smarter, more personal assistant that remembers what matters.
-
----

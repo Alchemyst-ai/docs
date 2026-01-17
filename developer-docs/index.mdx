@@ -1,111 +1,117 @@
 ---
-title: "Introduction"
-description: "Get started with AI context in general, and Alchemyst in particular."
+title: "Introduction - Alchemyst AI Docs"
+description: "The universal context layer for your AI stack. Choose a path to start building."
+mode: "custom"
+keywoed : ["welcome", "alchemyst-ai"]
 ---
 
+{/* Hero Section */}
+<div className="mx-auto w-screen max-w-[60vw] my-5 py-6 text-center">
+  <div className="flex gap-2 justify-center">
+  <h1 className="text-7xl sm:text-5xl font-bold my-3 text-black dark:text-white ">Alchemyst </h1>
+  <h1 className="text-7xl sm:text-5xl font-bold my-3 text-[#f59025]">AI </h1>
+  </div>
+  <p>
+    Getting started with the ONLY AI-native context layer - scalable, powerful and flexible, with you in control.
+  </p>
+</div>
 
-## Overview
+{/* Choose Your Journey Section */}
+<div className="mx-auto w-screen max-w-[60vw]">
+  {/* <h3 className="text-center text-4xl my-3">Choose your journey</h3> */}
+  <CardGroup cols={2}>
+    <Card
+      title="For users"
+      img="images/chrome_ext.png"
+      href="/integrations/extensions/chrome"
+    >
+      Give conversational memory to your AI tools instantly. **No coding required.**
+    </Card>
+    <Card
+      title="For Developers"
+      img="images/dashboard.png"
+      href="/integrations/introduction"
+    >
+      Build context-aware agents with your favourite tech stack in minutes.
+    </Card>
+  </CardGroup>
+</div>
 
-Alchemyst is the context cloud for LLMs and AI agents, a unified platform that helps developers build, integrate, and scale context-aware AI applications. Whether you are enhancing an existing workflow, building a new intelligent product, or exploring research prototypes, Alchemyst provides the memory, tooling, and integrations required to make AI systems more accurate, relevant, and maintainable.
+{/* Developer Resources Section */}
+<div className="mx-auto w-screen max-w-[60vw] my-5 py-6">
+  <h3 className="text-center text-4xl sm:text-2xl py-3 mt-3">Developer Resources</h3>
+  <p className="text-center">
+    Integrate context into the tools and frameworks you already use.
+  </p>
 
-Key outcomes you can expect from Alchemyst:
+  {/* Getting Started */}
+  <h4 className="text-center text-2xl sm:text-xl mt-6">Getting started</h4>
+  <Steps>
+    <Step title="Get your API Key">
+      Sign up at [**Alchemyst Platform**](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=getting_started&utm_medium=welcome_page&utm_content=getting_started_link) and grab your secret key from the dashboard.
+    </Step>
+    <Step title="Install the SDK">
+    <Tabs>
+<Tab title="javascript">
+      ```bash
+      npm install @alchemystai/sdk
+      ```
+      </Tab>
+      <Tab title="python">
+      ```bash
+      pip install alchemystai
+      ```
+      </Tab>
+      </Tabs>
+    </Step>
+    <Step title="Integrate with your tech stack">
+      Push data to your namespace to make it immediately available to your agents.
+    </Step>
+  </Steps>
 
-- **Aggregate and enrich data** from diverse sources, making it accessible to LLMs and agents in real time.
-- **Maintain persistent, context-aware memory** to enhance reasoning, retrieval, and generation.
-- **Orchestrate complex workflows** by connecting specialized frameworks, libraries, and platforms.
-- **Deploy modular, scalable AI solutions** that are easy to maintain and extend.
+  {/* Resource Cards */}
+  <CardGroup cols={2}>
+    <Card
+      title="LLM Frameworks"
+      icon="microchip"
+      href="/integrations/third-party/introduction"
+    >
+      Native support for **LangChain, LlamaIndex, Agno,** and **Vercel AI SDK**.
+    </Card>
+    <Card
+      title="Model Context Protocol"
+      icon="bolt"
+      href="/mcps/introduction"
+    >
+      Connect Alchemyst as an **MCP Server** to Cursor, Claude Desktop, and VS Code.
+    </Card>
+    <Card
+      title="API Reference"
+      icon="code"
+      href="/api-reference/introduction"
+    >
+      Learn the exact endpoints behind the Alchemyst AI Platform
+    </Card>
+    <Card
+      title="Sample Projects"
+      icon="github"
+      href="https://github.com/alchemyst-ai/awesome-saas"
+    >
+      Blueprints for newsletter generators, support bots, and research agents.
+    </Card>
+  </CardGroup>
+</div>
 
-
-## What is Alchemyst?
-
-Alchemyst is a developer-first platform focused on AI context management and runtime orchestration. It offers:
-
-- **Context management**: Store, index, and retrieve context in ways that improve model outputs.
-- **SDKs & APIs**: Official SDKs for Python and TypeScript plus a rich REST API surface for other languages and environments.
-- **Integration tooling**: Built-in connectors and examples for popular tools and editors to accelerate development.
-- **Sample projects & best practices**: Real-world examples you can adapt to jumpstart your work
-
-
-## Why Alchemyst?
-
-- **Boost AI accuracy and relevance** by giving your models the context they need.
-- **Accelerate development** with robust SDKs for Python and TypeScript.
-- **Integrate seamlessly** with popular tools like VS Code, GitHub Copilot, and more.
-- **Leverage real-world examples** and best practices from our community and team projects.
-
-
-## How Alchemyst works
-
-- **Ingest**: Bring data from databases, files, user interactions, and external APIs.
-- **Enrich & Index**: Normalize and enrich data, then index it for fast retrieval by your agents or LLM prompts.
-- **Serve context**: Provide contextual snippets and memories to models at inference time.
-- **Orchestrate**: Chain tools and services to create deterministic workflows and agent behaviors.
-- **Persist & Evolve**: Store user- or application-level memory that can be updated and audited over time.
-
-
-
-## Get Started
-
-Everything you need to create world-class, context-driven AI applications:
-
-<Columns cols={2}>
-  <Card
-    title="Python SDK"
-    icon="python"
-    href="/integrations/sdk/python-sdk"
-    horizontal
-  >
-    Build with Python
-  </Card>
-  <Card
-    title="TypeScript SDK"
-    icon="js"
-    href="/integrations/sdk/typescript-sdk"
-    horizontal
-  >
-    Build with TypeScript
-  </Card>
-  <Card
-    title="AI Tools & MCP Setup"
-    icon="robot"
-    href="/mcps/introduction"
-    horizontal
-  >
-    Integrate with AI tools and Model Context Protocol
-  </Card>
-  <Card
-    title="API Reference"
-    icon="terminal"
-    href="/api-reference/introduction"
-    horizontal
-  >
-    Explore the full API documentation
-  </Card>
-</Columns>
-
-## Explore Further
-
-<Columns cols={2}>
-  <Card
-    title="Sample Projects"
-    icon="code"
-    href="/example-projects"
-  >
-    See real-world code and implementation patterns.
-  </Card>
-  <Card
-    title="Cookbook"
-    icon="book"
-    href="https://github.com/alchemyst-ai/awesome-saas"
-  >
-    Explore full-fledged projects built on top of our platform.
-  </Card>
-</Columns>
-
-## Need Help?
-
-If you get stuck or want to share feedback:
-
-- Browse the **Guides** and **API docs** on this site.
-- Search the documentation for targeted answers.
-- Join our [Discord server](https://dub.sh/context-community) for real-time help.
+{/* Help Section */}
+<div className="mx-auto w-screen max-w-[60vw] my-5 py-6 text-center">
+  <h3 className="text-2xl font-semibold mb-3">Need help?</h3>
+  <p className="mb-4">Join our community to share your projects or get technical support.</p>
+  <CardGroup cols={2}>
+    <Card title="Join our Discord" icon="discord" href="https://dub.sh/context-community">
+      Connect with the community.
+    </Card>
+    <Card title="Submit a Feature Request" icon="github" href="https://github.com/Alchemyst-ai/docs/issues">
+      Request new features or report issues.
+    </Card>
+  </CardGroup>
+</div>

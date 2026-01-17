@@ -2,6 +2,7 @@
 title: "Claude Desktop"
 description: "Configure Claude Desktop MCP with Alchemyst AI"
 icon: "/logo/claude-2.svg"
+keywords: ['claude', 'mcps', 'memory', 'llm']
 ---
 
 It covers two methods of connection:
@@ -103,3 +104,5 @@ If there is **running** tag then **"Congratulations"**, You **Calude Desktop** i
 | **“Connecting to SSE…” but nothing happens**       | Incorrect SSE URL or invalid Alchemyst API key.           | Verify the URL:<br/>`https://mcp.getalchemystai.com/mcp/sse`<br/>and ensure your API key is valid and not expired.                         |
 | **`401 Unauthorized` or `403 Forbidden`**          | Invalid or expired API key provided to Supergateway.      | Regenerate your API key from the **Alchemyst Dashboard** and replace it in the command:<br/>`--oauth2Bearer YOUR_API_KEY`.                 |
 | **Claude or MCP not showing as connected**         | MCP configuration not detected or extension not reloaded. | 1. Restart **VS Code**.<br/>2. Open Command Palette → “MCP: List Active MCP Servers”.<br/>3. Confirm `supergateway` is listed and running. |
+
+

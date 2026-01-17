@@ -1,0 +1,485 @@
+---
+title: 'AI SDK Tools'
+description: "Integrate Alchemyst's tools and context management with Vercel AI SDK"
+icon: "wrench"
+keywords: ['ai-sdk', 'vercel', 'integration', 'tools', 'context']
+---
+
+## About Vercel AI SDK with Tools
+
+[Vercel AI SDK](https://ai-sdk.dev) is an open-source toolkit from the team behind Vercel and Next.js. It provides a **unified developer experience** for building AI-powered applications with tool calling capabilities.
+
+### Key Features for Tool Integration
+
+- Easy integration with multiple model providers (OpenAI, Anthropic, etc.)
+- Support for **streaming responses** for real-time chat UIs
+- Type-safe APIs with excellent **TypeScript support**
+- Built-in support for **agents, tools, and structured outputs**
+- Ready-to-use React/Next.js hooks for managing conversation state
+
+By using the AI SDK with Alchemyst tools, you can avoid handling low-level APIs directly and focus on creating seamless AI-driven experiences in your app.
+
+---
+
+## How It Works
+
+The AI SDK is split into modular packages:
+
+- **Core API**: A unified way to call LLMs and handle outputs
+- **Provider Adapters**: Packages like `@ai-sdk/openai` let you plug in specific providers
+- **UI Utilities**: Hooks such as `useChat` make it easy to build interactive experiences
+- **Tooling / Agents**: Support for calling external APIs or chaining workflows
+
+This modular design means you can start small and scale up to more complex AI flows as your application grows.
+
+### Alchemyst Tools Integration
+
+Alchemyst provides specialized tools that you can integrate with the AI SDK:
+
+- **Context Management Tools**: Add, search, and retrieve context dynamically
+- **Search Tools**: Find relevant information in your stored context
+- **Delete Tools**: Remove outdated or unnecessary context
+- **Custom Tools**: Extend with your own business logic
+
+---
+
+## When to Use Vercel AI SDK with Tools
+
+You should consider using the SDK with Alchemyst tools if:
+- You want to build chatbots, assistants, or agent-like applications quickly
+- You need real-time streaming responses from your models
+- You want to give your AI access to dynamic context and knowledge bases
+- You need cross-provider flexibility without rewriting core logic
+- You prefer type safety and well-structured APIs
+
+For more details, check out the official [**Vercel AI SDK documentation**](https://ai-sdk.dev/docs/introduction)
+
+---
+
+<Tabs>
+
+<Tab title="As AI-SDK Tool" icon="code">
+## As a Tool in AI-SDK
+
+Alchemyst can be added to your AI SDK codebase as a regular tool, which is the recommended way for developer control.
+
+The snippet below shows how to set up a tool using Vercel's AI SDK, using OpenAI GPT-4o-mini. This tool uses [**Alchemyst AI SDK**](https://npmjs.com/package/@alchemystai/sdk) under the hood, and exposes a nifty set of tools, letting you control if you want to use memory, context or both (default).
+
+This assumes that you have an OpenAI Key and Alchemyst API Key. If you don't have the Alchemyst API Key, you can get them in the [**Alchemyst Settings page**](https://platform.getalchemystai.com/settings)
+
+### Basic Setup
+
+```ts aiSdkToolSetup.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Search for users with the name rohan",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true)
+});
+```
+
+<Tip>
+**Hierarchical groupName Strategy**: Use 2-3 layers for optimal organization:
+- Layer 1: Organization/Domain ("engineering", "marketing", "sales")
+- Layer 2: Category/Time ("q4_2024", "backend", "campaign")
+- Layer 3: Specifics ("auth", "api", "billing")
+
+Example: ["engineering", "backend", "auth"] instead of flat ["engineering_backend_auth_login_jwt"]
+</Tip>
+
+### Complete Streaming Example
+
+This example shows how to handle streaming responses and tool calls:
+
+```ts streamingExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "What information do we have about our product documentation?",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true)
+});
+
+// Stream the text response
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+
+// Handle tool calls if any were made
+const toolCalls = await result.toolCalls;
+if (toolCalls && toolCalls.length > 0) {
+  console.log('\n\nTool calls made:');
+  for (const toolCall of toolCalls) {
+    console.log(`- ${toolCall.toolName}:`, toolCall.args);
+  }
+}
+
+// Get the full text result
+const fullText = await result.text;
+console.log('\n\nFull response:', fullText);
+```
+
+### Context Search Example
+
+This example demonstrates how the AI can search your stored context:
+
+```ts contextSearchExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Find all information about our pricing plans and feature comparisons",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false) // Context only
+});
+
+// The AI will automatically use the search_context tool to find relevant information
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+### Adding Context Example
+
+This example shows how to add context that the AI can later search:
+
+```ts addContextExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// First, add some context
+const addResult = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: `store this information: rohan is a good boy`,
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false) // Context only
+});
+
+
+const toolCalls = await addResult.toolCalls;
+if (toolCalls && toolCalls.length > 0) {
+  console.log('\n\nTool calls made:');
+  for (const toolCall of toolCalls) {
+    console.log(`- ${toolCall.toolName}:`, JSON.stringify(toolCall, null, 2));
+  }
+}
+// Wait for the tool to execute
+await addResult.text;
+
+// Now search for it
+const searchResult = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Search for users with the name rohan",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false)
+});
+
+for await (const chunk of searchResult.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+<Note>
+**Document Size Best Practice**: Keep documents between 500-2000 words for optimal retrieval:
+- Too small (less than 100 words): Loses context, requires many docs
+- Too large (more than 10,000 words): Retrieves too much irrelevant content, wastes tokens
+- Just right (500-2000 words): Single cohesive topic with enough context
+</Note>
+
+### Updating Context (Delete-Then-Add Pattern)
+
+When you need to update existing context, use the delete-then-add pattern to avoid 409 conflicts:
+
+```ts updateContextExample.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// Update existing context about a user
+async function updateUserContext(userId: string, newInfo: string) {
+  // Step 1: Delete old context
+  const deleteResult = await streamText({
+    model: openai('gpt-4o-mini'),
+    prompt: `Delete all information about ${userId}`,
+    tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false)
+  });
+  
+  await deleteResult.text; // Wait for deletion
+  
+  // Step 2: Small delay to ensure propagation
+  await new Promise(resolve => setTimeout(resolve, 150));
+  
+  // Step 3: Add updated context
+  const addResult = await streamText({
+    model: openai('gpt-4o-mini'),
+    prompt: `Store this updated information: ${newInfo}`,
+    tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false)
+  });
+  
+  return await addResult.text;
+}
+
+// Usage
+await updateUserContext("rohan", "rohan is an excellent developer who specializes in TypeScript");
+```
+
+<Warning>
+**Update Strategy**: Alchemyst uses metadata.fileName as the deduplication key. Same fileName = update attempt, which requires delete first to avoid 409 Conflict errors. This is by design to prevent accidental duplicates.
+</Warning>
+
+### Chat Assistant with Context and Memory
+
+A complete chat assistant that uses both context and memory:
+
+```ts chatAssistant.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+async function chatWithAssistant(userMessage: string, userId: string) {
+  const result = await streamText({
+    model: openai('gpt-4o-mini'),
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a helpful assistant with access to company knowledge and user preferences.'
+      },
+      {
+        role: 'user',
+        content: userMessage
+      }
+    ],
+    tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true) // Both context and memory
+  });
+
+  // Stream the response
+  let response = '';
+  for await (const chunk of result.textStream) {
+    process.stdout.write(chunk);
+    response += chunk;
+  }
+
+  // Check for tool calls
+  const toolCalls = await result.toolCalls;
+  if (toolCalls) {
+    console.log('\n\n[Tools used:', toolCalls.map(t => t.toolName).join(', '), ']');
+  }
+
+  return response;
+}
+
+// Example usage
+await chatWithAssistant("who is rohan?", "user_123");
+```
+
+### Tool Configuration Options
+
+Control which tools are available:
+
+```ts toolConfiguration.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// Only context tools (search, add, delete context)
+const contextOnly = alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false);
+
+// Only memory tools (add, delete memory)
+const memoryOnly = alchemystTools("YOUR_ALCHEMYST_AI_KEY", false, true);
+
+// Both context and memory (default)
+const both = alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, true);
+
+// Use context-only for knowledge base queries
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Search our documentation for API examples",
+  tools: contextOnly
+});
+```
+
+### Advanced Context Management
+
+Working with dynamic context in real-time with proper metadata structure:
+
+```ts advancedContext.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+// Add multiple pieces of context with lean metadata (5-field rule)
+const contexts = [
+  {
+    content: "Our pricing: Basic $10/month, Pro $50/month, Enterprise custom",
+    metadata: { category: "pricing", lastModified: "2024-12-29" }
+  },
+  {
+    content: "Support hours: 9am-5pm EST Monday-Friday",
+    metadata: { category: "support", lastModified: "2024-12-29" }
+  },
+  {
+    content: "Return policy: 30-day money-back guarantee",
+    metadata: { category: "policy", lastModified: "2024-12-29" }
+  }
+];
+
+for (const ctx of contexts) {
+  await streamText({
+    model: openai('gpt-4o-mini'),
+    prompt: `Store this information: ${ctx.content}`,
+    tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false)
+  });
+}
+
+// Query across all stored context
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "What are all our policies and pricing?",
+  tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false)
+});
+
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+<Tip>
+**The 5-Field Metadata Rule**: Start with maximum 5 metadata fields. Only add more when you have a specific query pattern that requires it.
+
+**Store in metadata** if you:
+- Filter or sort by it (category, price, status)
+- Need exact matching (id, sku)
+- Use for access control (department, classification)
+
+**Store in content** if it's:
+- Descriptive text (description, features)
+- Rarely filtered (dimensions, weight)
+- Only needed when retrieved (warranty, specifications)
+</Tip>
+
+### Bulk Context Operations
+
+For adding large amounts of context efficiently:
+
+```ts bulkContextOperations.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { alchemystTools } from '@alchemystai/aisdk';
+
+async function bulkAddContext(documents: Array<{content: string}>) {
+  const BATCH_SIZE = 1000; // Optimal batch size
+  const MAX_RETRIES = 3;
+  
+  for (let i = 0; i < documents.length; i += BATCH_SIZE) {
+    const batch = documents.slice(i, i + BATCH_SIZE);
+    
+    console.log(`Processing batch ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(documents.length/BATCH_SIZE)}`);
+    
+    for (const doc of batch) {
+      let attempt = 0;
+      let success = false;
+      
+      while (attempt < MAX_RETRIES && !success) {
+        try {
+          await streamText({
+            model: openai('gpt-4o-mini'),
+            prompt: `Store this: ${doc.content}`,
+            tools: alchemystTools("YOUR_ALCHEMYST_AI_KEY", true, false)
+          });
+          success = true;
+        } catch (error) {
+          attempt++;
+          if (attempt < MAX_RETRIES) {
+            // Exponential backoff: 1s, 2s, 4s
+            await new Promise(resolve => 
+              setTimeout(resolve, 1000 * Math.pow(2, attempt - 1))
+            );
+          }
+        }
+      }
+    }
+    
+    // Small delay between batches
+    if (i + BATCH_SIZE < documents.length) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+}
+```
+
+<Warning>
+**Performance Guidelines**:
+- 100 docs: ~0.5s (single call)
+- 1,000 docs: ~3s (single call)
+- 10,000 docs: ~35s (10 batches of 1000)
+- Always use batches of 1000 for optimal performance
+- Include retry logic with exponential backoff
+</Warning>
+
+</Tab>
+
+<Tab title="As MCP Tool (experimental)" icon="plug">
+## MCP Client Setup
+
+Alchemyst can be added to your AI SDK codebase as an MCP Tool, which is (probably) the most convenient way to do so.
+
+The snippet below shows how to set up an **MCP (Model Context Protocol) Client** using Vercel's AI SDK. This client communicates with your server via SSE (Server-Sent Events) and can be configured with custom headers for authentication.
+
+```ts aiSdkMcpSetup.ts
+import { experimental_createMCPClient as createMCPClient } from 'ai';
+
+const mcpClient = await createMCPClient({
+  transport: {
+    type: 'sse',
+    url: 'https://mcp.getalchemystai.com/sse',
+
+    // Configure HTTP headers, e.g. for authentication
+    headers: {
+      Authorization: 'Bearer YOUR_ALCHEMYST_AI_API_KEY',
+    },
+  },
+});
+```
+
+### Using MCP Client with Tools
+
+Once you've created the MCP client, you can use it with the AI SDK:
+
+```ts mcpUsage.ts
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { experimental_createMCPClient as createMCPClient } from 'ai';
+
+const mcpClient = await createMCPClient({
+  transport: {
+    type: 'sse',
+    url: 'https://mcp.getalchemystai.com/sse',
+    headers: {
+      Authorization: 'Bearer YOUR_ALCHEMYST_AI_API_KEY',
+    },
+  },
+});
+
+// Use the MCP client's tools
+const result = await streamText({
+  model: openai('gpt-4o-mini'),
+  prompt: "Search for information about our product",
+  tools: mcpClient.tools
+});
+
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+</Tab>
+
+</Tabs>
+
+If you don't have an Alchemyst API Key, you can get one in the [**Alchemyst Settings page**](https://platform.getalchemystai.com/settings)

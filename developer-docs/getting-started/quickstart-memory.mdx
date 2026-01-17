@@ -1,0 +1,390 @@
+---
+title: "Quickstart - Memory-aware AI Agent"
+description: "Build an AI system that remembers the preferences, details and conversations."
+keywords: ['configuration', 'setup', 'getting started', 'memory']
+---
+
+## Add Memory to Your LLM with Alchemyst AI
+
+This guide shows you how to **add memory to your LLM applications using Alchemyst AI with Vercel's AI SDK** - step by step.
+
+## What you'll build
+
+By the end of this guide, you will:
+- Wrap Vercel AI SDK functions with Alchemyst memory
+- Store conversation context automatically
+- Retrieve relevant memory across sessions
+- Build context-aware AI applications
+
+## Prerequisites
+
+You'll need:
+- An Alchemyst AI account - [**sign up**](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=quickstart_memory&utm_medium=quickstart_memory_article&utm_content=quickstart_memory_prerequisites_cta)
+- Your `ALCHEMYST_AI_API_KEY`
+- Node.js 18+
+
+<Info>
+Note that this tutorial is typescript-only. This is because AI SDK is only officially available for JS/TS.
+</Info>
+
+---
+
+## Step 1: Install the SDKs
+
+```bash
+npm install ai @alchemystai/aisdk @alchemystai/sdk
+```
+
+## Step 2: Initialize Alchemyst with AI SDK
+
+<Tabs>
+  <Tab title="AI SDK v5">
+```javascript
+import { streamText } from 'ai';
+import { withAlchemyst } from '@alchemystai/aisdk';
+
+const streamTextWithMemory = withAlchemyst(streamText, {
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+});
+```
+  </Tab>
+  <Tab title="AI SDK v6">
+```javascript
+import { generateText } from 'ai';
+import { withAlchemyst } from '@alchemystai/aisdk';
+
+// Wrap the AI SDK function with Alchemyst memory
+const generateTextWithMemory = withAlchemyst(generateText, {
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  // Optional configuration
+  withMemory: true
+});
+```
+  </Tab>
+</Tabs>
+
+## Step 3: Generate text with automatic memory storage
+
+The memory integration automatically stores conversation history in Alchemyst's context layer.
+
+<Tabs>
+  <Tab title="AI SDK v5">
+```javascript
+// Basic usage - memory is stored automatically
+const { textStream } = await streamTextWithMemory({
+  model: "anthropic/claude-sonnet-4.5",
+  prompt: 'Explain quantum mechanics',
+  userId: "user_123",
+  sessionId: "convo_789",
+});
+
+// Process the stream
+for await (const chunk of textStream) {
+  process.stdout.write(chunk);
+}
+```
+  </Tab>
+  <Tab title="AI SDK v6">
+```javascript
+// Basic usage - memory is stored automatically
+const { text } = await generateTextWithMemory({
+  model: "google/gemini-3-flash",
+  prompt: 'What is gravity?',
+  userId: "user_123",              // Required: identifies the user
+  sessionId: "convo_456",     // Required: groups related messages
+});
+
+console.log(text);
+```
+  </Tab>
+</Tabs>
+
+### What just happened?
+
+- The conversation was automatically stored in Alchemyst's [**memory layer**](https://platform.getalchemystai.com/context)
+- Future queries from the same `userId` and `sessionId` will have access to this context
+- Memory retrieval happens automatically on subsequent calls
+
+## Step 4: Continue conversations with context
+
+Subsequent messages in the same conversation automatically retrieve relevant context.
+
+<Tabs>
+  <Tab title="AI SDK v5">
+```javascript
+// Follow-up question - automatically retrieves context
+const { textStream: followUpStream } = await streamTextWithMemory({
+  model: "anthropic/claude-sonnet-4.5",
+  prompt: 'How does it relate to Einstein?',
+  userId: "user_123",
+  sessionId: "convo_789",
+});
+
+// Process the stream
+for await (const chunk of followUpStream) {
+  process.stdout.write(chunk);
+}
+```
+  </Tab>
+  <Tab title="AI SDK v6">
+```javascript
+// Follow-up question - automatically retrieves context
+const { text: followUp } = await generateTextWithMemory({
+  model: "google/gemini-3-flash",
+  prompt: 'How does it relate to Einstein?',
+  userId: "user_123",
+  sessionId: "convo_456",  // Same conversation
+});
+
+// The AI now has context about gravity from the previous exchange
+console.log(followUp);
+```
+  </Tab>
+</Tabs>
+
+## Step 5: Stream responses with memory
+
+For streaming responses, use `streamText` instead of `generateText`.
+
+```javascript
+import { streamText } from 'ai';
+import { withAlchemyst } from '@alchemystai/aisdk';
+
+const streamTextWithMemory = withAlchemyst(streamText, {
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+});
+
+const { textStream } = await streamTextWithMemory({
+  model: "google/gemini-3-flash",
+  prompt: 'Explain quantum mechanics',
+  userId: "user_123",
+  sessionId: "convo_789",
+});
+
+// Process the stream
+for await (const chunk of textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+## Step 6: Update or delete memories
+
+Manage conversation memory as needed.
+
+```javascript
+import AlchemystAI from '@alchemystai/sdk';
+
+const client = new AlchemystAI({
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+});
+
+// Update a specific memory
+await client.v1.context.memory.update({
+  userId: "user_123",
+  sessionId: "convo_456",
+  messageId: "msg_001",
+  content: "Updated content",
+});
+
+// Delete entire conversation
+await client.v1.context.memory.delete({
+  userId: "user_123",
+  sessionId: "convo_456",
+});
+```
+
+That's it, you're all set. With memory in place, your AI can now maintain context across conversations and sessions.
+
+<Note>
+**Want to learn about user profiling for AI consumer applications?**
+
+Alchemyst's memory layer enables sophisticated user profiling that enhances personalization - tracking preferences, adapting communication styles, and building rich user profiles across sessions.
+
+To learn more about implementing user profiling with memory, check out our [**User Profiling Guide**](/advanced-usage/user-profiling?utm_source=quickstart_memory_article&utm_medium=blog&utm_campaign=quickstart_memory_article_note&utm_content=user_profiling_guide_note).
+</Note>
+
+## Advanced: Multi-user conversations
+
+Handle group conversations where multiple users participate.
+
+<Tabs>
+  <Tab title="AI SDK v5">
+```javascript
+// User 1 asks a question
+await generateTextWithMemory({
+  model: "anthropic/claude-sonnet-4.5",
+  prompt: 'What are the best practices for React?',
+  userId: "user_alice",
+  sessionId: "team_discussion_001",
+});
+
+// User 2 follows up
+await generateTextWithMemory({
+  model: "anthropic/claude-sonnet-4.5",
+  prompt: 'Can you elaborate on hooks?',
+  userId: "user_bob",
+  sessionId: "team_discussion_001",  // Same conversation
+});
+
+// Both users' messages are stored in the same conversation context
+```
+  </Tab>
+  <Tab title="AI SDK v6">
+```javascript
+// User 1 asks a question
+await generateTextWithMemory({
+  model: "google/gemini-3-flash",
+  prompt: 'What are the best practices for React?',
+  userId: "user_alice",
+  sessionId: "team_discussion_001",
+});
+
+// User 2 follows up
+await generateTextWithMemory({
+  model: "google/gemini-3-flash",
+  prompt: 'Can you elaborate on hooks?',
+  userId: "user_bob",
+  sessionId: "team_discussion_001",  // Same conversation
+});
+
+// Both users' messages are stored in the same conversation context
+```
+  </Tab>
+</Tabs>
+
+#### What Alchemyst does automatically
+
+- Stores conversation history by user and conversation
+- Retrieves relevant context across sessions
+- Maintains conversation flow and coherence
+- Handles memory cleanup and optimization
+
+#### You don't need
+
+- Custom memory stores
+- Manual context window management
+- Session state handling
+- Memory deduplication logic
+
+## Configuration Options
+
+Customize how Alchemyst handles memory:
+
+```javascript
+const generateTextWithMemory = withAlchemyst(generateText, {
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+
+  // Memory retrieval settings
+  similarityThreshold: 0.8,           // Higher = more relevant results
+  minimumSimilarityThreshold: 0.5,    // Minimum relevance cutoff
+  scope: 'internal',                  // 'internal' | 'external'
+
+  // Storage settings
+  contextType: 'conversation',         // 'resource' | 'conversation' | 'instructions'
+  source: 'chat-application',          // Source identifier
+
+  // Advanced options
+  metadata: {
+    groupName: ['production'],         // ["default"] by default
+    version: '1.0',
+  },
+});
+```
+
+## Troubleshooting and Errors
+
+**Error: Missing userId or sessionId**
+- Both `userId` and `sessionId` are required for memory operations
+- Solution: Always provide both parameters when calling wrapped functions
+
+**Error: Memory not retrieving**
+- Check that `similarityThreshold` isn't set too high
+- Verify the same `userId` and `sessionId` are used
+- Use `client.v1.context.memory.search()` to test retrieval directly
+
+**Error: Too much context retrieved**
+- Lower the `similarityThreshold` for more precise results
+- Implement pagination for long conversations
+- Consider splitting into multiple conversation IDs
+
+## Next Steps: Go Deeper with Memory
+
+Get up and running with dedicated SDKs and advanced memory features.
+
+<Columns cols={2}>
+  <Card
+    title="AI SDK Integration"
+    icon="wand-magic-sparkles"
+    href="/integrations/sdk/aisdk"
+    horizontal
+  >
+    Full AI SDK guide
+  </Card>
+  <Card
+    title="TypeScript SDK"
+    icon="js"
+    href="/integrations/sdk/typescript-sdk"
+    horizontal
+  >
+    TypeScript SDK docs
+  </Card>
+  <Card
+    title="API Documentation"
+    icon="terminal"
+    href="/api-reference/introduction"
+    horizontal
+  >
+    Memory API reference
+  </Card>
+  <Card
+    title="Example Projects"
+    icon="code"
+    href="/example-projects"
+    horizontal
+  >
+    View sample projects
+  </Card>
+</Columns>
+
+## Memory Use Cases
+
+Real-world applications powered by Alchemyst memory:
+
+<Columns cols={2}>
+  <Card
+    title="Customer Support"
+    icon="headset"
+    href="/example-projects"
+  >
+    Persistent conversation history across sessions
+  </Card>
+  <Card
+    title="Personal Assistants"
+    icon="robot"
+    href="/example-projects"
+  >
+    Remember user preferences and past interactions
+  </Card>
+  <Card
+    title="Collaborative Tools"
+    icon="users"
+    href="/example-projects"
+  >
+    Multi-user conversations with shared context
+  </Card>
+  <Card
+    title="Educational Apps"
+    icon="graduation-cap"
+    href="/example-projects"
+  >
+    Track learning progress and adapt to student needs
+  </Card>
+</Columns>
+
+## Need Help?
+
+If you get stuck or want to share feedback:
+
+- Browse the **Guides** and **API docs** on this site.
+- Search the documentation for targeted answers.
+- Join our [Discord server](https://dub.sh/context-community) for real-time help.
