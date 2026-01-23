@@ -149,6 +149,14 @@
             ]
           },
           {
+            "group": "Data Sources",
+            "pages": [
+              "integrations/data-sources/databases",
+              "integrations/data-sources/docs",
+              "integrations/data-sources/cloud-storage"
+            ]
+          },
+          {
             "group": "Alchemyst SDK",
             "pages": [
               "integrations/sdk/python-sdk",

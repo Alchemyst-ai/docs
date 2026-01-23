@@ -1,0 +1,83 @@
+---
+title: "Database"
+description: "Connect PostgreSQL and MongoDB to your Alchemyst context layer"
+keywords: ['databases', 'postgres', 'postgresql', 'mongodb', 'relational', 'nosql', 'data-sources']
+---
+
+## Introduction
+
+Database integrations allow you to sync structured and semi-structured data directly into your Alchemyst context layer. Connect your live databases and pull fresh data on-demand instead of relying on manual exports or stale snapshots.
+
+## Why Connect Databases?
+
+Traditional agents struggle with operational data because data changes constantly, manual exports go stale quickly, and querying requires SQL knowledge. 
+
+With Alchemyst [database integrations](https://platform.getalchemystai.com/integrations?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web), you can:
+
+- Sync fresh data whenever context is needed
+- Search semantically across tables and collections
+- Combine database results with other data sources
+- Query in natural language without writing SQL
+
+Your databases become queryable context that responds to meaning, not just raw data.
+
+---
+
+## PostgreSQL
+
+PostgreSQL is the most popular open-source relational database, commonly used for customer records, product catalogs, transaction logs, and application state.
+
+### How to Connect
+
+**Prerequisites:**
+- PostgreSQL instance (local or cloud-hosted)
+- Read-only database user (recommended)
+- PostgreSQL connection string with credentials
+
+**What You Need:**
+- Connection String (full PostgreSQL URI)
+- Username (optional if included in URI)
+- Database Name (optional if included in URI)
+
+Alchemyst can index tables, views, query results, schema definitions, and stored procedure outputs.
+
+---
+
+## MongoDB
+
+MongoDB is a document-oriented NoSQL database, ideal for user profiles, content management systems, event logs, and flexible schema data.
+
+### How to Connect
+
+**Prerequisites:**
+- MongoDB cluster (Atlas, self-hosted, or cloud provider)
+- Database user with read permissions
+- MongoDB connection URI
+
+**What You Need:**
+- Connection URI (MongoDB connection string)
+- Auth Source (optional, defaults to `admin`)
+- Cluster Name (optional, for Atlas clusters)
+
+Alchemyst can index collections, documents, aggregation pipeline results, and embedded documents with nested data.
+
+---
+
+## Security Best Practices
+
+For all database integrations:
+
+- Use read-only credentials to prevent accidental data modification
+- Create dedicated service accounts for Alchemyst access
+- Enable SSL/TLS encryption for all connections
+- Whitelist Alchemyst service IPs or use private networks
+- Rotate credentials regularly using secrets managers
+- Enable database audit logs to monitor access
+
+---
+
+## Next Steps
+
+Once your databases are connected, you can search across your data semantically, combine database results with documents and other sources, and keep your agent's knowledge synchronized with live data.
+
+Explore other integrations: [Cloud Storage](/integrations/data-sources/cloud-storage) or [Productivity Tools](/integrations/data-sources/docs).

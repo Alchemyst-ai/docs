@@ -1,0 +1,110 @@
+---
+title: "Productivity & Document"
+description: "Connect Google Workspace (Docs, Sheets) to your Alchemyst context layer"
+keywords: ['google-docs', 'google-sheets', 'google-workspace', 'productivity', 'documents', 'spreadsheets', 'collaboration']
+---
+
+## Introduction
+
+Productivity integrations let you sync collaborative documents and spreadsheets directly into your Alchemyst context layer. Pull live data from Google Workspace and keep your agent synchronized with your team's knowledge instead of exporting files or copy-pasting content.
+
+## Why Connect Productivity Tools?
+
+Traditional document workflows fail because documents are scattered across drives, manual exports become stale immediately, there's no way to query across multiple docs, and collaboration happens outside agent context.
+
+With Alchemyst's [productivity integrations](https://platform.getalchemystai.com/integrations?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web):
+
+- Sync documents anytime you want
+- Search semantically across all your docs and sheets
+- Share team knowledge across collaborators
+- Query sheets like structured databases
+
+Your agent sees documents as living knowledge, not static files.
+
+---
+
+## Google Docs
+
+Google Docs is the most popular collaborative document editor, commonly used for meeting notes, project documentation, SOPs, knowledge base articles, and onboarding guides.
+
+### How to Connect
+
+**Prerequisites:**
+- Google Cloud Project
+- Service Account with Google Docs API access
+- Documents shared with the service account email
+
+**What You Need:**
+- Client Email (service account email address)
+- Private Key (from service account JSON key file)
+- Shared Document URL
+
+**Important:** You must share each document or folder with the service account email address. The service account needs at least Viewer permission to access the content.
+
+Alchemyst can index document text, formatting, comments, suggestions, embedded images, links, and version history.
+
+---
+
+## Google Sheets
+
+Google Sheets is a collaborative spreadsheet tool, commonly used for project tracking, budgets, customer lists, experiment results, and configuration data.
+
+### How to Connect
+
+**Prerequisites:**
+- Google Cloud Project
+- Service Account with Google Sheets API access
+- Spreadsheets shared with the service account email
+
+**What You Need:**
+- Client Email (service account email address)
+- Private Key (from service account JSON key file)
+- Spreadsheet URL
+
+**Important:** You must share the spreadsheet with the service account email address. The service account needs at least Viewer permission to access the content.
+
+Alchemyst can index cell values, formulas, named ranges, sheet names, structure, charts (as text descriptions), and comments.
+
+---
+
+## Setting Up a Service Account
+
+1. Go to Google Cloud Console and create or select a project
+2. Enable Google Docs API and Google Sheets API
+3. Navigate to IAM & Admin → Service Accounts
+4. Create a new service account
+5. Generate a JSON key file
+6. Extract the `client_email` and `private_key` from the JSON
+
+**The JSON key file contains:**
+- `client_email`: Service account email (e.g., `service@project.iam.gserviceaccount.com`)
+- `private_key`: Full private key string (including header and footer)
+
+---
+
+## Security Best Practices
+
+For Google Workspace integrations:
+
+- Use service accounts instead of OAuth for programmatic access
+- Store private keys in environment variables or secrets managers
+- Never commit private keys to version control
+- Rotate keys every 90 days
+- Grant only Viewer permissions to service accounts
+- Use folder-level sharing for easier management
+- Enable access logging in Google Workspace Admin Console
+- Monitor for unusual activity and set up alerts
+
+---
+
+## Version Tracking
+
+Google Docs and Sheets change constantly. Alchemyst automatically tracks versions by removing old content when documents update and indexing new content, ensuring searches always return the latest information.
+
+---
+
+## Next Steps
+
+Once Google Workspace is connected, you can search across your docs and sheets, combine workspace data with databases and other sources, and keep your agent synchronized with team collaboration.
+
+Explore other integrations: [Databases](/integrations/data-sources/databases) or [Cloud Storage](/integrations/data-sources/cloud-storage).
