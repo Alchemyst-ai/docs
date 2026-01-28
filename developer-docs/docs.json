@@ -151,6 +151,7 @@
           {
             "group": "Data Sources",
             "pages": [
+              "integrations/data-sources/introduction",
               "integrations/data-sources/databases",
               "integrations/data-sources/docs",
               "integrations/data-sources/cloud-storage"
