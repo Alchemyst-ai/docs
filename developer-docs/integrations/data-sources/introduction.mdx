@@ -6,207 +6,120 @@ keywords: ['integrations', 'data-sources', 'databases', 'cloud-storage', 'produc
 
 ## Overview
 
-Data source integrations bring your organization's knowledge directly into Alchemyst. Instead of manually uploading files or copying data, connect your existing systems and let Alchemyst automatically sync and search across everything.
+Data source integrations bring your organization's knowledge directly into Alchemyst. Connect your existing systems and let Alchemyst automatically sync and search across everything—no manual uploads, no SQL required.
 
-**Three ways to connect your data:**
+**Available integrations:**
 
--  **[Databases](#databases)** - PostgreSQL, MongoDB
--  **[Productivity Tools](#productivity-tools)** - Google Docs, Google Sheets
--  **[Cloud Storage](#cloud-storage)** - Amazon S3
+-  **Databases** - PostgreSQL, MongoDB
+-  **Productivity Tools** - Google Docs, Google Sheets
+-  **Cloud Storage** - Amazon S3
 
-Once connected, query all your data in natural language. No SQL required. No manual exports. Just ask questions and get answers.
-
----
-
-## Why Connect Your Data Sources?
-
-**Without integrations, you're stuck with:**
-- Manually exporting files that go stale immediately
-- Copy-pasting content between systems
-- Searching one place at a time
-- Data scattered across dozens of tools
-- No way for non-technical users to access databases
+Query all your data in natural language and get unified results across all connected sources.
 
 ---
 
-## Databases
+## Quick Start
 
-Connect relational and NoSQL databases to query operational data in natural language.
-
-### PostgreSQL
-
-Connect your PostgreSQL database to query operational data without writing SQL.
-
-**Common use cases:**
-- Customer records and CRM data
-- Product catalogs and inventory
-- Transaction history and financial records
-- Support tickets and resolutions
-- Application data and logs
-
-[Learn how to connect PostgreSQL →](/integrations/data-sources/databases#postgresql-integration)
-
-### MongoDB
-
-Connect your MongoDB database to search documents and collections in natural language.
-
-**Common use cases:**
-- User profiles and account data
-- Content management systems
-- Event logs and analytics
-- Customer feedback and reviews
-- Application settings and configuration
-
-[Learn how to connect MongoDB →](/integrations/data-sources/databases#mongodb-integration)
+<Steps>
+  <Step title="Connect Your Data Source">
+    Visit the [Alchemyst Integrations page](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=intro&utm_medium=web) and select your integration type
+  </Step>
+  <Step title="Configure Access">
+    Choose what data to sync and set your sync frequency
+  </Step>
+  <Step title="Start Querying">
+    Ask questions in plain English across all connected sources
+  </Step>
+</Steps>
 
 ---
 
-## Productivity Tools
+## Integration Types
 
-Sync collaborative documents and spreadsheets to keep your agent synchronized with team knowledge.
+<CardGroup cols={3}>
+  <Card title="Databases" icon="database" href="/integrations/data-sources/databases">
+    Query PostgreSQL and MongoDB in natural language
+  </Card>
+  <Card title="Productivity Tools" icon="file-lines" href="/integrations/data-sources/docs">
+    Sync Google Docs and Sheets
+  </Card>
+  <Card title="Cloud Storage" icon="cloud" href="/integrations/data-sources/cloud-storage">
+    Connect Amazon S3 buckets
+  </Card>
+</CardGroup>
 
-### Google Docs
+### Databases
 
-Sync your team's Google Docs so everyone can search across shared knowledge.
+Connect operational data sources:
+- **PostgreSQL** - Customer records, transactions, product catalogs
+- **MongoDB** - User profiles, event logs, content management
 
-**Common use cases:**
-- Meeting notes and decisions
-- Project documentation
-- Standard operating procedures (SOPs)
-- Product requirements and specs
-- Onboarding guides and training materials
+[View database integration guide →](/integrations/data-sources/databases)
 
-**What you can do:**
-- "Find meeting notes about the Q4 product launch"
-- "What's our process for handling customer escalations?"
-- "Show me all onboarding documentation for engineers"
-- "What decisions were made in the leadership meeting last week?"
+### Productivity Tools
 
-**What gets synced:** Document text, comments, and suggestions. Version history is tracked automatically so searches always return the latest content.
+Sync team knowledge:
+- **Google Docs** - Meeting notes, SOPs, project documentation
+- **Google Sheets** - Project tracking, budgets, customer lists
 
-[Learn how to connect Google Docs →](/integrations/data-sources/docs#google-docs)
+[View productivity integration guide →](/integrations/data-sources/docs)
 
-### Google Sheets
+### Cloud Storage
 
-Query your spreadsheets like a database, no formulas required.
+Access files at scale:
+- **Amazon S3** - Documents, reports, media, code repositories
+- Supports PDF, DOCX, PPTX, CSV, JSON, images, and more
 
-**Common use cases:**
-- Project tracking and roadmaps
-- Budget planning and expense tracking
-- Customer lists and contact databases
-- Experiment results and metrics
-- Inventory and resource management
-
-**What you can do:**
-- "What's our total marketing spend for Q1?"
-- "Find all projects that are behind schedule"
-- "Show me the top 10 customers by revenue"
-- "Which experiments showed positive results last month?"
-
-**What gets synced:** Cell values, formulas, and sheet structure. Search across all your sheets or query specific ranges.
-
-[Learn how to connect Google Sheets →](/integrations/data-sources/docs#google-sheets)
+[View cloud storage integration guide →](/integrations/data-sources/cloud-storage)
 
 ---
 
-## Cloud Storage
+## Key Benefits
 
-Ingest files, documents, and media from object storage systems into your context layer.
-
-### Amazon S3
-
-Connect your S3 buckets to search across all your files and documents.
-
-**Common use cases:**
-- Document archives and file repositories
-- Product specifications and technical docs
-- Media libraries and marketing assets
-- Data exports and reports
-- Code repositories and documentation
-
-**What you can do:**
-- "Find all quarterly financial reports from 2024"
-- "Search product spec PDFs for features related to authentication"
-- "Show me customer data exports from last week"
-- "Find all marketing images tagged with 'product-launch'"
-
-**Supported file types:**
-- **Documents:** PDF, DOCX, PPTX, TXT, MD
-- **Data:** CSV, JSON, JSONL, XML, Parquet, YAML
-- **Images:** PNG, JPG, SVG (with text extraction)
-- **Code:** All text-based source files
-
-[Learn how to connect Amazon S3 →](/integrations/data-sources/cloud-storage#amazon-s3)
-
----
-
-## How It Works
-
-### 1. Connect in Minutes
-
-Visit the [Alchemyst Integrations page](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=intro&utm_medium=web), select your data source, and enter your credentials. Most integrations take less than 5 minutes to set up.
-
-### 2. Choose What to Sync
-
-Select which databases, documents, or buckets to sync. You control exactly what data Alchemyst can access.
-
-### 3. Data Syncs Automatically
-
-Alchemyst indexes your data and keeps it up-to-date. Set your sync frequency—real-time, hourly, daily, or on-demand.
-
-### 4. Search Everything at Once
-
-Ask questions in plain English. Alchemyst searches across all your connected sources and combines results intelligently.
-
-**Example:** "Find customer feedback about our mobile app from the last 30 days"
-- Searches support ticket database (PostgreSQL)
-- Searches feedback collection (MongoDB)
-- Searches team notes (Google Docs)
-- Returns unified results ranked by relevance
+<AccordionGroup>
+  <Accordion title="Unified Search" icon="magnifying-glass">
+    Search across all connected sources simultaneously with a single query
+  </Accordion>
+  <Accordion title="Always Up-to-Date" icon="arrows-rotate">
+    Automatic syncing keeps your data fresh—no manual exports
+  </Accordion>
+  <Accordion title="Natural Language" icon="message">
+    Query databases and spreadsheets without writing SQL or formulas
+  </Accordion>
+  <Accordion title="Secure by Default" icon="shield">
+    Read-only access, encrypted connections, and granular permissions
+  </Accordion>
+</AccordionGroup>
 
 ---
 
 ## Security
 
-Your data security is our priority. All integrations follow enterprise-grade security standards:
+All integrations follow enterprise-grade security standards:
 
--  **Read-only access** - Alchemyst can only read your data, never modify or delete it
--  **Encrypted connections** - All data transfers use SSL/TLS encryption
--  **Minimal permissions** - Grant access only to the specific data you want to sync
--  **Your control** - Disconnect any integration instantly from your dashboard
--  **Credential security** - All credentials are encrypted at rest and in transit
+<Check>Read-only access - never modifies or deletes your data</Check>
+<Check>SSL/TLS encrypted connections</Check>
+<Check>Minimal permissions - access only what you choose to sync</Check>
+<Check>Instant disconnect from your dashboard</Check>
 
-We recommend creating dedicated service accounts with read-only permissions for all integrations. Detailed security setup instructions are provided for each integration type.
-
----
-
-## Getting Started
-
-Ready to connect your data sources? Choose your integration type:
-
-- **[Database Integration →](/integrations/data-sources/databases)** - Connect PostgreSQL or MongoDB
-- **[Productivity Integration →](/integrations/data-sources/docs)** - Sync Google Docs or Sheets
-- **[Cloud Storage Integration →](/integrations/data-sources/cloud-storage)** - Connect Amazon S3
-
-Or visit the [Alchemyst Integrations page](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=intro_cta&utm_medium=web) to browse all available integrations.
+[Learn more about security best practices →](/integrations/data-sources/databases#security-best-practices)
 
 ---
 
-## Need Help?
+## Get Started
 
-- Check our detailed [integration setup guides](/integrations/data-sources/databases) for step-by-step instructions
-- Review [security best practices](/integrations/data-sources/databases#security-best-practices) for each integration type
-- Contact support if you encounter connection issues or have questions
+<CardGroup cols={3}>
+  <Card title="Connect Databases" icon="database" href="/integrations/data-sources/databases">
+    PostgreSQL & MongoDB setup guides
+  </Card>
+  <Card title="Sync Documents" icon="file" href="/integrations/data-sources/docs">
+    Google Docs & Sheets integration
+  </Card>
+  <Card title="Add Cloud Storage" icon="cloud-arrow-up" href="/integrations/data-sources/cloud-storage">
+    Amazon S3 configuration
+  </Card>
+</CardGroup>
 
----
-
-## What's Next?
-
-Once your integrations are connected, explore how to get the most out of your data:
-
-- Query across multiple sources simultaneously
-- Set up automated sync schedules
-- Share access with your team
-- Monitor usage and performance
-
-Start connecting your data sources today and transform how your team accesses knowledge.
+<Card title="Browse All Integrations" icon="grid" href="https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=intro_cta&utm_medium=web">
+  Visit the Alchemyst Integrations page to get started
+</Card>
