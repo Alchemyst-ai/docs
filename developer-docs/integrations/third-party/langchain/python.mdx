@@ -5,163 +5,289 @@ icon: "python"
 keywords: ['python','memory', 'lang-chain', 'integration']
 ---
 
-## What is LangChain?
+## Why use LangChain with Alchemyst AI?
 
-LangChain is a framework that helps developers build applications powered by large language models (LLMs) such as OpenAI or Anthropic. It provides useful building blocks like prompts, chains, agents, and memory to manage conversations, connect data sources, and perform reasoning over multiple steps.
+[LangChain](https://python.langchain.com/) is a popular open-source framework for building context-aware AI applications in Python. It lets you chain together LLMs, retrievers, memory, and tools to create powerful, production-ready AI agents.
 
-Normally, LangChain's built-in memory (like ConversationBufferMemory) stores information only during a single runtime session. Once the app stops, all past context is lost.
-This is where Alchemyst Memory becomes valuable — it provides persistent, long-term memory that allows your LLM applications to remember and reuse context across sessions.
+However, LLMs alone are "forgetful"—they don't remember previous conversations, business rules, or your proprietary data. This is where **context** becomes critical. Without context, AI agents give generic, disconnected answers. With context, they become knowledgeable partners that can reason, personalize, and act based on your data and workflows. (See [What is AI Context?](/ai-context/what-is-ai-context) and [Why you need AI Context?](/ai-context/why-you-need-ai-context))
+
+**Alchemyst AI's LangChain integration** solves this by providing a plug-and-play memory system that connects your LangChain agents to the context stored in Alchemyst's memory architecture. This means your agents can:
+
+* Instantly access relevant documents, files, and knowledge bases.
+* Maintain both short-term and long-term memory across sessions.
+* Personalize responses and follow complex workflows using your proprietary data.
+* Avoid repetitive questions and deliver context-aware outputs.
+
+With Alchemyst, you simply upload your data, and the memory system handles context injection for you—no need to build your own memory system. (See [How Alchemyst Works](/ai-context/how-alchemyst-works))
 
 ## Installation
 
-```bash
-pip install langchain langchain-openai alchemystai python-dotenv
+To get started with the Alchemyst LangChain Integration, install the `alchemyst-langchain` package from PyPI.
+
+<CodeGroup>
+  ```sh pip theme={null}
+  pip install alchemyst-langchain
+  ```
+
+</CodeGroup>
+
+The `alchemyst-langchain` package includes all necessary Alchemyst dependencies. You'll also need to install your preferred LLM provider:
+
+```sh theme={null}
+pip install langchain-openai python-dotenv
 ```
 
-## AlchemystMemory Implementation
+<Card icon="pypi" href="https://pypi.org/project/alchemyst-langchain/">View on PyPI</Card>
 
-Here's the complete implementation of `AlchemystMemory` for LangChain:
+## Usage
+
+### As Memory
+
+The `AlchemystMemory` class can be used like any other Memory class in LangChain. See the example below:
 
 <Note>
   **groupName**: The group name acts like a namespace which creates a scope for context. Documents with the same group name will be grouped together for better organization and retrieval. In this implementation, we use the `session_id` as the group name to isolate conversations by session.
 </Note>
 
-```python
-from langchain.memory.chat_memory import BaseChatMemory
-from alchemyst_ai import AlchemystAI
-from typing import Dict, Any, List, Optional
-import time
-import uuid
-
-
-class AlchemystMemory(BaseChatMemory):
-    """AlchemystMemory implementation for persistent chat memory using Alchemyst AI."""
-
-    def __init__(
-        self,
-        api_key: str,
-        session_id: str,
-        **kwargs
-    ):
-        super().__init__(**kwargs)
-        self._session_id = session_id
-        self._client = AlchemystAI(
-            api_key=api_key,
-        )
-
-    @property
-    def memory_variables(self) -> List[str]:
-        """Return the list of memory variables."""
-        return ["history"]
-
-    def load_memory_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
-        """Load memory variables from Alchemyst."""
-        try:
-            # Use the input as query if available, otherwise use "conversation"
-            query = inputs.get("input", "").strip() if inputs.get("input") else "conversation"
-
-            response = self._client.v1.context.search(
-                query=query,
-                similarity_threshold=0.0,
-                minimum_similarity_threshold=0.0,
-                scope="internal",
-                body_metadata={
-                    "file_type": "text",
-                    "group_name": [self._session_id]
-                }
-            )
-
-            contexts = response.contexts if hasattr(response, 'contexts') else []
-            items = [c.content for c in contexts if hasattr(c, 'content') and c.content]
-
-            return {"history": "\n".join(items)}
-        except Exception as error:
-            print(f"Error loading memory variables: {error}")
-            return {"history": ""}
-
-    def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, Any]) -> None:
-        """Save context to Alchemyst memory."""
-        user_input = str(inputs.get("input", ""))
-        ai_output = str(outputs.get("output", ""))
-
-        contents = []
-        timestamp = int(time.time() * 1000)  # milliseconds
-
-        if user_input:
-            contents.append({
-                "content": user_input,
-                "metadata": {
-                    "source": self._session_id,
-                    "messageId": str(timestamp),
-                    "type": "text"
-                }
-            })
-
-        if ai_output:
-            contents.append({
-                "content": ai_output,
-                "metadata": {
-                    "source": self._session_id,
-                    "messageId": str(timestamp + 1),
-                    "type": "text"
-                }
-            })
-
-        if not contents:
-            return
-
-        try:
-            self._client.v1.context.memory.add(
-                memory_id=self._session_id,
-                contents=contents,
-                # Use group_name to namespace this memory by session (or any other grouping you prefer)
-                metadata={
-                    "group_name": [self._session_id],
-                },
-            )
-        except Exception as error:
-            print(f"Error saving context: {error}")
-
-    def clear(self) -> None:
-        """Clear memory for this session."""
-        try:
-            self._client.v1.context.memory.delete(
-                memory_id=self._session_id
-            )
-        except Exception as error:
-            print(f"Error clearing memory: {error}")
-
-    @property
-    def memory_keys(self) -> List[str]:
-        """Return the memory keys."""
-        return ["history"]
-```
-
-## Usage Example
-
-```python
+```python memory.py theme={null}
 from dotenv import load_dotenv
 import os
 from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationChain
+from alchemyst_langchain import AlchemystMemory
+import uuid
 
 load_dotenv()
 
 
 def main():
-    print("Alchemyst-LangChain Integration Test")
-    print("=" * 50)
-
+    print("Boot: starting test with env:", {
+        "OPENAI_API_KEY": "set" if os.getenv("OPENAI_API_KEY") else "missing",
+        "ALCHEMYST_AI_API_KEY": "set" if os.getenv("ALCHEMYST_AI_API_KEY") else "missing",
+    })
+    
     session_id = str(uuid.uuid4())
-    print(f"Session ID: {session_id}")
+    print(f"Session: {session_id}")
 
-    # Initialize memory
+    # Initialize Alchemyst Memory
     memory = AlchemystMemory(
         api_key=os.getenv("ALCHEMYST_AI_API_KEY", "YOUR_ALCHEMYST_API_KEY"),
         session_id=session_id
     )
 
-    # Initialize model
+    # Initialize your LLM
+    model = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0,
+    )
+
+    # Create conversation chain with persistent memory
+    chain = ConversationChain(llm=model, memory=memory)
+
+    print("Invoke #1 ->")
+    first_response = chain.invoke({
+        "input": "Hi, my name is Alice. Alice is from New York."
+    })
+    print("First reply:", first_response.get('response', first_response))
+
+    print("Invoke #2 ->")
+    second_response = chain.invoke({
+        "input": "Who is Alice? Where is Alice from?"
+    })
+    print("Second reply:", second_response.get('response', second_response))
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### Memory Operations
+
+The `AlchemystMemory` class provides several key operations:
+
+**Load Memory Variables**: Automatically retrieves relevant context based on the current input
+```python theme={null}
+# Happens automatically when you use the chain
+memory_vars = memory.load_memory_variables({"input": "your query here"})
+print(memory_vars["history"])
+```
+
+**Save Context**: Stores both user input and AI output after each interaction
+```python theme={null}
+# Happens automatically after each conversation turn
+memory.save_context(
+    inputs={"input": "user message"},
+    outputs={"output": "AI response"}
+)
+```
+
+**Clear Memory**: Remove all stored context for a session
+```python theme={null}
+# Clear all memory for this session
+memory.clear()
+```
+
+### Multi-User Applications
+
+For applications with multiple users, create separate sessions for each user:
+
+```python multi_user.py theme={null}
+from alchemyst_langchain import AlchemystMemory
+from langchain_openai import ChatOpenAI
+from langchain.chains import ConversationChain
+import os
+
+
+def get_user_memory(user_id: str):
+    """Create or retrieve memory for a specific user"""
+    return AlchemystMemory(
+        api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+        session_id=f"user_{user_id}"
+    )
+
+
+# Usage
+alice_memory = get_user_memory("alice_123")
+bob_memory = get_user_memory("bob_456")
+
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+# Create separate chains for each user
+alice_chain = ConversationChain(llm=model, memory=alice_memory)
+bob_chain = ConversationChain(llm=model, memory=bob_memory)
+
+# Each user has isolated conversation history
+alice_chain.invoke({"input": "I love Python programming"})
+bob_chain.invoke({"input": "I prefer JavaScript"})
+```
+
+### Hierarchical Session Organization
+
+For complex applications, use hierarchical naming to organize conversations:
+
+```python hierarchical_sessions.py theme={null}
+from alchemyst_langchain import AlchemystMemory
+import os
+
+# Layer 1: Organization/Domain
+# Layer 2: Category/Project
+# Layer 3: Specific identifier
+
+# Example 1: Customer support tickets
+support_memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id="support_customer_alice_ticket_1234"
+)
+
+# Example 2: Department-specific conversations
+engineering_memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id="engineering_backend_review_2024"
+)
+
+# Example 3: Project-based sessions
+project_memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id="project_alpha_team_design"
+)
+```
+
+<Note>
+**Hierarchical Naming Best Practice**: Use underscores to separate logical layers in your session_id. This makes it easier to organize, search, and manage conversations at scale. Think of it like a file path: `domain_category_specific_identifier`
+</Note>
+
+### Topic-Based Sessions
+
+Organize conversations by topic or purpose:
+
+```python topic_sessions.py theme={null}
+from alchemyst_langchain import AlchemystMemory
+import os
+
+# Different sessions for different purposes
+support_memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id="support_ticket_789"
+)
+
+onboarding_memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id="onboarding_new_user"
+)
+
+research_memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id="research_project_ai"
+)
+```
+
+### Resuming Previous Conversations
+
+Simply reuse the same `session_id` to continue where you left off:
+
+```python resume_conversation.py theme={null}
+from alchemyst_langchain import AlchemystMemory
+from langchain_openai import ChatOpenAI
+from langchain.chains import ConversationChain
+import os
+
+# First conversation session
+session_id = "conversation_abc123"
+memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id=session_id
+)
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+chain = ConversationChain(llm=model, memory=memory)
+
+response = chain.invoke({"input": "Remember that I work at Acme Corp"})
+print(response.get('response'))
+
+# ... application closes or restarts ...
+
+# Later, resume the same conversation with the same session_id
+memory = AlchemystMemory(
+    api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+    session_id=session_id  # Same session ID
+)
+chain = ConversationChain(llm=model, memory=memory)
+
+# Previous context is automatically loaded!
+response = chain.invoke({"input": "Where do I work?"})
+print(response.get('response'))  # Will remember "Acme Corp"
+```
+
+## Complete Example
+
+Here's a comprehensive example demonstrating the full capabilities:
+
+```python complete_example.py theme={null}
+from dotenv import load_dotenv
+import os
+from langchain_openai import ChatOpenAI
+from langchain.chains import ConversationChain
+from alchemyst_langchain import AlchemystMemory
+import uuid
+
+load_dotenv()
+
+
+def main():
+    print("Alchemyst-LangChain Integration Demo")
+    print("=" * 50)
+
+    # Use a consistent session_id to continue previous conversations
+    # or generate a new one for a fresh start
+    session_id = str(uuid.uuid4())
+    print(f"Session ID: {session_id}\n")
+
+    # Initialize Alchemyst Memory
+    memory = AlchemystMemory(
+        api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+        session_id=session_id
+    )
+
+    # Initialize your preferred LLM
     model = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0,
@@ -170,32 +296,340 @@ def main():
     # Create conversation chain
     chain = ConversationChain(llm=model, memory=memory)
 
-    # Test conversation
+    # Test conversation with context persistence
     test_messages = [
-        "Hi, my name is Alice from New York.",
-        "Who is Alice? Where is Alice from?",
-        "What did I tell you about myself in our previous conversation?"
+        "Hi, my name is Alice and I'm from New York.",
+        "I'm a software engineer working on AI applications.",
+        "What do you remember about me?"
     ]
 
     for i, message in enumerate(test_messages, 1):
-        print(f"\n[Test {i}] User: {message}")
+        print(f"[Message {i}] User: {message}")
         response = chain.invoke({"input": message})
-        print(f"Bot: {response.get('response', response)}")
+        print(f"Assistant: {response.get('response', response)}\n")
 
-    print("\n" + "=" * 50)
-    print("Test completed! The bot should have remembered your information.")
+    print("=" * 50)
+    print(f"Session {session_id} completed!")
+    print("Use the same session_id to continue this conversation later.")
+
+    # Optional: Clear memory when done
+    # memory.clear()
+
 
 if __name__ == "__main__":
     main()
 ```
 
+## Key Features
+
+**Persistent Memory**: Context survives app restarts and persists indefinitely  
+**Seamless Integration**: Drop-in replacement for LangChain's built-in memory  
+**Session Isolation**: Keep different conversations separate and organized  
+**Automatic Context Retrieval**: Smart relevance-based memory loading  
+**Multi-User Support**: Easy to implement user-specific memory  
+**Production Ready**: Built on Alchemyst's robust memory infrastructure  
+
+## Configuration Options
+
+### AlchemystMemory Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `api_key` | `str` | Your Alchemyst API key (required) |
+| `session_id` | `str` | Unique identifier for the conversation session (required) |
+| `**kwargs` | | Additional LangChain memory parameters |
+
+### Memory Variables
+
+The memory exposes the following variables:
+
+- **`history`**: Contains the conversation history as a string
+
+## Best Practices
+
+### 1. Session ID Naming Strategy
+
+Use meaningful, hierarchical session IDs to organize conversations at scale:
+
+```python theme={null}
+# Good - Clear hierarchy
+"support_customer_alice_ticket_1234"
+"engineering_backend_auth_review"
+"sales_enterprise_acme_corp"
+
+# Avoid - Random or flat naming
+"abc123xyz"
+"conversation_1"
+"session"
+```
+
+**Benefits of hierarchical naming:**
+- Easy to filter and search conversations
+- Clear ownership and categorization
+- Scalable for large applications
+
+### 2. Memory Lifecycle Management
+
+Decide when to clear memory based on your use case:
+
+```python theme={null}
+# Customer support - clear after ticket resolution
+if ticket_resolved:
+    memory.clear()
+
+# Personal assistant - never clear (indefinite memory)
+# No clear() call
+
+# Training session - clear after session ends
+if training_complete:
+    memory.clear()
+```
+
+### 3. Handle API Keys Securely
+
+Always use environment variables for API keys, never hardcode them:
+
+```python theme={null}
+# Good
+api_key=os.getenv("ALCHEMYST_AI_API_KEY")
+
+# Never do this
+api_key="alch_1234567890abcdef"
+```
+
+### 4. Session ID Persistence
+
+For resumable conversations, store session IDs in your database:
+
+```python theme={null}
+# Example with a database
+user = db.get_user(user_id)
+
+if user.session_id:
+    # Resume existing conversation
+    memory = AlchemystMemory(
+        api_key=api_key,
+        session_id=user.session_id
+    )
+else:
+    # Create new conversation
+    session_id = str(uuid.uuid4())
+    db.update_user(user_id, session_id=session_id)
+    memory = AlchemystMemory(
+        api_key=api_key,
+        session_id=session_id
+    )
+```
+
+### 5. Error Handling
+
+The memory system handles errors gracefully, but monitor your logs:
+
+```python theme={null}
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+try:
+    memory = AlchemystMemory(
+        api_key=os.getenv("ALCHEMYST_AI_API_KEY"),
+        session_id=session_id
+    )
+    chain = ConversationChain(llm=model, memory=memory)
+    response = chain.invoke({"input": user_input})
+except Exception as e:
+    logging.error(f"Memory error: {e}")
+    # Fallback to stateless conversation or retry
+```
+
+## Performance Considerations
+
+### Conversation Length
+
+The memory system is optimized for typical conversation lengths:
+
+- **Optimal**: 10-100 message exchanges per session
+- **Good**: 100-500 message exchanges
+- **Consider splitting**: 500+ message exchanges
+
+For very long conversations, consider creating new sessions periodically:
+
+```python theme={null}
+# Track message count
+message_count = 0
+MAX_MESSAGES_PER_SESSION = 500
+
+if message_count >= MAX_MESSAGES_PER_SESSION:
+    # Archive old session
+    old_session_id = session_id
+    
+    # Create new session
+    session_id = f"{old_session_id}_continued_{int(time.time())}"
+    memory = AlchemystMemory(api_key=api_key, session_id=session_id)
+    message_count = 0
+```
+
+### Context Retrieval Speed
+
+The memory system uses semantic search for context retrieval:
+
+- **Typical retrieval time**: 100-300ms
+- **Factors affecting speed**: 
+  - Total documents in session
+  - Query complexity
+  - Network latency
+
+For time-sensitive applications, consider caching or pre-loading context.
+
+## Troubleshooting
+
+### Memory not loading
+
+**Symptom**: Previous conversation context not appearing in responses
+
+**Solutions**:
+1. Ensure your `session_id` remains consistent across requests:
+   ```python
+   # Wrong - generates new UUID each time
+   memory = AlchemystMemory(api_key=api_key, session_id=str(uuid.uuid4()))
+   
+   # Correct - reuse existing session_id
+   memory = AlchemystMemory(api_key=api_key, session_id=existing_session_id)
+   ```
+
+2. Verify the session_id has data:
+   ```python
+   memory_vars = memory.load_memory_variables({"input": "test"})
+   print(f"Loaded history: {memory_vars['history']}")
+   ```
+
+### API key errors
+
+**Symptom**: Authentication errors or 401 responses
+
+**Solutions**:
+1. Check your environment variables:
+   ```bash
+   echo $ALCHEMYST_AI_API_KEY
+   ```
+
+2. Verify API key format (should start with `alch_`)
+
+3. Use a `.env` file for local development:
+   ```env
+   ALCHEMYST_AI_API_KEY=alch_your_api_key_here
+   OPENAI_API_KEY=sk-your_openai_key_here
+   ```
+
+### Empty context returned
+
+**Symptom**: `history` is empty even with previous messages
+
+**Explanation**: This is normal for the first message in a new session. Context builds up as the conversation progresses.
+
+```python theme={null}
+# First message - no context yet
+response1 = chain.invoke({"input": "Hi, I'm Alice"})
+# Context: (empty)
+
+# Second message - previous context available
+response2 = chain.invoke({"input": "What's my name?"})
+# Context: "Hi, I'm Alice"
+```
+
+### Import errors
+
+**Symptom**: `ModuleNotFoundError: No module named 'alchemyst_langchain'`
+
+**Solutions**:
+1. Verify installation:
+   ```bash
+   pip list | grep alchemyst
+   ```
+
+2. Reinstall the package:
+   ```bash
+   pip install --upgrade alchemyst-langchain
+   ```
+
+3. Check Python environment (virtual env, conda, etc.)
+
+### Session ID conflicts
+
+**Symptom**: Unexpected context from other conversations
+
+**Cause**: Two different conversations sharing the same session_id
+
+**Solution**: Use unique, namespaced session IDs:
+```python theme={null}
+# Include user ID or unique identifier
+session_id = f"user_{user_id}_{conversation_type}_{timestamp}"
+```
+
+## How It Works Under the Hood
+
+### Automatic Deduplication
+
+AlchemystMemory automatically handles message deduplication using internal identifiers. You don't need to worry about duplicate messages being stored - the system intelligently manages updates.
+
+### Context Search Algorithm
+
+When loading memory variables, AlchemystMemory:
+1. Takes your input query
+2. Searches through the session's conversation history
+3. Returns relevant context based on semantic similarity
+4. Formats it as a string for the LLM
+
+### Metadata Structure
+
+Each conversation turn is stored with minimal metadata following best practices:
+
+```python theme={null}
+# Automatically generated metadata (you don't need to set this)
+{
+    "source": session_id,
+    "messageId": timestamp,
+    "type": "text",
+    "group_name": [session_id]  # For session isolation
+}
+```
+
+This lean metadata approach ensures:
+- Fast queries and retrieval
+- Minimal storage overhead
+- No metadata bloat
+- Follows the "5-field rule" from best practices
+
+## Migration from Custom Implementation
+
+If you were previously using a custom `AlchemystMemory` implementation, migrating to the published package is simple:
+
+**Before** (custom implementation):
+```python theme={null}
+from langchain.memory.chat_memory import BaseChatMemory
+from alchemyst_ai import AlchemystAI
+
+class AlchemystMemory(BaseChatMemory):
+    # Custom implementation code...
+    pass
+```
+
+**After** (using published package):
+```python theme={null}
+from alchemyst_langchain import AlchemystMemory
+```
+
+The interface remains exactly the same, so your existing code will work without any changes!
+
 ## Summary
 
 By combining LangChain's workflow capabilities with Alchemyst's persistent memory, developers can build intelligent agents that:
 
-- Retain user context and preferences
-- Continue conversations across sessions
-- Improve personalization over time
+* **Retain user context and preferences** across sessions
+* **Continue conversations** days, weeks, or months later
+* **Improve personalization** over time with accumulated context
+* **Scale** to production with reliable, persistent storage
+* **Organize** conversations by user, topic, or any custom grouping
 
-This simple integration makes your LLM applications more human-like and contextually aware — without losing information after every run.
+This integration makes your LLM applications more human-like and contextually aware — without losing information after every run.
 

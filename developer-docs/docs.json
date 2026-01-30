@@ -152,7 +152,13 @@
             "group": "Data Sources",
             "pages": [
               "integrations/data-sources/introduction",
-              "integrations/data-sources/databases",
+              {
+                "group":"Databases",
+                "pages":[
+                  "integrations/data-sources/databases/Mongodb",
+                  "integrations/data-sources/databases/Postgresql"
+                ]
+              },
               "integrations/data-sources/docs",
               "integrations/data-sources/cloud-storage"
             ]

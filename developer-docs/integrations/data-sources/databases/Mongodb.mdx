@@ -1,0 +1,193 @@
+---
+title: "MongoDB Integration"
+description: "Connect MongoDB databases to your Alchemyst context layer"
+---
+
+## Overview
+
+MongoDB is a document-oriented NoSQL database, ideal for:
+
+- User profiles and account data
+- Content management systems
+- Event logs and analytics
+- Flexible schema applications
+
+## Why Connect MongoDB?
+
+Traditional AI agents struggle with operational data because:
+
+- **Data changes constantly** - Static exports become outdated quickly
+- **Manual exports go stale** - Syncing requires constant maintenance  
+- **Querying requires technical knowledge** - Non-technical users can't access data easily
+
+With Alchemyst MongoDB integration, you can:
+
+- ✓ Sync fresh data whenever context is needed
+- ✓ Search semantically across collections and documents
+- ✓ Combine database results with other data sources
+- ✓ Query in natural language without writing aggregation pipelines
+
+Your databases become queryable context that responds to meaning, not just raw data.
+
+---
+
+## Getting Started
+
+![Database Integration Setup](../../../images/integrations1.jpeg)
+
+To connect MongoDB to Alchemyst:
+
+1. Navigate to the [Alchemyst Integrations page](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=mongodb_docs&utm_medium=web)
+2. Click **Add Integration** → **MongoDB**
+3. Provide your connection credentials
+4. Configure which data to sync
+5. Start querying your data with natural language
+
+---
+
+## Connection Requirements
+
+### Prerequisites
+
+- MongoDB cluster (Atlas, self-hosted, or cloud provider)
+- Database user with read permissions
+- Network access to your MongoDB cluster
+
+### Required Information
+
+- **Connection URL** - MongoDB connection string in format:
+  ```
+  mongodb+srv://username:password@cluster.mongodb.net/database
+  ```
+- **Auth Source** (optional, defaults to `admin`)
+- **Database Name** - Specific database to index
+- **Cluster Name** (optional, for Atlas clusters)
+
+---
+
+## What Gets Indexed
+
+Alchemyst can index and make searchable:
+
+- **Collections** - All documents within specified collections
+- **Documents** - Individual records with all fields
+- **Aggregation Results** - Pipeline outputs and computed data
+- **Embedded Documents** - Nested data structures
+- **Array Fields** - List data and sub-documents
+
+---
+
+## How Data is Structured
+
+When you sync MongoDB collections, Alchemyst preserves your document structure while optimizing for search:
+
+### Hierarchical Organization
+
+```javascript
+// Example: User profiles collection
+groupName: ["database", "mongodb", "user_profiles"]
+metadata: {
+  collectionId: "user_profiles",
+  userId: "user_abc123",
+  accountType: "premium",
+  region: "us-east"
+}
+content: `
+  User Profile: Jane Smith
+  
+  Account Details:
+  - Email: jane.smith@example.com
+  - Account Type: Premium
+  - Member Since: January 2024
+  - Region: US East
+  
+  Preferences:
+  - Notifications: Email, Push
+  - Theme: Dark mode
+  - Language: English
+  
+  Activity Summary:
+  - Last Login: 2024-12-29
+  - Total Sessions: 245
+  - Feature Usage: Analytics (Daily), Reports (Weekly)
+`
+```
+
+### Example Query Patterns
+
+```
+"Find all premium users in the US region"
+→ Filters: metadata.accountType="premium", metadata.region="us-east"
+
+"What features do active users prefer?"
+→ Semantic search across user preferences and activity data
+
+"Show recent user feedback"
+→ Time-filtered search in feedback collection
+```
+
+---
+
+## How to Connect
+
+1. Go to [Alchemyst Integrations](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=mongodb_setup&utm_medium=web)
+2. Click **Add Integration** → **MongoDB**
+3. Enter your connection details:
+   - MongoDB connection URI
+   - Select collections to index
+4. Test the connection
+5. Configure sync settings
+6. Save and activate the integration
+
+---
+
+## Connection String Examples
+
+### MongoDB Atlas
+
+```
+mongodb+srv://user:password@cluster0.abc123.mongodb.net/mydb?retryWrites=true&w=majority
+```
+
+### Self-Hosted MongoDB
+
+```
+mongodb://admin:password@localhost:27017/database?authSource=admin
+```
+
+### MongoDB with Replica Set
+
+```
+mongodb://user:password@host1:27017,host2:27017,host3:27017/database?replicaSet=myReplicaSet
+```
+
+---
+
+## Best Practices
+
+- **Use read-only roles** - Create users with `read` role only
+- **Enable authentication** - Always use authenticated connections
+- **Use connection pooling** - Improve performance for large collections
+- **Filter collections** - Index only necessary data to reduce load
+- **Monitor queries** - Track slow operations and optimize as needed
+
+---
+
+## Security Best Practices
+
+### Access Control
+
+- **Use read-only credentials** - Prevent accidental data modification
+- **Create dedicated service accounts** - Separate Alchemyst access from application users
+- **Apply principle of least privilege** - Grant access only to required collections
+
+### Network Security
+
+- **Enable SSL/TLS encryption** - Protect data in transit
+- **Whitelist Alchemyst IPs** - Restrict database access by IP address
+- **Use private networks** - Connect via VPN or private peering when possible
+- **Enable firewall rules** - Block unauthorized access attempts
+
+---
+
+**Ready to connect MongoDB?** Visit the [Alchemyst Integrations page](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=mongodb_cta&utm_medium=web) to get started.
