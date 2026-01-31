@@ -80,27 +80,6 @@ Alchemyst can index and make searchable:
 
 When you sync PostgreSQL tables, Alchemyst automatically structures your data for optimal retrieval:
 
-### Hierarchical Organization
-
-```javascript
-// Example: Customer support database
-groupName: ["database", "postgres", "support_tickets"]
-metadata: {
-  tableId: "support_tickets",
-  recordId: "ticket_1234",
-  status: "resolved",
-  priority: "high"
-}
-content: `
-  Ticket #1234: Cannot access dashboard
-  Customer: John Doe (john@example.com)
-  Issue: User reports "Access Denied" error when logging in
-  Resolution: Password reset link sent, issue resolved
-  Assigned to: Support Team
-  Created: 2024-12-29 | Resolved: 2024-12-29
-`
-```
-
 ### Example Query Patterns
 
 ```

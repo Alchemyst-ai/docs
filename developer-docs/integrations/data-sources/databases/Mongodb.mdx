@@ -81,38 +81,6 @@ Alchemyst can index and make searchable:
 
 When you sync MongoDB collections, Alchemyst preserves your document structure while optimizing for search:
 
-### Hierarchical Organization
-
-```javascript
-// Example: User profiles collection
-groupName: ["database", "mongodb", "user_profiles"]
-metadata: {
-  collectionId: "user_profiles",
-  userId: "user_abc123",
-  accountType: "premium",
-  region: "us-east"
-}
-content: `
-  User Profile: Jane Smith
-  
-  Account Details:
-  - Email: jane.smith@example.com
-  - Account Type: Premium
-  - Member Since: January 2024
-  - Region: US East
-  
-  Preferences:
-  - Notifications: Email, Push
-  - Theme: Dark mode
-  - Language: English
-  
-  Activity Summary:
-  - Last Login: 2024-12-29
-  - Total Sessions: 245
-  - Feature Usage: Analytics (Daily), Reports (Weekly)
-`
-```
-
 ### Example Query Patterns
 
 ```
