@@ -437,13 +437,24 @@ await alchemyst.add({
 ### The Performance Cliff
 
 ```javascript
-// ❌ Sequential adds: ~30 seconds for 1000 docs
+// Sequential adds: ~30 seconds for 1000 docs
 for (let i = 0; i < 1000; i++) {
   await alchemyst.add(documents[i]);
 }
 
-// ✅ Bulk adds: ~3 seconds for 1000 docs (10x faster!)
-await alchemyst.bulkAdd(documents);
+// Async add: ~3 seconds for 1000 docs (10x faster!)
+// documents is an array of content
+const documents = [];
+documents.push({
+  content: "files content",
+  metadata: { // optional
+    file_name: "file_name",
+    file_type: "pdf/txt/json",
+    group_name: ["group1", "group2"],
+  },
+});
+
+await alchemyst.add(documents);
 ```
 
 ### Optimal Batch Sizes
