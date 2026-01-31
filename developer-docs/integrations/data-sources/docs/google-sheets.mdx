@@ -1,0 +1,107 @@
+---
+title: "Google Sheets"
+description: "Connect Google Sheets to your Alchemyst context layer"
+keywords: ['google-sheets', 'google-workspace', 'sheets', 'spreadsheets', 'collaboration', 'productivity', 'data-sources', 'service-account']
+---
+
+## Introduction
+
+Google Sheets is a collaborative spreadsheet tool, commonly used for project tracking, budgets, customer lists, experiment results, and configuration data.
+
+With Alchemyst's [Google Sheets integration](https://platform.getalchemystai.com/integrations?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web), you can sync spreadsheets anytime you want, search semantically across all your sheets, and query sheets like structured databases.
+
+Your agent sees spreadsheets as living knowledge, not static files.
+
+***
+
+## Why Connect Google Sheets?
+
+Traditional spreadsheet workflows fail because:
+
+* Spreadsheets are scattered across drives
+* Manual exports become stale immediately
+* There's no way to query across multiple sheets
+* Collaboration happens outside agent context
+
+With Alchemyst's Google Sheets integration, your spreadsheets sync directly into your context layer, enabling seamless collaboration and always up-to-date information.
+
+***
+
+## How to Connect
+
+**Prerequisites:**
+
+* Google Cloud Project
+* Service Account with Google Sheets API access
+* Spreadsheets shared with the service account email
+
+**What You Need:**
+
+* Client Email (service account email address)
+* Private Key (from service account JSON key file)
+* Spreadsheet URL
+
+**Important:** You must share the spreadsheet with the service account email address. The service account needs at least Viewer permission to access the content.
+
+***
+
+## What Gets Indexed
+
+Alchemyst can index:
+
+* Cell values
+* Formulas
+* Named ranges
+* Sheet names
+* Structure
+* Charts (as text descriptions)
+* Comments
+
+***
+
+## Setting Up a Service Account
+
+1. Go to Google Cloud Console and create or select a project
+2. Enable Google Sheets API
+3. Navigate to IAM & Admin → Service Accounts
+4. Create a new service account
+5. Generate a JSON key file
+6. Extract the `client_email` and `private_key` from the JSON
+
+**The JSON key file contains:**
+
+* `client_email`: Service account email (e.g., `service@project.iam.gserviceaccount.com`)
+* `private_key`: Full private key string (including header and footer)
+
+***
+
+## Security Best Practices
+
+For Google Sheets integrations:
+
+* Use service accounts instead of OAuth for programmatic access
+* Store private keys in environment variables or secrets managers
+* Never commit private keys to version control
+* Rotate keys every 90 days
+* Grant only Viewer permissions to service accounts
+* Use folder-level sharing for easier management
+* Enable access logging in Google Workspace Admin Console
+* Monitor for unusual activity and set up alerts
+
+***
+
+## Version Tracking
+
+Google Sheets change constantly. Alchemyst automatically tracks versions by removing old content when spreadsheets update and indexing new content, ensuring searches always return the latest information.
+
+***
+
+## Next Steps
+
+Once Google Sheets is connected, you can:
+
+* Search across all your spreadsheets
+* Combine spreadsheet data with databases and other sources
+* Keep your agent synchronized with team collaboration
+
+Explore other integrations: [Google Docs](/integrations/data-sources/google-docs), [Databases](/integrations/data-sources/databases), or [Cloud Storage](/integrations/data-sources/cloud-storage).

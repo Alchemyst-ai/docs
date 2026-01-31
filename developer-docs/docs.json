@@ -153,14 +153,25 @@
             "pages": [
               "integrations/data-sources/introduction",
               {
-                "group":"Databases",
-                "pages":[
+                "group": "Databases",
+                "pages": [
                   "integrations/data-sources/databases/Mongodb",
                   "integrations/data-sources/databases/Postgresql"
                 ]
               },
-              "integrations/data-sources/docs",
-              "integrations/data-sources/cloud-storage"
+              {
+                "group": "Productivity & Documents",
+                "pages": [
+                  "integrations/data-sources/docs/google-docs",
+                  "integrations/data-sources/docs/google-sheets"
+                ]
+              },
+              {
+                "group": "Cloud Storage",
+                "pages": [
+                  "integrations/data-sources/cloud-storage/amazon-s3"
+                ]
+              }
             ]
           },
           {

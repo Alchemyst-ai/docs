@@ -1,0 +1,107 @@
+---
+title: "Google Docs"
+description: "Connect Google Docs to your Alchemyst context layer"
+keywords: ['google-docs', 'google-workspace', 'docs', 'documents', 'collaboration', 'productivity', 'data-sources', 'service-account']
+---
+
+## Introduction
+
+Google Docs is the most popular collaborative document editor, commonly used for meeting notes, project documentation, SOPs, knowledge base articles, and onboarding guides.
+
+With Alchemyst's [Google Docs integration](https://platform.getalchemystai.com/integrations?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web), you can sync documents anytime you want, search semantically across all your docs, and share team knowledge across collaborators.
+
+Your agent sees documents as living knowledge, not static files.
+
+***
+
+## Why Connect Google Docs?
+
+Traditional document workflows fail because:
+
+* Documents are scattered across drives
+* Manual exports become stale immediately
+* There's no way to query across multiple docs
+* Collaboration happens outside agent context
+
+With Alchemyst's Google Docs integration, your documents sync directly into your context layer, enabling seamless collaboration and always up-to-date information.
+
+***
+
+## How to Connect
+
+**Prerequisites:**
+
+* Google Cloud Project
+* Service Account with Google Docs API access
+* Documents shared with the service account email
+
+**What You Need:**
+
+* Client Email (service account email address)
+* Private Key (from service account JSON key file)
+* Shared Document URL
+
+**Important:** You must share each document or folder with the service account email address. The service account needs at least Viewer permission to access the content.
+
+***
+
+## What Gets Indexed
+
+Alchemyst can index:
+
+* Document text
+* Formatting
+* Comments
+* Suggestions
+* Embedded images
+* Links
+* Version history
+
+***
+
+## Setting Up a Service Account
+
+1. Go to Google Cloud Console and create or select a project
+2. Enable Google Docs API
+3. Navigate to IAM & Admin → Service Accounts
+4. Create a new service account
+5. Generate a JSON key file
+6. Extract the `client_email` and `private_key` from the JSON
+
+**The JSON key file contains:**
+
+* `client_email`: Service account email (e.g., `service@project.iam.gserviceaccount.com`)
+* `private_key`: Full private key string (including header and footer)
+
+***
+
+## Security Best Practices
+
+For Google Docs integrations:
+
+* Use service accounts instead of OAuth for programmatic access
+* Store private keys in environment variables or secrets managers
+* Never commit private keys to version control
+* Rotate keys every 90 days
+* Grant only Viewer permissions to service accounts
+* Use folder-level sharing for easier management
+* Enable access logging in Google Workspace Admin Console
+* Monitor for unusual activity and set up alerts
+
+***
+
+## Version Tracking
+
+Google Docs change constantly. Alchemyst automatically tracks versions by removing old content when documents update and indexing new content, ensuring searches always return the latest information.
+
+***
+
+## Next Steps
+
+Once Google Docs is connected, you can:
+
+* Search across all your documents
+* Combine document data with databases and other sources
+* Keep your agent synchronized with team collaboration
+
+Explore other integrations: [Google Sheets](/integrations/data-sources/google-sheets), [Databases](/integrations/data-sources/databases), or [Cloud Storage](/integrations/data-sources/cloud-storage).
