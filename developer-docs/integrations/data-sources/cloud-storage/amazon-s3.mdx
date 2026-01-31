@@ -1,0 +1,151 @@
+---
+title: "Amazon S3"
+description: "Connect Amazon S3 to your Alchemyst context layer"
+keywords: ['amazon-s3', 's3', 'aws', 'cloud-storage', 'object-storage', 'buckets', 'data-sources', 'file-sync']
+---
+
+## Introduction
+
+Amazon S3 (Simple Storage Service) is the industry-standard object storage platform, commonly used for document archives, media libraries, data lakes, and backups.
+
+With Alchemyst's [Amazon S3 integration](https://platform.getalchemystai.com/integrations?utm_source=getalchemystai.com&utm_campaign=docs&utm_medium=web), you can sync entire buckets, search semantically across documents and media, and keep your agent's knowledge synchronized with your storage.
+
+Your agent sees files as meaning, not just bytes.
+
+***
+
+## Why Connect Amazon S3?
+
+Traditional file-based workflows break down because:
+
+* Files are scattered across services
+* Manual operations are error-prone
+* Large files exceed context windows
+* There's no way to query across files semantically
+
+With Alchemyst's S3 integration, your files sync directly into your context layer, enabling seamless access to all your stored content.
+
+***
+
+## How to Connect
+
+**Prerequisites:**
+
+* AWS account with S3 access
+* S3 bucket with files to sync
+* IAM credentials with read permissions
+
+**What You Need:**
+
+* Bucket Name (S3 bucket identifier)
+* AWS Access Key ID (IAM user access key)
+* AWS Secret Access Key (IAM user secret key)
+* Region (AWS region, e.g., `us-east-1`)
+* Prefix/Folder (optional path filter)
+
+***
+
+## What Gets Indexed
+
+Alchemyst can index:
+
+**Documents:**
+* PDF, DOCX, PPTX, TXT, MD
+
+**Data:**
+* CSV, JSON, JSONL, XML, Parquet, YAML
+
+**Images:**
+* PNG, JPG, SVG (with OCR and vision models)
+
+**Code:**
+* All text-based source files
+
+***
+
+## IAM Permissions
+
+Create a dedicated IAM user with read-only S3 access. Grant only the following permissions to the specific buckets you want to sync:
+
+* `s3:GetObject` - Read objects from the bucket
+* `s3:ListBucket` - List objects in the bucket
+
+**Example IAM Policy:**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::your-bucket-name",
+        "arn:aws:s3:::your-bucket-name/*"
+      ]
+    }
+  ]
+}
+```
+
+***
+
+## Security Best Practices
+
+For Amazon S3 integrations:
+
+* Use IAM roles instead of access keys when possible
+* Grant only read-only permissions
+* Enable bucket encryption (SSE-S3 or SSE-KMS)
+* Restrict public access to sensitive buckets
+* Use HTTPS-only access policies
+* Enable S3 access logging to monitor activity
+* Rotate credentials regularly
+* Use bucket policies to enforce encryption in transit
+* Enable versioning for critical data
+
+***
+
+## Performance & Cost Optimization
+
+**Sync Strategies:**
+
+* **Full Sync:** For small buckets with static content
+* **Incremental Sync:** For large buckets with frequent updates
+* **Event-Driven:** For real-time updates using S3 event notifications
+
+**Cost Reduction:**
+
+* Use S3 Intelligent-Tiering for infrequent access
+* Set lifecycle policies to archive old files
+* Limit sync frequency for static content
+* Use prefix filters to avoid listing entire buckets
+* Filter by file type to exclude unnecessary files
+* Monitor data transfer costs and optimize accordingly
+
+***
+
+## Prefix Filtering
+
+Use the Prefix/Folder field to sync only specific directories within your bucket:
+
+* Leave empty to sync the entire bucket
+* Use `documents/` to sync only the documents folder
+* Use `data/2024/` to sync a specific year's data
+* Combine with file type filters for precise control
+
+***
+
+## Next Steps
+
+Once Amazon S3 is connected, you can:
+
+* Search across your files semantically
+* Combine cloud storage with databases and other sources
+* Enable real-time sync with webhooks
+* Process multimodal content (PDFs, images, CSVs, JSON)
+
+Explore other integrations: [Databases](/integrations/data-sources/databases) or [Productivity & Documents](/integrations/data-sources/docs).

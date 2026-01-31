@@ -1,0 +1,160 @@
+---
+title: "PostgreSQL Integration"
+description: "Connect PostgreSQL databases to your Alchemyst context layer"
+---
+
+## Overview
+
+PostgreSQL is the most popular open-source relational database, commonly used for:
+
+- Customer records and CRM data
+- Product catalogs and inventory
+- Transaction logs and financial data
+- Application state and configuration
+
+## Why Connect PostgreSQL?
+
+Traditional AI agents struggle with operational data because:
+
+- **Data changes constantly** - Static exports become outdated quickly
+- **Manual exports go stale** - Syncing requires constant maintenance  
+- **Querying requires SQL knowledge** - Non-technical users can't access data easily
+
+With Alchemyst PostgreSQL integration, you can:
+
+- Sync fresh data whenever context is needed
+- Search semantically across tables and collections
+- Combine database results with other data sources
+- Query in natural language without writing SQL
+
+Your databases become queryable context that responds to meaning, not just raw data.
+
+---
+
+## Getting Started
+
+To connect PostgreSQL to Alchemyst:
+
+1. Navigate to the [Alchemyst Integrations page](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=postgresql_docs&utm_medium=web)
+2. Click **Add Integration** → **PostgreSQL**
+3. Provide your connection credentials
+4. Configure which data to sync
+5. Start querying your data with natural language
+
+---
+
+## Connection Requirements
+
+### Prerequisites
+
+- PostgreSQL instance (local, cloud-hosted, or managed service)
+- Read-only database user (strongly recommended)
+- Network access to your PostgreSQL instance
+
+### Required Information
+
+- **Connection String** - Full PostgreSQL URL in format:
+  ```
+  postgresql://username:password@host:port/database
+  ```
+- **Username** (optional if included in URL)
+- **Password** (optional if included in URL)  
+- **Database Name** (optional if included in URL)
+- **Port** (default: 5432)
+
+---
+
+## What Gets Indexed
+
+Alchemyst can index and make searchable:
+
+- **Tables** - All rows and columns from specified tables
+- **Views** - Materialized and regular views
+- **Query Results** - Custom SQL query outputs
+- **Schema Definitions** - Table structures and relationships
+- **Stored Procedures** - Procedure outputs and results
+
+---
+
+## How Data is Structured
+
+When you sync PostgreSQL tables, Alchemyst automatically structures your data for optimal retrieval:
+
+### Example Query Patterns
+
+```
+"Show me all high-priority support tickets from last month"
+→ Filters: groupName includes "support_tickets", metadata.priority="high"
+
+"Find customer payment issues"
+→ Semantic search across content for payment-related problems
+
+"What's the resolution pattern for login errors?"
+→ Retrieves similar resolved tickets and identifies common solutions
+```
+
+---
+
+## How to Connect
+
+1. Go to [Alchemyst Integrations](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=postgresql_setup&utm_medium=web)
+2. Click **Add Integration** → **PostgreSQL**
+3. Enter your connection details:
+   - Connection string or individual credentials
+   - Select tables or provide custom queries
+4. Test the connection
+5. Configure sync frequency and data filters
+6. Save and activate the integration
+
+---
+
+## Connection String Examples
+
+### Local PostgreSQL
+
+```
+postgresql://myuser:mypassword@localhost:5432/mydb
+```
+
+### Cloud PostgreSQL (AWS RDS)
+
+```
+postgresql://admin:password@mydb.abc123.us-east-1.rds.amazonaws.com:5432/production
+```
+
+### Google Cloud SQL
+
+```
+postgresql://user:password@/database?host=/cloudsql/project:region:instance
+```
+
+---
+
+## Best Practices
+
+- **Use read-only users** - Create a dedicated service account with `SELECT` permissions only
+- **Enable SSL/TLS** - Always use encrypted connections for production data
+- **Whitelist IPs** - Restrict database access to Alchemyst service IPs
+- **Index strategically** - Start with critical tables, expand as needed
+- **Monitor performance** - Watch for slow queries or high load
+
+---
+
+## Security Best Practices
+
+### Access Control
+
+- **Use read-only credentials** - Prevent accidental data modification
+- **Create dedicated service accounts** - Separate Alchemyst access from application users
+- **Apply principle of least privilege** - Grant access only to required tables/collections
+
+### Network Security
+
+- **Enable SSL/TLS encryption** - Protect data in transit
+- **Whitelist Alchemyst IPs** - Restrict database access by IP address
+- **Use private networks** - Connect via VPN or private peering when possible
+- **Enable firewall rules** - Block unauthorized access attempts
+
+---
+
+**Ready to connect PostgreSQL?** Visit the [Alchemyst Integrations page](https://platform.getalchemystai.com/integrations?utm_source=docs&utm_campaign=postgresql_cta&utm_medium=web) to get started.
