@@ -1,307 +1,1016 @@
 ---
-title: "Quickstart - Contextual Agent"
-description: "Build a context-aware AI system in minutes"
-keywords: ['configuration', 'setup', 'getting started', 'rag']
+title: "Contextual AI Agent"
+description: "Build AI that answers from your documents in 10 minutes"
+keywords: ['context', 'rag', 'quickstart', 'getting started']
 ---
 
-## Add Context to Alchemyst AI
+## What You're Building
 
-This guide shows you how to **store context in Alchemyst AI and reuse it in your LLM or agent** - step by step.
+An AI that answers questions using YOUR documents instead of guessing.
 
+**Before Alchemyst:**
+```typescript
+const answer = await llm.generate("What's our refund policy?");
+// "I don't have information about your specific refund policy..." ❌
+```
 
-## What you'll build
+**After Alchemyst:**
+```typescript
+const answer = await llm.generate("What's our refund policy?");
+// "We offer a 30-day money back guarantee. Contact support@example.com..." ✅
+```
 
-By the end of this guide, you will:
-- Store context in Alchemyst
-- Reuse that context in future requests
-- Retrieve relevant context and feed it to llms
-
+---
 
 ## Prerequisites
 
-You'll need:
-- An Alchemyst AI account - [**sign up**](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=quickstart&utm_medium=quickstart_article&utm_content=quickstart_prerequisites_cta)
+- Alchemyst account ([sign up](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=prerequisites_signup_cta))
 - Your `ALCHEMYST_AI_API_KEY`
-- Python 3.9+ or Node.js 18+
+- Node.js 18+ or Python 3.9+
+
+**Time to complete:** 10 minutes
 
 ---
 
-## Step 1: Install the SDK
+## Step 1: Install
 
 <CodeGroup>
-  ```bash node
-  npm install @alchemystai/sdk
-  ```
-  ```bash python
-  pip install alchemystai
-  ```
+```bash npm
+npm install @alchemystai/sdk
+```
+```bash python
+pip install alchemystai
+```
 </CodeGroup>
 
-## Step 2: Initialize the client
+---
+
+## Step 2: Initialize
+
 <CodeGroup>
+```typescript TypeScript
+import AlchemystAI from '@alchemystai/sdk';
 
-  ```javascript ts
-  import AlchemystAI from '@alchemystai/sdk';
+const client = new AlchemystAI({
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+});
+```
+```python Python
+import os
+from alchemyst_ai import AlchemystAI
 
-  const client = new AlchemystAI({
-      apiKey: process.env.ALCHEMYST_AI_API_KEY,
+client = AlchemystAI(
+  api_key=os.environ.get("ALCHEMYST_AI_API_KEY")
+)
+```
+</CodeGroup>
+
+---
+
+## Step 3: Store a Document
+
+<CodeGroup>
+```typescript TypeScript
+const result = await client.v1.context.add({
+  documents: [{
+    content: "Our refund policy: We offer a 30-day money back guarantee. Contact support@example.com to request a refund."
+  }],
+  context_type: 'resource',
+  source: 'documentation',
+  scope: 'internal'
+});
+
+console.log(`✅ Stored ${result.documents?.length || 0} documents`);
+// Output: ✅ Stored 1 documents
+```
+```python Python
+result = client.v1.context.add(
+  documents=[{
+    "content": "Our refund policy: We offer a 30-day money back guarantee. Contact support@example.com to request a refund."
+  }],
+  context_type="resource",
+  source="documentation",
+  scope="internal"
+)
+
+print(f"✅ Stored {len(result.get('documents', []))} documents")
+# Output: ✅ Stored 1 documents
+```
+</CodeGroup>
+
+**What just happened:**
+- Your document was chunked into searchable pieces (~500 word chunks)
+- Embeddings were generated automatically (vector representations)
+- Everything is indexed and ready to search
+
+**Verify it worked:**
+1. Visit [platform.getalchemystai.com/context](https://platform.getalchemystai.com/context?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=verify_setup_context_link)
+2. You should see your document listed
+3. Click to view chunks and metadata
+
+---
+
+## Step 4: Search for Context
+
+<CodeGroup>
+```typescript TypeScript
+const userQuestion = "What's your refund policy?";
+
+const { contexts } = await client.v1.context.search({
+  query: userQuestion,
+  similarity_threshold: 0.7,
+  scope: 'internal'
+});
+
+console.log(`Found ${contexts?.length || 0} relevant chunks`);
+// Output: Found 1 relevant chunks
+
+console.log(contexts[0].content);
+// Output: "Our refund policy: We offer a 30-day money back guarantee..."
+```
+```python Python
+user_question = "What's your refund policy?"
+
+result = client.v1.context.search(
+  query=user_question,
+  similarity_threshold=0.7,
+  scope="internal"
+)
+
+contexts = result.contexts or []
+print(f"Found {len(contexts)} relevant chunks")
+# Output: Found 1 relevant chunks
+
+print(contexts[0].content)
+# Output: "Our refund policy: We offer a 30-day money back guarantee..."
+```
+</CodeGroup>
+
+### Understanding similarity_threshold
+
+| Value | Meaning | When to Use |
+|-------|---------|-------------|
+| `0.5` | Somewhat relevant | Exploratory searches, broad topics |
+| `0.7` | Relevant  | **Start here** - good balance |
+| `0.9` | Very relevant | Precise matches, technical queries |
+
+<Note>
+**Tip:** Start at 0.7, lower to 0.5 if you get no results, raise to 0.9 if results are too broad.
+</Note>
+
+---
+
+## Step 5: Feed Context to Your LLM
+
+<CodeGroup>
+```typescript TypeScript
+import OpenAI from 'openai';
+
+const openai = new OpenAI();
+
+const prompt = contexts?.length 
+  ? `Context:\n${contexts.map(c => c.content).join('\n\n')}\n\nQuestion: ${userQuestion}`
+  : userQuestion;
+
+const response = await openai.chat.completions.create({
+  model: "gpt-4",
+  messages: [{ role: "user", content: prompt }]
+});
+
+console.log(response.choices[0].message.content);
+// Output: "We offer a 30-day money back guarantee. To request a refund, contact support@example.com."
+```
+```python Python
+import openai
+
+if contexts:
+  context_text = "\n\n".join([ctx.content for ctx in contexts])
+  prompt = f"Context:\n{context_text}\n\nQuestion: {user_question}"
+else:
+  prompt = user_question
+
+response = openai.chat.completions.create(
+  model="gpt-4",
+  messages=[{"role": "user", "content": prompt}]
+)
+
+print(response.choices[0].message.content)
+# Output: "We offer a 30-day money back guarantee. To request a refund, contact support@example.com."
+```
+</CodeGroup>
+
+**Result:** Your AI now answers from YOUR data, not generic training data.
+
+---
+
+## Complete Working Example
+
+<Tabs>
+  <Tab title="TypeScript">
+```typescript
+import AlchemystAI from '@alchemystai/sdk';
+import OpenAI from 'openai';
+
+const alchemyst = new AlchemystAI({
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+});
+
+const openai = new OpenAI();
+
+async function main() {
+  // 1. Store document
+  await alchemyst.v1.context.add({
+    documents: [{
+      content: "Our refund policy: We offer a 30-day money back guarantee. Contact support@example.com to request a refund."
+    }],
+    context_type: 'resource',
+    source: 'docs',
+    scope: 'internal'
   });
-  ```
+  console.log("✅ Document stored");
 
-  ```python python
-  import os
-  from alchemyst_ai import AlchemystAI
+  // 2. Search for context
+  const userQuestion = "What's your refund policy?";
+  const { contexts } = await alchemyst.v1.context.search({
+    query: userQuestion,
+    similarity_threshold: 0.7,
+    scope: 'internal'
+  });
+  console.log(`Found ${contexts?.length} relevant chunks`);
 
-  client = AlchemystAI(
-      api_key=os.environ.get("ALCHEMYST_AI_API_KEY"),
-  )
-  ```
+  // 3. Generate answer with context
+  const prompt = contexts?.length
+    ? `Context:\n${contexts.map(c => c.content).join('\n\n')}\n\nQuestion: ${userQuestion}`
+    : userQuestion;
 
-</CodeGroup>
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [{ role: "user", content: prompt }]
+  });
 
-## Step 3 : Create documents array
-
-The ```documents``` array contains the raw content you want Alchemyst to store - documents, PDFs, and other sources must first be converted into text strings and then uploaded
-
-<CodeGroup>
-
-  ```javascript ts
-
-interface AlchemystDocument {
-  content: string;
-  metadata?: { //optional
-    file_name?: string;
-    file_type?: string;
-    group_name?: string[];
-  };
+  console.log("AI Response:", response.choices[0].message.content);
 }
 
-const docs_array: AlchemystDocument[] = [];
-
-docs_array.push({
-  content: "files content",
-  metadata: {
-    file_name: "file_name",
-    file_type: "pdf/txt/json",
-    group_name: ["group1", "group2"],
-  },
-});
-  ```
-
-  ```python python
-docs_array = []
-
-docs_array.append({
-    "content": "files content",
-    "metadata": {   # optional
-        "file_name": "file_name",
-        "file_type": "pdf/txt/json",
-        "group_name": ["group1", "group2"]
-    }
-})
+main();
 ```
 
-</CodeGroup>
+**Expected Output:**
+```
+✅ Document stored
+Found 1 relevant chunks
+AI Response: We offer a 30-day money back guarantee. To request a refund, contact support@example.com.
+```
+  </Tab>
+  
+  <Tab title="Python">
+```python
+import os
+from alchemyst_ai import AlchemystAI
+import openai
 
+alchemyst = AlchemystAI(api_key=os.environ.get("ALCHEMYST_AI_API_KEY"))
 
-## Step 4: Add context (store data)
+def main():
+    # 1. Store document
+    alchemyst.v1.context.add(
+        documents=[{
+            "content": "Our refund policy: We offer a 30-day money back guarantee. Contact support@example.com to request a refund."
+        }],
+        context_type="resource",
+        source="docs",
+        scope="internal"
+    )
+    print("✅ Document stored")
 
-This step adds documents into the context processor which are then turned into nodes.
+    # 2. Search for context
+    user_question = "What's your refund policy?"
+    result = alchemyst.v1.context.search(
+        query=user_question,
+        similarity_threshold=0.7,
+        scope="internal"
+    )
 
+    contexts = result.contexts or []
+    print(f"Found {len(contexts)} relevant chunks")
+
+    # 3. Generate answer with context
+    if contexts:
+        context_text = "\n\n".join([ctx.content for ctx in contexts])
+        prompt = f"Context:\n{context_text}\n\nQuestion: {user_question}"
+    else:
+        prompt = user_question
+
+    response = openai.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    print("AI Response:", response.choices[0].message.content)
+
+if __name__ == "__main__":
+    main()
+```
+
+**Expected Output:**
+```
+✅ Document stored
+Found 1 relevant chunks
+AI Response: We offer a 30-day money back guarantee. To request a refund, contact support@example.com.
+```
+  </Tab>
+</Tabs>
+
+---
+
+## Next: Add Real Documents
+
+Now that you understand the basics, let's add real documents:
+
+<Tabs>
+  <Tab title="From File">
 <CodeGroup>
+```typescript TypeScript
+import fs from 'fs';
 
-  ```javascript ts
-  await client.v1.context.add({
-    documents:docs_array,
-    context_type: 'resource',  // one of: resource | conversation | instruction
-    source: 'web-upload',
-    scope: 'internal',     // one of: internal | external
-      // [OPTIONAL] metadata can be null. Use for filtering later.
+const content = fs.readFileSync('./docs/policy.txt', 'utf-8');
+
+await client.v1.context.add({
+  documents: [{
+    content: content,
     metadata: {
-      fileName: 'notes.txt',
-      fileType: 'text/plain',
-      lastModified: new Date().toISOString(),
-      fileSize: 1024,
-      groupName: ['group1', 'group2'],
+      file_name: "policy.txt",
+      file_type: "text"
+    }
+  }],
+  context_type: 'resource',
+  source: 'documentation',
+  scope: 'internal'
+});
+
+console.log("✅ File uploaded and indexed");
+```
+```python Python
+with open('./docs/policy.txt', 'r') as f:
+    content = f.read()
+
+client.v1.context.add(
+    documents=[{
+        "content": content,
+        "metadata": {
+            "file_name": "policy.txt",
+            "file_type": "text"
+        }
+    }],
+    context_type="resource",
+    source="documentation",
+    scope="internal"
+)
+
+print("✅ File uploaded and indexed")
+```
+</CodeGroup>
+  </Tab>
+  
+  <Tab title="From API">
+<CodeGroup>
+```typescript TypeScript
+const response = await fetch('https://api.example.com/docs');
+const apiDocs = await response.json();
+
+const docs = apiDocs.map(doc => ({
+  content: doc.body,
+  metadata: {
+    file_name: doc.title,
+    doc_id: doc.id
+  }
+}));
+
+await client.v1.context.add({
+  documents: docs,
+  context_type: 'resource',
+  source: 'api',
+  scope: 'internal'
+});
+
+console.log(`✅ Indexed ${docs.length} documents from API`);
+```
+```python Python
+import requests
+
+response = requests.get('https://api.example.com/docs')
+api_docs = response.json()
+
+docs = [{
+    "content": doc["body"],
+    "metadata": {
+        "file_name": doc["title"],
+        "doc_id": doc["id"]
+    }
+} for doc in api_docs]
+
+client.v1.context.add(
+    documents=docs,
+    context_type="resource",
+    source="api",
+    scope="internal"
+)
+
+print(f"✅ Indexed {len(docs)} documents from API")
+```
+</CodeGroup>
+  </Tab>
+  
+  <Tab title="Multiple Files">
+<CodeGroup>
+```typescript TypeScript
+const docs = [
+  {
+    content: "Refund policy: We offer a 30-day money back guarantee...",
+    metadata: { file_name: "refunds.md" }
+  },
+  {
+    content: "Shipping policy: We ship worldwide within 5-7 business days...",
+    metadata: { file_name: "shipping.md" }
+  },
+  {
+    content: "Privacy policy: We collect and protect your data...",
+    metadata: { file_name: "privacy.md" }
+  }
+];
+
+await client.v1.context.add({
+  documents: docs,
+  context_type: 'resource',
+  source: 'documentation',
+  scope: 'internal'
+});
+
+console.log(`✅ Indexed ${docs.length} policy documents`);
+```
+```python Python
+docs = [
+    {
+        "content": "Refund policy: We offer a 30-day money back guarantee...",
+        "metadata": {"file_name": "refunds.md"}
     },
-  });
-  console.log("Context successfully added.")
+    {
+        "content": "Shipping policy: We ship worldwide within 5-7 business days...",
+        "metadata": {"file_name": "shipping.md"}
+    },
+    {
+        "content": "Privacy policy: We collect and protect your data...",
+        "metadata": {"file_name": "privacy.md"}
+    }
+]
 
-  ```
+client.v1.context.add(
+    documents=docs,
+    context_type="resource",
+    source="documentation",
+    scope="internal"
+)
 
-  ```python python
-  # Add documents to context
-  response = client.v1.context.add(
-      documents=docs_array,
-      source="source of context data",
-      context_type="resource",   # one of: resource | conversation | instruction
-      scope="internal",          # one of: internal | external
-      metadata={                 # optional
-          "file_name": "name of the file",
-          "file_type": "type",
-          "last_modified": "timestamp",
-          "file_size": 1234,   # number
-          "group_name": ["group1", "group2"]
+print(f"✅ Indexed {len(docs)} policy documents")
+```
+</CodeGroup>
+  </Tab>
+</Tabs>
+
+---
+
+## Advanced: Organize with Metadata
+
+Use `group_name` to filter searches by category:
+
+<CodeGroup>
+```typescript TypeScript
+// Store with groups
+await client.v1.context.add({
+  documents: [{
+    content: "Refund policy: We offer a 30-day money back guarantee...",
+    metadata: {
+      file_name: "refund-policy.md",
+      group_name: ["customer-support", "policies"]  // ← For storage
+    }
+  }],
+  context_type: 'resource',
+  source: 'documentation',
+  scope: 'internal'
+});
+
+// Search within specific groups
+const { contexts } = await client.v1.context.search({
+  query: "refund policy",
+  scope: 'internal',
+  metadata: {
+    groupName: ['customer-support']  // ← For search (note: camelCase)
+  }
+});
+
+console.log(`Found ${contexts?.length} results in customer-support`);
+```
+```python Python
+# Store with groups
+client.v1.context.add(
+    documents=[{
+        "content": "Refund policy: We offer a 30-day money back guarantee...",
+        "metadata": {
+            "file_name": "refund-policy.md",
+            "group_name": ["customer-support", "policies"]  # ← For storage
+        }
+    }],
+    context_type="resource",
+    source="documentation",
+    scope="internal"
+)
+
+# Search within specific groups
+result = client.v1.context.search(
+    query="refund policy",
+    scope="internal",
+    metadata={
+        "group_name": ["customer-support"]  # ← For search (note: snake_case)
+    }
+)
+
+print(f"Found {len(result.contexts or [])} results in customer-support")
+```
+</CodeGroup>
+
+<Note>
+**Naming difference:** Storage uses `group_name` (snake_case in metadata) but TypeScript search uses `groupName` (camelCase). Python uses `group_name` consistently. Both refer to the same field - this is due to API design conventions.
+</Note>
+
+### Why use groups?
+
+| Benefit | Description |
+|---------|-------------|
+| **Faster searches** | Smaller search space = lower latency |
+| **More relevant** | Only search customer-support docs, not engineering docs |
+| **Better organization** | Hierarchical structure like folders |
+| **Access control** | Filter by team, project, or user permissions |
+
+**Example hierarchy:**
+```typescript
+group_name: ["company", "customer-support", "policies"]
+group_name: ["company", "engineering", "api-docs"]
+group_name: ["company", "hr", "employee-handbook"]
+```
+
+Learn more: [Context Arithmetic](/advanced/context-arithmetic)
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No results from search">
+    **Error symptoms:**
+    - `contexts?.length` returns 0
+    - Empty array in search results
+    
+    **Common causes:**
+    1. `similarity_threshold` is too high
+    2. Document wasn't stored successfully
+    3. `scope` mismatch between add and search
+    
+    **Fixes:**
+    
+    **Step 1: Lower the threshold:**
+```typescript
+similarity_threshold: 0.5  // Instead of 0.9
+```
+    
+    **Step 2: Verify documents were stored:**
+```typescript
+const stored = await client.v1.context.view();
+console.log("Total documents:", stored.length);
+console.log("Documents:", stored);
+```
+
+**Expected output:**
+```
+Total documents: 1
+Documents: [{ id: "doc_123", content: "Our refund policy...", ... }]
+```
+    
+    **Step 3: Check scope matches:**
+```typescript
+// Both must use the same scope
+await client.v1.context.add({ scope: 'internal', ... });
+await client.v1.context.search({ scope: 'internal', ... });  // ✅ Match
+```
+  </Accordion>
+  
+  <Accordion title="Too many irrelevant results">
+    **Error symptoms:**
+    - Getting documents that don't match the query
+    - Too many results to process efficiently
+    
+    **Common causes:**
+    1. `similarity_threshold` is too low
+    2. Documents are too broad or generic
+    3. Not using group filtering
+    
+    **Fixes:**
+    
+    **Step 1: Raise the threshold:**
+```typescript
+similarity_threshold: 0.8  // More strict (was 0.5)
+```
+    
+    **Step 2: Use group filtering:**
+```typescript
+metadata: { 
+  groupName: ['customer-support']  // Narrow to specific category
+}
+```
+
+    **Step 3: Add more specific metadata:**
+```typescript
+await client.v1.context.add({
+  documents: [{
+    content: "...",
+    metadata: {
+      group_name: ["support", "refunds"],  // More specific
+      category: "policies",
+      department: "customer-service"
+    }
+  }]
+});
+```
+  </Accordion>
+  
+  <Accordion title="Document already exists error">
+    **Error message:**
+    ```json
+    {
+      "error": "Document with file_name 'policy.md' already exists",
+      "code": "CONFLICT",
+      "status": 409
+    }
+    ```
+    
+    **Cause:** Trying to add a document with duplicate `file_name` in metadata.
+    
+    **Fixes:**
+    
+    **Step 1: Delete old version first:**
+```typescript
+// Delete by file name
+await client.v1.context.delete({ 
+  metadata: { fileName: "policy.md" } 
+});
+
+// Then add new version
+await client.v1.context.add({
+  documents: [{
+    content: "Updated content...",
+    metadata: { file_name: "policy.md" }
+  }]
+});
+```
+    
+    **Step 2: Use versioned names:**
+```typescript
+file_name: "policy-v2.md"  // or "policy-2024-02-01.md"
+```
+
+    **Step 3: Use unique identifiers:**
+```typescript
+file_name: `policy-${Date.now()}.md`  // Timestamp
+// or
+file_name: `policy-${uuid()}.md`       // UUID
+```
+  </Accordion>
+
+  <Accordion title="API authentication errors">
+    **Error message:**
+    ```json
+    {
+      "error": "Invalid API key",
+      "code": "UNAUTHORIZED",
+      "status": 401
+    }
+    ```
+    
+    **Fixes:**
+    
+    **Step 1: Verify API key is set:**
+```typescript
+console.log("API Key exists:", !!process.env.ALCHEMYST_AI_API_KEY);
+// Should output: API Key exists: true
+```
+    
+    **Step 2: Check key format:**
+```typescript
+// Should start with "alch_" or similar prefix
+console.log("Key prefix:", process.env.ALCHEMYST_AI_API_KEY?.substring(0, 5));
+```
+    
+    **Step 3: Get a new key:**
+    - Visit [platform.getalchemystai.com/settings](https://platform.getalchemystai.com/settings?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=troubleshooting_api_key_settings)
+    - Generate a new API key
+    - Update your `.env` file
+  </Accordion>
+
+  <Accordion title="Rate limit exceeded">
+    **Error message:**
+    ```json
+    {
+      "error": "Rate limit exceeded",
+      "code": "RATE_LIMIT",
+      "status": 429,
+      "retry_after": 60
+    }
+    ```
+    
+    **Cause:** Too many requests in a short time period.
+    
+    **Fixes:**
+    
+    **Step 1: Add retry logic:**
+```typescript
+async function searchWithRetry(query: string, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await client.v1.context.search({ query, scope: 'internal' });
+    } catch (error) {
+      if (error.status === 429 && i < retries - 1) {
+        const waitTime = error.retry_after || 60;
+        console.log(`Rate limited. Waiting ${waitTime}s...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+      } else {
+        throw error;
       }
-  )
-  ```
+    }
+  }
+}
+```
+    
+    **Step 2: Check your rate limits:**
+    - Free tier: 100 operations/day
+    - Pro tier: 10,000 operations/day
+    
+    **Step 3: Upgrade your plan:** [View pricing](https://platform.getalchemystai.com/settings/billing?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=troubleshooting_rate_limit_billing)
+  </Accordion>
+</AccordionGroup>
 
-</CodeGroup>
+---
 
-### What just happened?
+## Best Practices
 
-- The data was stored in Alchemyst's [context layer](https://platform.getalchemystai.com/context)
-- It can be used to search query and provide llm with relevant context
+### Document Organization
 
+```typescript
+// ✅ Good - organized with meaningful metadata
+await client.v1.context.add({
+  documents: [{
+    content: "...",
+    metadata: {
+      file_name: "refund-policy-2024-02.md",
+      group_name: ["customer-support", "policies"],
+      department: "support",
+      last_updated: "2024-02-01"
+    }
+  }]
+});
 
-## Step 5: Search through context
+// ❌ Bad - minimal metadata, hard to search
+await client.v1.context.add({
+  documents: [{
+    content: "..."
+  }]
+});
+```
 
-Retrieve the most relevant stored context before invoking the model.
+### Chunk Size Considerations
 
-<CodeGroup>
+- **Small documents** (under 1000 words): Add as-is
+- **Medium documents** (1000-5000 words): Let Alchemyst auto-chunk
+- **Large documents** (over 5000 words): Consider splitting by section
 
-  ```javascript ts
+```typescript
+// For large documents, split manually for better control
+const sections = [
+  { title: "Introduction", content: "..." },
+  { title: "Features", content: "..." },
+  { title: "Pricing", content: "..." }
+];
+
+const docs = sections.map(section => ({
+  content: section.content,
+  metadata: {
+    file_name: "product-docs.md",
+    section: section.title
+  }
+}));
+
+await client.v1.context.add({ documents: docs });
+```
+
+### Search Optimization
+
+```typescript
+// ✅ Good - specific query with filtering
+const { contexts } = await client.v1.context.search({
+  query: "How to request a refund for damaged items",
+  scope: 'internal',
+  similarity_threshold: 0.7,
+  metadata: {
+    groupName: ['customer-support', 'refunds']
+  }
+});
+
+// ❌ Bad - too broad, no filtering
+const { contexts } = await client.v1.context.search({
+  query: "help",
+  scope: 'internal'
+});
+```
+
+### Error Handling
+
+```typescript
+async function safeSearch(query: string) {
+  try {
     const { contexts } = await client.v1.context.search({
-        query: "user_query",
-        similarity_threshold: 0.8,
-        minimum_similarity_threshold: 0.5,
-        scope: 'internal',
-        metadata: null,
+      query,
+      scope: 'internal',
+      similarity_threshold: 0.7
     });
-  ```
+    
+    if (!contexts || contexts.length === 0) {
+      console.log("No results found. Try a broader query.");
+      return null;
+    }
+    
+    return contexts;
+  } catch (error) {
+    console.error("Search failed:", error.message);
+    // Fallback or retry logic here
+    return null;
+  }
+}
+```
 
-  ```python python
-    results = client.v1.context.search(
-        query=question,
-        similarity_threshold=0.8,
-        minimum_similarity_threshold = 0.5,
-        scope = "internal",
-        metadata= None,
-    )
+---
 
-    docs = results.contexts or []
+## Verify Your Setup
 
-  ```
+After implementing context search, verify everything is working:
 
-</CodeGroup>
+### Check Platform UI
 
-## Step 6 : Ingest the retrieved context into llm prompts
+1. Visit [platform.getalchemystai.com/context](https://platform.getalchemystai.com/context?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=verify_setup_ui_check)
+2. You should see your stored documents
+3. Click to view chunks and embeddings
+4. Check document count matches what you uploaded
 
-Convert the resolved context into a structured prompt before sending it to the LLM.
+### Test with Code
 
-<CodeGroup>
+```typescript
+// Test the complete flow
+async function testSetup() {
+  // 1. Store a test document
+  console.log("Step 1: Storing test document...");
+  await client.v1.context.add({
+    documents: [{
+      content: "Test document: The answer is 42",
+      metadata: { file_name: "test.txt" }
+    }],
+    scope: 'internal'
+  });
+  
+  // 2. Search for it
+  console.log("Step 2: Searching for test document...");
+  const { contexts } = await client.v1.context.search({
+    query: "What is the answer?",
+    scope: 'internal',
+    similarity_threshold: 0.5
+  });
+  
+  // 3. Verify results
+  const found = contexts?.some(c => c.content.includes("42"));
+  console.log("✅ Test passed:", found);
+  
+  // 4. Cleanup
+  console.log("Step 3: Cleaning up...");
+  await client.v1.context.delete({
+    metadata: { fileName: "test.txt" }
+  });
+}
 
-  ```javascript ts
-  const promptText = contexts?.length ? `Use the context below to answer the question. If the context is insufficient, say so.
-        ${contexts.map((c, i) => `Context ${i + 1}: ${c.content ?? JSON.stringify(c)}`).join('\n\n')}
-        Question: ${userQuestion}`;
+testSetup();
+```
 
-  const result = await model.generateContent(promptText);
+**Expected Output:**
+```
+Step 1: Storing test document...
+Step 2: Searching for test document...
+✅ Test passed: true
+Step 3: Cleaning up...
+```
 
-  ```
+---
 
-  ```python python
-  if docs:
-    context = "\n\n".join(
-        f"Context {i+1}: {getattr(doc, 'content', str(doc))}"
-        for i, doc in enumerate(docs)
-    )
-    prompt = f"""Use the context below to answer the question. If the context is insufficient, say so.
-        {context}
-        Question: {question}"""
-  else:
-    prompt = question
-    response = model.generate_content(prompt)
-  ```
+## What's Next?
 
-</CodeGroup>
-
-That's it, you're all set. With context in place, the model can now generate accurate, context-aware responses.
-
-
-#### What Alchemyst does automatically
-
-- Stores context securely
-- Retrieves relevant context
-- keeps behavior consistent across sessions
-
-#### You don't need
-
-- Custom vector stores
-- Manual Prompt stuffing
-- Context orchestration logic
-
-## Troubleshooting and Errors
-
-If you encounter unexpected behavior or specific API errors, please refer to our [Troubleshooting Guide](/advanced/troubleshooting) for detailed solutions and error code definitions.
-
-
-## Next Steps: Go Deeper with the SDK & APIs
-
-Get up and running with our dedicated SDKs or integrate directly via our API.
-
-<Columns cols={2}>
+<CardGroup cols={2}>
   <Card
-  title="Python SDK"
-  icon="python"
-  href="/integrations/sdk/python-sdk"
-  horizontal
+    title="Add Memory"
+    icon="clock-rotate-left"
+    href="/getting-started/quickstart-memory"
   >
-  Python
-</Card>
-<Card
-title="TypeScript SDK"
-icon="js"
-href="/integrations/sdk/typescript-sdk"
-horizontal
->
-TypeScript
-</Card>
-<Card
-title="AI Tools Setup"
-icon="robot"
-href="/mcps/introduction"
-horizontal
->
-Use Alchemyst with AI Tools
-</Card>
-<Card
-title="API documentation"
-icon="terminal"
-href="/api-reference/introduction"
-horizontal
->
-Read the API documentation.
-</Card>
-</Columns>
-
-## Cookbooks & Community Examples
-
-Step-by-step cookbooks and real projects from the community to help you build faster with Alchemyst.
-
-<Columns cols={2}>
+    Make your AI remember users across sessions
+  </Card>
   <Card
-  title="Sample Projects"
-  icon="code"
-  href="https://github.com/alchemyst-ai/awesome-saas"
+    title="TypeScript SDK"
+    icon="js"
+    href="/integrations/sdk/typescript-sdk"
   >
-  Add sample code to demonstrate how to use your product.
-</Card>
-<Card
-title="Cookbook"
-icon="utensils"
-href="/example-projects"
->
-Explore full fledged projects built on top of our platform.
-</Card>
-</Columns>
+    Complete TypeScript SDK reference
+  </Card>
+  <Card
+    title="Python SDK"
+    icon="python"
+    href="/integrations/sdk/python-sdk"
+  >
+    Complete Python SDK reference
+  </Card>
+  <Card
+    title="API Reference"
+    icon="terminal"
+    href="/api-reference/introduction"
+  >
+    REST API documentation
+  </Card>
+</CardGroup>
+
+### Learn Advanced Patterns
+
+<CardGroup cols={2}>
+  <Card
+    title="Context Arithmetic"
+    icon="calculator"
+    href="/advanced/context-arithmetic"
+  >
+    Master advanced filtering and organization
+  </Card>
+  <Card
+    title="Usage Patterns"
+    icon="lightbulb"
+    href="/advanced/usage-patterns"
+  >
+    Best practices and anti-patterns
+  </Card>
+  <Card
+    title="Real-World Use Cases"
+    icon="building"
+    href="/advanced/realworld-use-cases"
+  >
+    Customer support, code assistants, and more
+  </Card>
+  <Card
+    title="Sample Projects"
+    icon="code"
+    href="https://github.com/alchemyst-ai/awesome-saas?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=sample_projects_card"
+  >
+    Community-built projects
+  </Card>
+</CardGroup>
+
+---
 
 ## Need Help?
 
-If you get stuck or want to share feedback:
-
-- Browse the **Guides** and **API docs** on this site.
-- Search the documentation for targeted answers.
-- Join our [Discord server](https://dub.sh/context-community) for real-time help.
-
-
+<CardGroup cols={2}>
+  <Card
+    title="Discord Community"
+    icon="discord"
+    href="https://dub.sh/context-community?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=discord_support_card"
+  >
+    Get real-time help from our community
+  </Card>
+  <Card
+    title="Documentation"
+    icon="book"
+    href="/getting-started/quickstart"
+  >
+    Browse guides and tutorials
+  </Card>
+  <Card
+    title="Email Support"
+    icon="envelope"
+    href="mailto:support@getalchemystai.com"
+  >
+    Contact our support team
+  </Card>
+  <Card
+    title="GitHub Issues"
+    icon="github"
+    href="https://github.com/alchemyst-ai/sdk/issues?utm_source=docs&utm_campaign=contextual_ai_quickstart&utm_medium=quickstart_article&utm_content=github_issues_card"
+  >
+    Report bugs or request features
+  </Card>
+</CardGroup>

@@ -1,146 +1,70 @@
 ---
-title: "Introduction"
-description: "Understand AI context, memory, and how Alchemyst helps you build reliable, context-aware LLMs and agents."
-keywords: ['introduction', 'context', 'alchemyst']
+title: "Get Started with Alchemyst"
+description: "Add context or memory to your AI applications"
 ---
 
-## Overview
+## Choose Your Path
 
-Alchemyst is the **context layer for LLMs and AI agents**.
-It helps you store, retrieve, and apply context so AI systems stay accurate, relevant, and consistent over time.
-
-If you've ever struggled with:
-- Stateless LLM responses
-- Prompt stuffing
-- Fragile RAG pipelines
-- Agents that forget users or past actions
-
-Alchemyst is built to solve exactly that.
-
-## What problem does Alchemyst solve?
-
-Large language models don't remember anything by default.
-
-Every request starts from scratch unless you:
-- Manually inject context
-- Rebuild memory systems
-- Orchestrate retrieval logic yourself
-
-This quickly becomes brittle, expensive, and hard to scale.
-
-**Alchemyst makes context a first-class system capability.**
-
-
-## What is Alchemyst?
-
-Alchemyst is a **developer-first platform for AI context management**.
-
-It gives you a reliable way to:
-- Store application, user, and workflow context as raw facts
-- Retrieve the most relevant information based on query
-- Feed that context into LLMs and agents
-
-All without writing custom memory or retrieval infrastructure.
-
-
-## What you can do with Alchemyst
-
-- **Persist memory across sessions**
-  Give agents long-term memory without prompt hacks.
-
-- **Retrieve relevant context on demand**
-  Search and fetch only what matters for a given request.
-
-- **Build reliable AI agents**
-  Create agents that behave consistently and deterministically.
-
-- **Scale from prototype to production**
-  Use the same system for experiments, products, and enterprise workloads.
-
-
-## Why use Alchemyst instead of rolling your own?
-
-- **Cleaner architecture** – No custom vector plumbing or brittle glue code
-- **Better AI outputs** – Models respond using relevant, grounded context
-- **Faster development** – Official SDKs for Python and TypeScript
-- **Production-ready** – Built for real workloads, not demos
-
-## How Alchemyst works
-
-Alchemyst sits between your data and your LLM.
-
-```mermaid
-flowchart LR
-    %% Define styles
-    classDef engine fill:#ff9f43,stroke:#000,stroke-width:3px,color:#000,font-weight:bold;
-    classDef node fill:#2d3436,stroke:#ff9f43,stroke-width:2px,color:#fff;
-    classDef store fill:#2d3436,stroke:#ff9f43,stroke-width:2px,color:#fff;
-    linkStyle default stroke:#ff9f43,stroke-width:2px;
-
-    A[Your App or Data] -->|Store context| B[Alchemyst]:::engine
-    D[User Request] -->|Search context| B
-    B -->|Relevant context| E[Your App or Agent]
-    E -->|Prompt + Context| F[LLM]
-    F --> G[Response]
-```
-
-## The flow is simple
-
-**Ingest context**
-Store data from users, files, APIs, or application events.
-
-**Index and organize**
-Context is structured for fast, relevant retrieval.
-
-**Search when needed**
-Retrieve only the most useful context for a request.
-
-**Use with LLMs or agents**
-Pass retrieved context into prompts or agent logic.
-
-**Persist and evolve**
-Update memory as users and workflows change.
-
-
-## Who is this for?
-
-Alchemyst is built for:
-- Developers building AI agents
-- Teams shipping LLM-powered products
-- Engineers tired of fragile context pipelines
-
-If you're building with LLMs in production, you're in the right place.
-
-## Why Alchemyst?
-
-Most AI systems break as context grows. We don't.
-
-Alchemyst operates at the Pareto frontier — higher reliability without sacrificing capability.
-
-- **Memory isn't text** - We store information as structured facts, modeled as connected nodes at ingestion.
-- **LLMs aren't the core** - They reason over resolved context, but never own state or truth.
-- **Context is deterministic** - No bloated prompts, no token juggling, no surprise amnesia.
-- **Built for production** - Stable, inspectable context that holds up beyond demos.
+<CardGroup cols={2}>
+  <Card 
+    title="Context: Search Your Docs" 
+    icon="brain"
+    href="/getting-started/quickstart"
+  >
+    Store documents and retrieve relevant information on demand.
+    
+    **Example:** AI answers "What's our refund policy?" from your documentation
+    
+    **Time:** 10 minutes
+  </Card>
+  
+  <Card 
+    title="Memory: Remember Users" 
+    icon="clock-rotate-left"
+    href="/getting-started/quickstart-memory"
+  >
+    Track user preferences and conversation history automatically.
+    
+    **Example:** Chatbot remembers "I'm vegan" across sessions
+    
+    **Time:** 15 minutes
+  </Card>
+</CardGroup>
 
 ---
 
-## Next steps
+## Start with Context, Add Memory Later
 
-Start with the fastest path to value:
+90% of users start with Context because it shows immediate value:
+1. Store a document
+2. Ask a question  
+3. Get accurate answers
 
-- [**Quick Start**](/getting-started/quickstart) – Store and reuse context in minutes
-- [**Cookbooks & Examples**](example-projects/team/cli-chatbot) – Real projects built by the community
-- [**Core Principles**](/advanced/overview) – Learn how to best use Alchemyst AI
+Add Memory when you need your AI to remember users across sessions.
 
-When you're ready, head to the **Quick Start** and build your first context-aware application.
+---
 
+## Ready to Build?
 
-{/*
-https://chatgpt.com/share/694ef6b1-d9d4-8007-8dc2-e43ee026f30e
+<CardGroup cols={2}>
+  <Card 
+    title="Context Quickstart →" 
+    icon="book"
+    href="/getting-started/quickstart"
+  >
+    Store docs • Search context • Build RAG apps
+  </Card>
+  <Card 
+    title="Memory Quickstart →" 
+    icon="brain"
+    href="/getting-started/quickstart-memory"
+  >
+    Track users • Remember conversations • Personalize responses
+  </Card>
+</CardGroup>
 
-https://claude.ai/share/d38d4088-6cff-407b-848c-6ce96cc89c8a
+---
 
-https://gemini.google.com/share/c3c89a2e40bf */}
+## Need Help Deciding?
 
-
-
+Join our [Discord](https://dub.sh/context-community) - we'll help you choose the right approach.
