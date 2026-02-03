@@ -1,152 +1,316 @@
 ---
-title: "Quickstart - Memory-aware AI Agent"
-description: "Build an AI system that remembers the preferences, details and conversations."
-keywords: ['configuration', 'setup', 'getting started', 'memory']
+title: "Memory enabled Agent"
+description: "Build a RAG Agent enabled memory that remembers users across sessions in 15 minutes"
+keywords: ['memory', 'ai sdk', 'quickstart', 'getting started']
 ---
 
-## Add Memory to Your LLM with Alchemyst AI
+## What You're Building
 
-This guide shows you how to **add memory to your LLM applications using Alchemyst AI with Vercel's AI SDK** - step by step.
+An AI that remembers user preferences and past conversations automatically.
 
-## What you'll build
+**Without Memory:**
+```typescript
+// Day 1
+await llm.generate("I'm vegan and allergic to peanuts");
+// Day 2
+await llm.generate("Give me a recipe");
+// AI: "What dietary restrictions do you have?" ❌
+```
 
-By the end of this guide, you will:
-- Wrap Vercel AI SDK functions with Alchemyst memory
-- Store conversation context automatically
-- Retrieve relevant memory across sessions
-- Build context-aware AI applications
+**With Memory:**
+```typescript
+// Day 1
+await generateWithMemory({ prompt: "I'm vegan", userId: "alice" });
+// Day 2
+await generateWithMemory({ prompt: "Give me a recipe", userId: "alice" });
+// AI: "Here's a vegan recipe: ..."  ✅ Remembered automatically
+```
+
+---
 
 ## Prerequisites
 
-You'll need:
-- An Alchemyst AI account - [**sign up**](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=quickstart_memory&utm_medium=quickstart_memory_article&utm_content=quickstart_memory_prerequisites_cta)
+- Alchemyst account ([sign up](https://platform.getalchemystai.com/auth?utm_source=docs&utm_campaign=memory_agent_quickstart&utm_medium=quickstart_article&utm_content=prerequisites_signup_cta))
 - Your `ALCHEMYST_AI_API_KEY`
-- Node.js 18+
+- Node.js 18+ or Python 3.9+
 
-<Info>
-Note that this tutorial is typescript-only. This is because AI SDK is only officially available for JS/TS.
-</Info>
+**Time to complete:** 15 minutes
 
 ---
 
-## Step 1: Install the SDKs
-
-```bash
-npm install ai @alchemystai/aisdk @alchemystai/sdk
-```
-
-## Step 2: Initialize Alchemyst with AI SDK
+## Choose Your Approach
 
 <Tabs>
-  <Tab title="AI SDK v5">
-```javascript
-import { streamText } from 'ai';
-import { withAlchemyst } from '@alchemystai/aisdk';
+  <Tab title="TypeScript (Recommended)">
+**Best for:** Next.js, React, Node.js apps
 
-const streamTextWithMemory = withAlchemyst(streamText, {
-  apiKey: process.env.ALCHEMYST_AI_API_KEY,
-});
+Uses Vercel AI SDK wrapper for automatic memory management.
+
+```bash
+npm install ai @alchemystai/aisdk
 ```
   </Tab>
-  <Tab title="AI SDK v6">
-```javascript
+  
+  <Tab title="Python">
+**Best for:** FastAPI, Django, Flask apps
+
+Uses direct SDK with manual memory management (more control).
+
+```bash
+pip install alchemystai openai
+```
+  </Tab>
+</Tabs>
+
+---
+
+## Quick Start: TypeScript
+
+### Step 1: Set Up Memory
+
+```typescript
 import { generateText } from 'ai';
 import { withAlchemyst } from '@alchemystai/aisdk';
 
-// Wrap the AI SDK function with Alchemyst memory
+// Wrap AI SDK with automatic memory
 const generateTextWithMemory = withAlchemyst(generateText, {
   apiKey: process.env.ALCHEMYST_AI_API_KEY,
-  // Optional configuration
-  withMemory: true
 });
 ```
-  </Tab>
-</Tabs>
 
-## Step 3: Generate text with automatic memory storage
+**What this does:**
+1. Retrieves past conversations for this user
+2. Includes them in the prompt automatically
+3. Stores the new conversation
 
-The memory integration automatically stores conversation history in Alchemyst's context layer.
+### Step 2: Use Memory
+
+```typescript
+// First conversation: User shares preference
+const response1 = await generateTextWithMemory({
+  model: "openai:gpt-4",
+  prompt: "I'm vegan and allergic to peanuts",
+  userId: "alice",
+  sessionId: "profile_setup"
+});
+
+console.log(response1.text);
+// Output: "Got it! I'll remember you're vegan and have a peanut allergy."
+
+// Later: Different session, AI remembers
+const response2 = await generateTextWithMemory({
+  model: "openai:gpt-4",
+  prompt: "Give me a dinner recipe",
+  userId: "alice",
+  sessionId: "cooking_monday"
+});
+
+console.log(response2.text);
+// Output: "Here's a vegan stir-fry without peanuts: ..."
+// ✅ Remembered from different conversation!
+```
+
+**Memory works across:**
+- Different sessions (profile_setup → cooking_monday)
+- Different topics (preferences → recipes)
+- Days or weeks apart
+
+### Complete TypeScript Example
+
+```typescript
+import { generateText } from 'ai';
+import { withAlchemyst } from '@alchemystai/aisdk';
+
+const generateTextWithMemory = withAlchemyst(generateText, {
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+});
+
+async function main() {
+  // Day 1: Learn preference
+  const response1 = await generateTextWithMemory({
+    model: "openai:gpt-4",
+    prompt: "I love science fiction movies",
+    userId: "bob",
+    sessionId: "preferences"
+  });
+  console.log("AI:", response1.text);
+  // Output: "Great! I'll remember you enjoy sci-fi films."
+
+  // Day 2: Use preference
+  const response2 = await generateTextWithMemory({
+    model: "openai:gpt-4",
+    prompt: "Recommend a movie",
+    userId: "bob",
+    sessionId: "movie_night"
+  });
+  console.log("AI:", response2.text);
+  // Output: "How about Interstellar? You mentioned you love sci-fi."
+}
+
+main();
+```
+
+**Verify it worked:**
+1. Visit [platform.getalchemystai.com/context](https://platform.getalchemystai.com/context?utm_source=docs&utm_campaign=memory_agent_quickstart&utm_medium=quickstart_article&utm_content=verify_setup_context_link)
+2. You should see stored conversations for user "bob"
+3. Click to view memory contents
+
+---
+
+## Quick Start: Python
+
+### Step 1: Simple Example (Recommended)
+
+Start with this simplified version to understand the basics:
+
+```python
+import os
+from alchemyst_ai import AlchemystAI
+
+alchemyst = AlchemystAI(api_key=os.environ.get("ALCHEMYST_AI_API_KEY"))
+
+# Store a memory
+alchemyst.v1.context.memory.add({
+    "user_id": "alice",
+    "session_id": "preferences",
+    "content": "User said: I'm vegan and allergic to peanuts"
+})
+
+print("✅ Memory stored!")
+
+# Later: Retrieve memories
+result = alchemyst.v1.context.memory.search(
+    user_id="alice",
+    session_id="preferences"
+)
+
+if result and hasattr(result, 'memories'):
+    for memory in result.memories:
+        print(f"Found: {memory.content}")
+        # Output: Found: User said: I'm vegan and allergic to peanuts
+```
+
+**Expected Output:**
+```
+✅ Memory stored!
+Found: User said: I'm vegan and allergic to peanuts
+```
+
+### Step 2: Full Integration with OpenAI
+
+Now integrate with OpenAI for complete chat functionality:
+
+```python
+import os
+from alchemyst_ai import AlchemystAI
+import openai
+
+alchemyst = AlchemystAI(api_key=os.environ.get("ALCHEMYST_AI_API_KEY"))
+openai_client = openai.OpenAI()
+
+def chat_with_memory(prompt: str, user_id: str, session_id: str):
+    """Chat function that remembers past conversations"""
+    
+    # 1. Get past conversations
+    memory = alchemyst.v1.context.memory.search(
+        user_id=user_id,
+        session_id=session_id,
+        limit=10
+    )
+    
+    # 2. Build message history
+    messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    
+    # Add past memories to context
+    if memory and hasattr(memory, 'memories'):
+        for mem in memory.memories:
+            if hasattr(mem, 'content'):
+                messages.append({"role": "assistant", "content": mem.content})
+    
+    # Add current prompt
+    messages.append({"role": "user", "content": prompt})
+    
+    # 3. Generate response with full context
+    response = openai_client.chat.completions.create(
+        model="gpt-4",
+        messages=messages
+    )
+    
+    assistant_message = response.choices[0].message.content
+    
+    # 4. Store this conversation for next time
+    alchemyst.v1.context.memory.add({
+        "user_id": user_id,
+        "session_id": session_id,
+        "content": f"User: {prompt}\nAssistant: {assistant_message}"
+    })
+    
+    return assistant_message
+
+# Test it
+response = chat_with_memory(
+    prompt="I'm vegan",
+    user_id="alice",
+    session_id="profile"
+)
+print(response)
+# Output: "Got it! I'll remember you're vegan."
+
+response2 = chat_with_memory(
+    prompt="Give me a recipe",
+    user_id="alice", 
+    session_id="cooking"
+)
+print(response2)
+# Output: "Here's a vegan pasta recipe: ..."
+```
+
+**Expected Output:**
+```
+Got it! I'll remember you're vegan.
+Here's a vegan pasta recipe: ...
+```
+
+---
+
+## Understanding userId and sessionId
+
+These two parameters control memory scope:
+
+```typescript
+await generateTextWithMemory({
+  prompt: "...",
+  userId: "alice",      // WHO is talking
+  sessionId: "cooking"  // WHAT conversation thread
+});
+```
+
+### Real-World Examples
+
+| Use Case | userId | sessionId | Why |
+|----------|--------|-----------|-----|
+| Customer support | `customer_123` | `ticket_456` | Track support history per customer |
+| Personal assistant | `user_alice` | `daily_planning_2024_02_01` | Separate daily planning sessions |
+| Team collaboration | `user_bob` | `project_alpha_sprint_3` | Isolate project discussions by sprint |
+| Multi-user chat | `user_charlie` | `team_standup_2024_w05` | Group conversations by topic and time |
+
+<Note>
+**Pro Tip:** Use descriptive sessionIds like `"recipe_planning_2024_02"` instead of `"session_1"` for easier debugging and analytics.
+</Note>
+
+**Rule:** Same `userId` + same `sessionId` = same conversation thread
+
+---
+
+## Advanced Features
+
+### Stream Responses with Memory
+
+For real-time chat experiences:
 
 <Tabs>
-  <Tab title="AI SDK v5">
-```javascript
-// Basic usage - memory is stored automatically
-const { textStream } = await streamTextWithMemory({
-  model: "anthropic/claude-sonnet-4.5",
-  prompt: 'Explain quantum mechanics',
-  userId: "user_123",
-  sessionId: "convo_789",
-});
-
-// Process the stream
-for await (const chunk of textStream) {
-  process.stdout.write(chunk);
-}
-```
-  </Tab>
-  <Tab title="AI SDK v6">
-```javascript
-// Basic usage - memory is stored automatically
-const { text } = await generateTextWithMemory({
-  model: "google/gemini-3-flash",
-  prompt: 'What is gravity?',
-  userId: "user_123",              // Required: identifies the user
-  sessionId: "convo_456",     // Required: groups related messages
-});
-
-console.log(text);
-```
-  </Tab>
-</Tabs>
-
-### What just happened?
-
-- The conversation was automatically stored in Alchemyst's [**memory layer**](https://platform.getalchemystai.com/context)
-- Future queries from the same `userId` and `sessionId` will have access to this context
-- Memory retrieval happens automatically on subsequent calls
-
-## Step 4: Continue conversations with context
-
-Subsequent messages in the same conversation automatically retrieve relevant context.
-
-<Tabs>
-  <Tab title="AI SDK v5">
-```javascript
-// Follow-up question - automatically retrieves context
-const { textStream: followUpStream } = await streamTextWithMemory({
-  model: "anthropic/claude-sonnet-4.5",
-  prompt: 'How does it relate to Einstein?',
-  userId: "user_123",
-  sessionId: "convo_789",
-});
-
-// Process the stream
-for await (const chunk of followUpStream) {
-  process.stdout.write(chunk);
-}
-```
-  </Tab>
-  <Tab title="AI SDK v6">
-```javascript
-// Follow-up question - automatically retrieves context
-const { text: followUp } = await generateTextWithMemory({
-  model: "google/gemini-3-flash",
-  prompt: 'How does it relate to Einstein?',
-  userId: "user_123",
-  sessionId: "convo_456",  // Same conversation
-});
-
-// The AI now has context about gravity from the previous exchange
-console.log(followUp);
-```
-  </Tab>
-</Tabs>
-
-## Step 5: Stream responses with memory
-
-For streaming responses, use `streamText` instead of `generateText`.
-
-```javascript
+  <Tab title="TypeScript">
+```typescript
 import { streamText } from 'ai';
 import { withAlchemyst } from '@alchemystai/aisdk';
 
@@ -154,237 +318,619 @@ const streamTextWithMemory = withAlchemyst(streamText, {
   apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-const { textStream } = await streamTextWithMemory({
-  model: "google/gemini-3-flash",
-  prompt: 'Explain quantum mechanics',
-  userId: "user_123",
-  sessionId: "convo_789",
-});
+async function streamChat() {
+  const { textStream } = await streamTextWithMemory({
+    model: "openai:gpt-4",
+    prompt: "Tell me about quantum mechanics",
+    userId: "user_123",
+    sessionId: "physics_101"
+  });
 
-// Process the stream
-for await (const chunk of textStream) {
-  process.stdout.write(chunk);
+  // Process stream chunk by chunk
+  for await (const chunk of textStream) {
+    process.stdout.write(chunk);
+  }
 }
+
+streamChat();
 ```
 
-## Step 6: Update or delete memories
+**Expected Output:**
+```
+Quantum mechanics is the branch of physics... [streams in real-time]
+```
+  </Tab>
+  
+  <Tab title="Python">
+```python
+def chat_with_memory_streaming(prompt: str, user_id: str, session_id: str):
+    """Stream responses while remembering context"""
+    
+    # Get past conversations
+    memory = alchemyst.v1.context.memory.search(
+        user_id=user_id,
+        session_id=session_id,
+        limit=10
+    )
+    
+    messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    
+    if memory and hasattr(memory, 'memories'):
+        for mem in memory.memories:
+            if hasattr(mem, 'content'):
+                messages.append({"role": "assistant", "content": mem.content})
+    
+    messages.append({"role": "user", "content": prompt})
+    
+    # Stream response
+    stream = openai_client.chat.completions.create(
+        model="gpt-4",
+        messages=messages,
+        stream=True
+    )
+    
+    full_response = ""
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            content = chunk.choices[0].delta.content
+            print(content, end="", flush=True)
+            full_response += content
+    
+    # Store complete conversation
+    alchemyst.v1.context.memory.add({
+        "user_id": user_id,
+        "session_id": session_id,
+        "content": f"User: {prompt}\nAssistant: {full_response}"
+    })
+    
+    return full_response
 
-Manage conversation memory as needed.
+# Usage
+response = chat_with_memory_streaming(
+    prompt="Tell me about quantum mechanics",
+    user_id="user_123",
+    session_id="physics_101"
+)
+```
 
-```javascript
+**Expected Output:**
+```
+Quantum mechanics is the branch of physics... [streams in real-time]
+```
+  </Tab>
+</Tabs>
+
+---
+
+### Manage Memory
+
+Update or delete conversations as needed:
+
+<Tabs>
+  <Tab title="TypeScript">
+```typescript
 import AlchemystAI from '@alchemystai/sdk';
 
 const client = new AlchemystAI({
   apiKey: process.env.ALCHEMYST_AI_API_KEY,
 });
 
-// Update a specific memory
+// Update specific memory
 await client.v1.context.memory.update({
-  userId: "user_123",
-  sessionId: "convo_456",
+  userId: "alice",
+  sessionId: "profile_setup",
   messageId: "msg_001",
-  content: "Updated content",
+  content: "Updated: I'm vegan and gluten-free"
 });
 
-// Delete entire conversation
+// Delete a specific conversation
 await client.v1.context.memory.delete({
-  userId: "user_123",
-  sessionId: "convo_456",
-});
-```
-
-That's it, you're all set. With memory in place, your AI can now maintain context across conversations and sessions.
-
-<Note>
-**Want to learn about user profiling for AI consumer applications?**
-
-Alchemyst's memory layer enables sophisticated user profiling that enhances personalization - tracking preferences, adapting communication styles, and building rich user profiles across sessions.
-
-To learn more about implementing user profiling with memory, check out our [**User Profiling Guide**](/advanced-usage/user-profiling?utm_source=quickstart_memory_article&utm_medium=blog&utm_campaign=quickstart_memory_article_note&utm_content=user_profiling_guide_note).
-</Note>
-
-## Advanced: Multi-user conversations
-
-Handle group conversations where multiple users participate.
-
-<Tabs>
-  <Tab title="AI SDK v5">
-```javascript
-// User 1 asks a question
-await generateTextWithMemory({
-  model: "anthropic/claude-sonnet-4.5",
-  prompt: 'What are the best practices for React?',
-  userId: "user_alice",
-  sessionId: "team_discussion_001",
+  userId: "alice",
+  sessionId: "profile_setup"
 });
 
-// User 2 follows up
-await generateTextWithMemory({
-  model: "anthropic/claude-sonnet-4.5",
-  prompt: 'Can you elaborate on hooks?',
-  userId: "user_bob",
-  sessionId: "team_discussion_001",  // Same conversation
+// Delete ALL memories for a user (use with caution!)
+await client.v1.context.memory.delete({
+  userId: "alice"
 });
 
-// Both users' messages are stored in the same conversation context
+console.log("✅ Memory updated/deleted");
 ```
   </Tab>
-  <Tab title="AI SDK v6">
-```javascript
-// User 1 asks a question
-await generateTextWithMemory({
-  model: "google/gemini-3-flash",
-  prompt: 'What are the best practices for React?',
-  userId: "user_alice",
-  sessionId: "team_discussion_001",
-});
+  
+  <Tab title="Python">
+```python
+# Update specific memory
+alchemyst.v1.context.memory.update(
+    user_id="alice",
+    session_id="profile_setup",
+    message_id="msg_001",
+    content="Updated: I'm vegan and gluten-free"
+)
 
-// User 2 follows up
-await generateTextWithMemory({
-  model: "google/gemini-3-flash",
-  prompt: 'Can you elaborate on hooks?',
-  userId: "user_bob",
-  sessionId: "team_discussion_001",  // Same conversation
-});
+# Delete a specific conversation
+alchemyst.v1.context.memory.delete(
+    user_id="alice",
+    session_id="profile_setup"
+)
 
-// Both users' messages are stored in the same conversation context
+# Delete ALL memories for a user (use with caution!)
+alchemyst.v1.context.memory.delete(
+    user_id="alice"
+)
+
+print("✅ Memory updated/deleted")
 ```
   </Tab>
 </Tabs>
 
-#### What Alchemyst does automatically
+---
 
-- Stores conversation history by user and conversation
-- Retrieves relevant context across sessions
-- Maintains conversation flow and coherence
-- Handles memory cleanup and optimization
+### Multi-User Conversations
 
-#### You don't need
+Handle group chats where multiple users participate in the same thread:
 
-- Custom memory stores
-- Manual context window management
-- Session state handling
-- Memory deduplication logic
+<Tabs>
+  <Tab title="TypeScript">
+```typescript
+// User 1 starts discussion
+await generateTextWithMemory({
+  model: "openai:gpt-4",
+  prompt: "What are React hooks best practices?",
+  userId: "alice",
+  sessionId: "team_discussion_001"
+});
+
+// User 2 joins same discussion
+await generateTextWithMemory({
+  model: "openai:gpt-4",
+  prompt: "Can you elaborate on useEffect?",
+  userId: "bob",
+  sessionId: "team_discussion_001"  // ← Same session = shared context
+});
+
+// User 1 continues - AI has full thread context
+await generateTextWithMemory({
+  model: "openai:gpt-4",
+  prompt: "What about custom hooks?",
+  userId: "alice",
+  sessionId: "team_discussion_001"
+});
+
+// AI has full thread context regardless of who asks
+```
+  </Tab>
+  
+  <Tab title="Python">
+```python
+# User 1 starts discussion
+chat_with_memory(
+    prompt="What are React hooks best practices?",
+    user_id="alice",
+    session_id="team_discussion_001"
+)
+
+# User 2 joins same discussion
+chat_with_memory(
+    prompt="Can you elaborate on useEffect?",
+    user_id="bob",
+    session_id="team_discussion_001"  # ← Same session = shared context
+)
+
+# User 1 continues - AI has full thread context
+chat_with_memory(
+    prompt="What about custom hooks?",
+    user_id="alice",
+    session_id="team_discussion_001"
+)
+
+# AI has full thread context regardless of who asks
+```
+  </Tab>
+</Tabs>
+
+**Key insight:** Using the same `sessionId` across different `userId` values creates a shared memory space for team conversations.
+
+---
 
 ## Configuration Options
 
-Customize how Alchemyst handles memory:
+Customize memory retrieval and storage behavior:
 
-```javascript
+<Tabs>
+  <Tab title="TypeScript">
+```typescript
 const generateTextWithMemory = withAlchemyst(generateText, {
   apiKey: process.env.ALCHEMYST_AI_API_KEY,
 
   // Memory retrieval settings
-  similarityThreshold: 0.8,           // Higher = more relevant results
-  minimumSimilarityThreshold: 0.5,    // Minimum relevance cutoff
+  similarityThreshold: 0.8,           // How relevant (0-1)
+  minimumSimilarityThreshold: 0.5,    // Absolute minimum cutoff
   scope: 'internal',                  // 'internal' | 'external'
 
   // Storage settings
-  contextType: 'conversation',         // 'resource' | 'conversation' | 'instructions'
-  source: 'chat-application',          // Source identifier
+  contextType: 'conversation',
+  source: 'chat-app',
 
-  // Advanced options
+  // Organization (optional)
   metadata: {
-    groupName: ['production'],         // ["default"] by default
-    version: '1.0',
+    groupName: ['production', 'app-v2'],
+    environment: 'production',
+    version: '2.0'
   },
 });
 ```
+  </Tab>
+  
+  <Tab title="Python">
+```python
+def chat_with_memory(
+    prompt: str, 
+    user_id: str, 
+    session_id: str,
+    similarity_threshold: float = 0.8,
+    min_similarity_threshold: float = 0.5,
+    scope: str = 'internal'
+):
+    memory = alchemyst.v1.context.memory.search(
+        user_id=user_id,
+        session_id=session_id,
+        similarity_threshold=similarity_threshold,
+        minimum_similarity_threshold=min_similarity_threshold,
+        scope=scope,
+        limit=10
+    )
+    # ... rest of implementation
+```
+  </Tab>
+</Tabs>
 
-## Troubleshooting and Errors
+### Configuration Reference
 
-**Error: Missing userId or sessionId**
-- Both `userId` and `sessionId` are required for memory operations
-- Solution: Always provide both parameters when calling wrapped functions
+| Parameter | Value | When to Use |
+|-----------|-------|-------------|
+| **similarityThreshold** | `0.5` | Broad, exploratory searches |
+| | `0.7` | **Recommended default** - balanced |
+| | `0.9` | Precise matches only |
+| **minimumSimilarityThreshold** | `0.5` | Never return results below this |
+| **scope** | `'internal'` | Your app's private data |
+| | `'external'` | Public/shared knowledge |
 
-**Error: Memory not retrieving**
-- Check that `similarityThreshold` isn't set too high
-- Verify the same `userId` and `sessionId` are used
-- Use `client.v1.context.memory.search()` to test retrieval directly
+<Note>
+**Recommendation:** Start with `similarityThreshold: 0.7`. Lower to 0.5 if you get no results, raise to 0.9 if results are too broad.
+</Note>
 
-**Error: Too much context retrieved**
-- Lower the `similarityThreshold` for more precise results
-- Implement pagination for long conversations
-- Consider splitting into multiple conversation IDs
+---
 
-## Next Steps: Go Deeper with Memory
+## Troubleshooting
 
-Get up and running with dedicated SDKs and advanced memory features.
+<AccordionGroup>
+  <Accordion title="Missing userId or sessionId error">
+    **Error Message:**
+    ```json
+    {
+      "error": "userId and sessionId are required",
+      "code": "MISSING_PARAMETERS"
+    }
+    ```
+    
+    **Cause:** Both parameters are required for memory operations.
+    
+    **Fix:** Always provide both:
+```typescript
+await generateTextWithMemory({
+  model: "openai:gpt-4",
+  prompt: "Hello",
+  userId: "user_123",    // ✅ Required
+  sessionId: "chat_456"  // ✅ Required
+});
+```
+  </Accordion>
+  
+  <Accordion title="Memory not retrieving">
+    **Symptoms:** AI doesn't remember past conversations.
+    
+    **Causes:**
+    1. Threshold too high
+    2. Wrong userId/sessionId
+    3. Memory wasn't stored correctly
+    
+    **Fixes:**
+    
+    **1. Lower threshold:**
+```typescript
+similarityThreshold: 0.6  // Instead of 0.9
+```
+    
+    **2. Verify exact same IDs:**
+```typescript
+// IDs must match EXACTLY (case-sensitive)
+userId: "user_123"      // ❌ Not "user_124" or "User_123"
+sessionId: "chat_456"   // ❌ Not "chat_457" or "Chat_456"
+```
+    
+    **3. Test retrieval directly:**
+```typescript
+const memories = await client.v1.context.memory.search({
+  userId: "user_123",
+  sessionId: "chat_456"
+});
+console.log("Found memories:", memories.memories?.length);
+console.log("Memory content:", memories.memories);
+```
 
-<Columns cols={2}>
+    **Expected Output:**
+```
+Found memories: 2
+Memory content: [
+  { content: "User: I'm vegan\nAssistant: Got it!" },
+  { content: "User: Give me a recipe\nAssistant: Here's a vegan..." }
+]
+```
+  </Accordion>
+  
+  <Accordion title="Too much irrelevant context">
+    **Symptoms:** AI references unrelated past conversations or gets confused.
+    
+    **Causes:**
+    1. Threshold too low
+    2. Mixing unrelated conversations in same session
+    
+    **Fixes:**
+    
+    **1. Raise threshold:**
+```typescript
+similarityThreshold: 0.85  // More strict
+```
+    
+    **2. Use separate sessions by topic:**
+```typescript
+// ✅ Good - separate by topic
+sessionId: "physics_homework"
+sessionId: "cooking_recipes"
+sessionId: "movie_recommendations"
+
+// ❌ Bad - everything mixed
+sessionId: "general_chat"
+```
+    
+    **3. Limit memory retrieval:**
+```typescript
+// Only retrieve last 5 memories instead of 10
+limit: 5
+```
+  </Accordion>
+
+  <Accordion title="Memory storage failures">
+    **Error Message:**
+    ```json
+    {
+      "error": "Failed to store memory",
+      "code": "STORAGE_ERROR"
+    }
+    ```
+    
+    **Common Causes:**
+    1. Invalid API key
+    2. Rate limit exceeded
+    3. Content too large
+    
+    **Fixes:**
+    
+    **1. Verify API key:**
+```typescript
+console.log("API Key set:", !!process.env.ALCHEMYST_AI_API_KEY);
+// Should output: API Key set: true
+```
+    
+    **2. Check rate limits:**
+    - Free tier: 100 operations/day
+    - Pro tier: Unlimited
+    
+    **3. Reduce content size:**
+```typescript
+// Keep memory entries under 10KB each
+const content = longText.slice(0, 10000);  // Truncate if needed
+```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Best Practices
+
+### 1. Session Naming Convention
+
+```typescript
+// ✅ Good - descriptive and structured
+sessionId: "support_ticket_2024_02_001"
+sessionId: "recipe_planning_vegan_week_5"
+sessionId: "project_alpha_sprint_3_planning"
+
+// ❌ Bad - hard to debug
+sessionId: "session1"
+sessionId: "chat"
+sessionId: "abc123"
+```
+
+### 2. Memory Retention Limits
+
+```typescript
+// ✅ Good - limit memory lookback
+limit: 10  // Last 10 conversations
+
+// ❌ Bad - retrieving everything
+limit: 1000  // Too much context, slows down LLM
+```
+
+### 3. Privacy-Aware Memory
+
+```typescript
+// Store memories with appropriate scope
+const generateTextWithMemory = withAlchemyst(generateText, {
+  apiKey: process.env.ALCHEMYST_AI_API_KEY,
+  scope: 'internal',  // ✅ Private user data
+  metadata: {
+    dataClassification: 'PII',  // Track sensitive data
+    retentionPolicy: '90days'
+  }
+});
+```
+
+### 4. Error Handling
+
+```typescript
+// ✅ Good - handle failures gracefully
+try {
+  const response = await generateTextWithMemory({
+    model: "openai:gpt-4",
+    prompt: userInput,
+    userId: user.id,
+    sessionId: conversation.id
+  });
+  return response.text;
+} catch (error) {
+  console.error("Memory error:", error);
+  // Fallback: Generate without memory
+  return await generateText({
+    model: "openai:gpt-4",
+    prompt: userInput
+  });
+}
+```
+
+---
+
+## Verify Your Setup
+
+After implementing memory, verify it's working:
+
+### 1. Check Platform UI
+
+1. Visit [platform.getalchemystai.com/context](https://platform.getalchemystai.com/context?utm_source=docs&utm_campaign=memory_agent_quickstart&utm_medium=quickstart_article&utm_content=verify_setup_ui_check)
+2. Filter by your userId
+3. You should see stored memories with timestamps
+4. Click to view conversation content
+
+### 2. Test with Code
+
+```typescript
+// Store a test memory
+await client.v1.context.memory.add({
+  userId: "test_user",
+  sessionId: "test_session",
+  content: "Test memory: The user likes pizza"
+});
+
+// Retrieve it immediately
+const result = await client.v1.context.memory.search({
+  userId: "test_user",
+  sessionId: "test_session"
+});
+
+console.log("Test passed:", result.memories?.length === 1);
+// Expected Output: Test passed: true
+```
+
+---
+
+## What's Next?
+
+<CardGroup cols={2}>
   <Card
-    title="AI SDK Integration"
+    title="Add Context Search"
+    icon="brain"
+    href="/getting-started/quickstart"
+  >
+    Combine memory with document search for powerful RAG
+  </Card>
+  <Card
+    title="Vercel AI SDK Guide"
     icon="wand-magic-sparkles"
     href="/integrations/third-party/aisdk"
-    horizontal
   >
-    Full AI SDK guide
+    Deep dive into AI SDK integration
   </Card>
   <Card
-    title="TypeScript SDK"
+    title="TypeScript SDK Reference"
     icon="js"
     href="/integrations/sdk/typescript-sdk"
-    horizontal
   >
-    TypeScript SDK docs
+    Complete API reference for TypeScript
   </Card>
   <Card
-    title="API Documentation"
+    title="Python SDK Reference"
+    icon="python"
+    href="/integrations/sdk/python-sdk"
+  >
+    Complete API reference for Python
+  </Card>
+</CardGroup>
+
+### Learn Advanced Patterns
+
+<CardGroup cols={2}>
+  <Card
+    title="User Profiling"
+    icon="user"
+    href="/advanced/user-profiling"
+  >
+    Build rich user profiles from memory
+  </Card>
+  <Card
+    title="Memory Use Cases"
+    icon="lightbulb"
+    href="/example-projects"
+  >
+    Customer support, personal assistants, chatbots
+  </Card>
+  <Card
+    title="Memory API Reference"
     icon="terminal"
     href="/api-reference/introduction"
-    horizontal
   >
-    Memory API reference
+    Complete REST API documentation
   </Card>
   <Card
-    title="Example Projects"
+    title="Sample Projects"
     icon="code"
-    href="/example-projects"
-    horizontal
+    href="https://github.com/alchemyst-ai/awesome-saas?utm_source=docs&utm_campaign=memory_agent_quickstart&utm_medium=quickstart_article&utm_content=sample_projects_card"
   >
-    View sample projects
+    Community-built memory applications
   </Card>
-</Columns>
+</CardGroup>
 
-## Memory Use Cases
-
-Real-world applications powered by Alchemyst memory:
-
-<Columns cols={2}>
-  <Card
-    title="Customer Support"
-    icon="headset"
-    href="/example-projects"
-  >
-    Persistent conversation history across sessions
-  </Card>
-  <Card
-    title="Personal Assistants"
-    icon="robot"
-    href="/example-projects"
-  >
-    Remember user preferences and past interactions
-  </Card>
-  <Card
-    title="Collaborative Tools"
-    icon="users"
-    href="/example-projects"
-  >
-    Multi-user conversations with shared context
-  </Card>
-  <Card
-    title="Educational Apps"
-    icon="graduation-cap"
-    href="/example-projects"
-  >
-    Track learning progress and adapt to student needs
-  </Card>
-</Columns>
+---
 
 ## Need Help?
 
-If you get stuck or want to share feedback:
-
-- Browse the **Guides** and **API docs** on this site.
-- Search the documentation for targeted answers.
-- Join our [Discord server](https://dub.sh/context-community) for real-time help.
+<CardGroup cols={2}>
+  <Card
+    title="Discord Community"
+    icon="discord"
+    href="https://dub.sh/context-community?utm_source=docs&utm_campaign=memory_agent_quickstart&utm_medium=quickstart_article&utm_content=discord_support_card"
+  >
+    Get real-time help from our community
+  </Card>
+  <Card
+    title="Documentation"
+    icon="book"
+    href="/getting-started/quickstart"
+  >
+    Browse guides and API references
+  </Card>
+  <Card
+    title="Email Support"
+    icon="envelope"
+    href="mailto:support@getalchemystai.com"
+  >
+    Contact our support team
+  </Card>
+  <Card
+    title="GitHub Issues"
+    icon="github"
+    href="https://github.com/alchemyst-ai/sdk/issues?utm_source=docs&utm_campaign=memory_agent_quickstart&utm_medium=quickstart_article&utm_content=github_issues_card"
+  >
+    Report bugs or request features
+  </Card>
+</CardGroup>

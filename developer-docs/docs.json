@@ -4,6 +4,7 @@
   "api": {
     "openapi": "https://platform-backend.getalchemystai.com/api/openapi.json"
   },
+  
   "fonts": {
     "heading": {
       "family": "Sora",
@@ -16,7 +17,7 @@
       "format": "woff2"
     }
   },
-  "name": "Alchemyst AI Docs",
+  "name": "Alchemyst AI Documentation",
   "colors": {
     "primary": "#f59025",
     "light": "#f39025",
@@ -39,6 +40,21 @@
     "dismissible": false
   },
   "favicon": "/logo/logo.png",
+  "modeToggle": {
+    "default": "dark",
+    "isHidden": false
+  },
+  "search": {
+    "prompt": "Search Alchemyst AI documentation..."
+  },
+  "feedback": {
+    "suggestEdit": true,
+    "raiseIssue": true,
+    "thumbsRating": true
+  },
+  "tabs": {
+    "enabled": true
+  },
   "navigation": {
     "tabs": [
       {
@@ -61,8 +77,13 @@
             "group": "Getting started",
             "pages": [
               "getting-started/index",
-              "getting-started/quickstart",
-              "getting-started/quickstart-memory"
+              {
+                "group": "Quickstart",
+                "pages": [
+                  "getting-started/quickstart",
+                  "getting-started/quickstart-memory"
+                ]
+              }
             ]
           },
           {
@@ -181,35 +202,35 @@
               "integrations/sdk/typescript-sdk"
             ]
           },
-            {
-              "group": "Third-party integrations",
-              "pages": [
-                "integrations/third-party/introduction",
-                {
-                  "group": "Vercel AI SDK",
-                  "pages": [
-                    "integrations/third-party/aisdk/middleware",
-                    "integrations/third-party/aisdk/tools"
-                  ]
-                },
-                "integrations/third-party/agnoagi",
-                {
-                  "group": "LangChain",
-                  "pages": [
-                    "integrations/third-party/langchain/python",
-                    "integrations/third-party/langchain/js"
-                  ]
-                },
-                {
-                  "group": "LLamaIndex (coming soon)",
-                  "pages": [
-                    "integrations/third-party/llamaindex/python",
-                    "integrations/third-party/llamaindex/js"
-                  ]
-                }
-              ],
-              "expanded": false
-            },
+          {
+            "group": "Third-party integrations",
+            "pages": [
+              "integrations/third-party/introduction",
+              {
+                "group": "Vercel AI SDK",
+                "pages": [
+                  "integrations/third-party/aisdk/middleware",
+                  "integrations/third-party/aisdk/tools"
+                ]
+              },
+              "integrations/third-party/agnoagi",
+              {
+                "group": "LangChain",
+                "pages": [
+                  "integrations/third-party/langchain/python",
+                  "integrations/third-party/langchain/js"
+                ]
+              },
+              {
+                "group": "LLamaIndex (coming soon)",
+                "pages": [
+                  "integrations/third-party/llamaindex/python",
+                  "integrations/third-party/llamaindex/js"
+                ]
+              }
+            ],
+            "expanded": false
+          },
           {
             "group": "Context Proxy",
             "pages": [
@@ -301,6 +322,11 @@
           "anchor": "Blog",
           "href": "https://getalchemystai.com/blog?utm_source=docs&utm_campaign=docs&utm_medium=web",
           "icon": "newspaper"
+        },
+        {
+          "anchor": "API Status",
+          "href": "https://status.getalchemystai.com",
+          "icon": "signal-bars"
         }
       ]
     }
@@ -314,13 +340,18 @@
   ],
   "logo": {
     "light": "/logo/logo-full-light.jpeg",
-    "dark": "/logo/logo-full.webp"
+    "dark": "/logo/logo-full.webp",
+    "href": "https://getalchemystai.com"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
         "href": "mailto:anuran@getalchemystai.com"
+      },
+      {
+        "label": "Changelog",
+        "href": "/changelog"
       }
     ],
     "primary": {
@@ -347,7 +378,29 @@
     "metatags": {
       "og:type": "website",
       "og:site_name": "Alchemyst AI Documentation",
-      "og:description": "Complete guide to Alchemyst AI - context management, SDKs, integrations, and API reference"
+      "og:title": "Alchemyst AI - AI-Native Context Management Platform",
+      "og:description": "Alchemyst AI is the Pareto Frontier for AI Context. Build scalable, context-aware AI agents with native support for LangChain, LlamaIndex, Vercel AI SDK, Agno, and Model Context Protocol. Sub-100ms latency, comprehensive SDKs, and enterprise-ready.",
+      "og:image": "https://getalchemystai.com/images/og-image.png",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "og:url": "https://docs.getalchemystai.com",
+      "twitter:card": "summary_large_image",
+      "twitter:site": "@getalchemyst",
+      "twitter:creator": "@getalchemyst",
+      "twitter:title": "Alchemyst AI - Context Management for AI Applications",
+      "twitter:description": "Pareto Frontier for AI Context. Native integrations with LangChain, LlamaIndex, MCP servers, Chrome extension, and more. Build context-aware AI agents with sub-100ms performance.",
+      "twitter:image": "https://getalchemystai.com/images/og-image.png",
+      "description": "Alchemyst AI is the leading AI-native context management platform. Learn how to implement persistent memory, context retrieval, and RAG optimization for AI agents. Includes Python SDK, TypeScript SDK, LangChain integration, LlamaIndex support, MCP servers for Cursor and Claude Desktop, Chrome extension, and comprehensive API documentation.",
+      "keywords": "Alchemyst AI, AI context management, LLM context, conversational memory, context layer, AI agents, LangChain memory, LlamaIndex integration, Vercel AI SDK, Agno integration, Model Context Protocol, MCP server, RAG optimization, retrieval augmented generation, vector database, AI SDK, context retrieval, persistent memory, chatbot memory, AI application development, semantic search, embedding storage, context injection, AI middleware, LLM memory systems",
+      "author": "Alchemyst AI",
+      "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "googlebot": "index, follow",
+      "bingbot": "index, follow",
+      "language": "en",
+      "revisit-after": "7 days",
+      "article:author": "Alchemyst AI Team",
+      "article:publisher": "https://getalchemystai.com",
+      "canonical": "https://docs.getalchemystai.com"
     }
   }
 }
