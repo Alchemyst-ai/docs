@@ -1,103 +1,163 @@
 ---
-title: Platform 
-description: A chronological breakdown of product, platform, and infrastructure changes across the context and memory platform.
-keywords: ['platform-revamp', 'magic-keys', 'context-sharing']
+title: Platform
+description: Latest features, improvements, and infrastructure updates to the Alchemyst platform.
+keywords: ['platform-revamp', 'magic-keys', 'context-sharing', 'vercel-ai-sdk', 'namespaces']
+---
+
+Track the evolution of Alchemyst's context and memory platform. From performance optimizations to new integrations, see what's new and how we're making AI context more powerful and accessible.
+
 ---
 
 ### 31 January 2026
 **Data Sources Documentation**
 
-- Streamlined **database documentation** for MongoDB and PostgreSQL
-- Improved readability and user-friendliness across data source integrations
+**What's new:**
+- Cleaner, more focused database integration guides
+
+**What changed:**
+- Streamlined **MongoDB and PostgreSQL documentation** by removing redundant examples
+- Improved overall readability and structure across all data source integration guides
+- Made documentation more beginner-friendly with simplified explanations
 
 ---
 
 ### 17 January 2026
 **Third-party Integrations: Vercel AI SDK**
 
-- Added comprehensive **Vercel AI SDK integration** with middleware support for memory and context management
-- Introduced examples for user preferences, personalized chat, streaming responses, and bulk operations with batching
-- Updated parameter naming: **conversationId** changed to **sessionId** for better clarity
+**What's new:**
+- **Vercel AI SDK integration** with full middleware support
+- Comprehensive examples for real-world use cases (user preferences, personalized chat, streaming, bulk operations)
+
+**What changed:**
+- Renamed **conversationId** → **sessionId** across all integrations for better API consistency
+- Added batching support and performance optimization guides for large-scale operations
 
 ---
 
 ### 15 January 2026
 **Advanced Usage Documentation**
 
-- Updated **user profiling** documentation in advanced usage guides
-- Enhanced examples and best practices for user-specific context management
-- Improved documentation structure for advanced platform features
+**What's new:**
+- Enhanced **user profiling documentation** with advanced patterns
+- New code examples for user-specific context management
+
+**What changed:**
+- Restructured advanced features section for easier navigation
+- Expanded best practices with production-ready examples
+- Improved documentation discoverability
 
 ---
 
-### 18 December 2025
-**Platform revamp**
+## Recent Platform Updates
 
-- Rolled out a **full UI and platform revamp**, including the Playground, to streamline experimentation and iteration workflows
-- Playground evolved beyond conversation into a full-fledged **experimentation environment**:
-  - Upload data directly
-  - Work with shared memory via **magic keys**
-  - Iterate on context without leaving the Playground
+### 18 December 2025
+**Platform Revamp**
+
+**What's new:**
+- Completely redesigned UI and Playground experience
+- Playground now supports direct data uploads and experimentation
+- Magic keys integration in the Playground interface
+
+**What changed:**
+- Streamlined navigation and workflows across the entire platform
+- Playground evolved from a simple chat interface to a full experimentation environment
+- Faster iteration cycles without leaving the Playground
 
 ---
 
 ### 12 December 2025
 **Ingestion Performance & Reliability**
 
-- Added **async ingestion routes** backed by a job queue
-- Enabled **non-blocking uploads**, improving throughput and system stability under load
+**What's new:**
+- Asynchronous ingestion routes with job queue backing
+- Non-blocking upload capabilities
+
+**What changed:**
+- Upload operations no longer block other processes
+- Dramatically improved throughput under heavy load
+- More stable system performance during peak usage
 
 ---
 
 ### 3 December 2025
 **Context Sharing**
 
-- Introduced **magic keys** to reference and share context with anyone without duplicating or re-ingesting data
-- The people you share the context with get a read only view of data, shared via magic key
+**What's new:**
+- **Magic keys** for sharing context without duplication
+- Read-only sharing capabilities
+
+**What changed:**
+- No need to re-ingest data when sharing with team members
+- Recipients automatically get read-only access via magic key
+- Simplified collaboration workflows
 
 ---
 
 ### 27 November 2025
 **Context Visualization**
 
-- Revamped **context-graph visualization** with dual views:
-  - **Document view** to explore context grouped by source documents
-  - **Node view** to inspect individual context nodes and relationships
-- Added **group-name based clustering** to logically organize related documents and nodes
-- Enabled **direct graph interactions**:
-  - Edit context nodes in place
-  - Delete nodes directly from the graph
-  - Instantly reflect changes across connected context
+**What's new:**
+- Dual-view context graph visualization
+- Interactive graph editing capabilities
+- Group-name based clustering
+
+**What changed:**
+- Added **Document view** to explore context by source documents
+- Added **Node view** to inspect individual context relationships
+- Can now edit and delete nodes directly from the graph
+- Changes reflect instantly across all connected context
 
 ---
 
 ### 8 November 2025
 **Namespaces**
 
-- Introduced **Namespaces** to group and scope data under logical boundaries
-- Enabled cleaner data organization and more precise context retrieval
-- Improved support for **multi-tenant** and **multi-project** workflows
+**What's new:**
+- **Namespaces** for logical data boundaries
+- Multi-tenant and multi-project support
+
+**What changed:**
+- Data can now be organized under named namespaces
+- More precise context retrieval through namespace scoping
+- Better isolation for enterprise and team workflows
 
 ---
 
 ### 21 October 2025
 **Context Retrieval**
 
-- Improved context processor powering faster, more efficient retrieval
-- Reduced retrieval latency by **~71%** (from ~7s to ~2s)
-- Improved fast-mode retrieval latency by **~57%** (from ~400ms to ~170ms)
+**What's new:**
+- Completely overhauled context processor
+
+**What changed:**
+- **~71% faster** ranked retrieval (from ~7s to ~2s for 10k data points)
+- **~57% faster** fast-mode retrieval (from ~400ms to ~170ms at p50)
+- More efficient retrieval algorithms under the hood
 
 ---
 
 ### 6 October 2025
 **SDK Release**
 
-- Released **TypeScript** and **Python SDKs** for seamless integration with any AI agent or application
-- Simplified context ingestion, retrieval, and memory management through a unified, developer-friendly API
-- Designed for quick drop-in adoption across agent frameworks, services, and custom pipelines
+**What's new:**
+- Official **TypeScript SDK**
+- Official **Python SDK**
+
+**What changed:**
+- Unified API for context ingestion, retrieval, and memory management
+- Drop-in integration support for popular agent frameworks
+- Developer-friendly API design optimized for quick adoption
 
 ---
 
-## Summary
+## The Journey So Far
 
-Throughout 2025 and into early 2026, the platform evolved from foundational data infrastructure into a faster, more observable, and developer-friendly **context and memory layer**, delivering major gains in ingestion speed, retrieval latency, automation, usability, and integration ecosystem maturity.
+From October 2025 through early 2026, Alchemyst evolved from foundational data infrastructure into a **production-ready context and memory layer** for modern AI applications. 
+
+Key achievements:
+- **10x faster retrieval** through optimized processors and caching
+- **Expanded integration ecosystem** with native SDK support and framework integrations
+- **Enhanced developer experience** with intuitive UI, comprehensive docs, and powerful debugging tools
+- **Enterprise-ready features** including namespaces, magic keys, and robust async ingestion
+
+We're just getting started. More updates coming soon.
