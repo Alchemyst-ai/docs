@@ -4,17 +4,29 @@ description: Key platform, performance, and developer experience updates.
 keywords: ['key-improvements', 'updates', 'performance']
 ---
 
-Past couple of months (Oct - Dec, 2025), we focused on strengthening the **context layer**, improving performance and developer experience across the platform.
+Past few months (Oct 2025 - Jan 2026), we focused on strengthening the **context layer**, expanding **integrations**, and improving performance and developer experience across the platform.
 
 ### The milestones we reached
-- **Ingestion Speed and reliability**
+
+- **Third-party Integration Ecosystem**
+  - Added comprehensive **Vercel AI SDK integration** with middleware support for seamless memory and context management
+  - Introduced detailed examples for personalized chat, streaming responses, and bulk operations
+  - Updated parameter conventions: **conversationId** changed to **sessionId** for better clarity across all integrations
+
+- **Documentation & Developer Experience**
+  - Enhanced **advanced usage guides** with improved user profiling documentation
+  - Streamlined **database documentation** for MongoDB and PostgreSQL with cleaner, more focused examples
+  - Improved readability and accessibility across all data source integrations
+
+- **Ingestion Speed and Reliability**
   - We toiled at improving our ingestion speed as much as possible, and will continue doing so. We improved our upload times by around 37% for large documents, and by >70% over short conversations. Exact numbers may vary, and so do the speedups; but they are definitely there!
+
 - **UI Revamp**
   - We simplified navigation and workflows to make core features easier and faster to use. Onboarding experience is shorter and smoother, whether you're a user trying to make ChatGPT remember stuff, or an experienced developer incorporating context to your AI agent!
-- **Retrieval speed**
+
+- **Retrieval Speed**
   - Reduced **ranked** retrieval time (radius: 10k data points) by **~71%** (from ~4s to ~1.14s)
   - Improved latency for `fast` mode by **~57%** (from p50 ~400ms to p50 ~170ms)
+
 - **Introduced Namespaces**
   - Group and scope data under named namespaces for precise, controlled context retrieval.
-
-
