@@ -26,10 +26,10 @@ Before proceeding, ensure that:
 3. Choose HTTP (HTTP or Server-Sent Events) as the transport type.
 4. Enter the URL:
    `https://mcp.getalchemystai.com/mcp/sse`
-5. Select Server ID: This is going to be you serve name. eg -> `Alchemyst-server-mcp`.
-6. Then, you will asked to choose whether to save settings at User-level `settings.json` or Workspace level.
+5. Select Server ID: This is going to be your server name. e.g., `Alchemyst-server-mcp`.
+6. Then, you will be asked to choose whether to save settings at User-level `settings.json` or Workspace level.
 7. You'll be redirected to your respective `settings.json` file.
-8. Then edit the headers inside the MCP server object(name you gave to you server) in `settings.json` with:
+8. Then edit the headers inside the MCP server object (name you gave to your server) in `settings.json` with:
 
 ```json
 "headers": {
@@ -38,16 +38,16 @@ Before proceeding, ensure that:
 ```
 
 9. You will see a faint Start button popping right up on top of the MCP object in your present settings.json file.
-10. Click on that and your MCP server wil ready to use!
+10. Click on that and your MCP server will be ready to use!
 
 **You're done! Your MCP server is now connected via HTTP (SSE).**
 
-### 2. Configration via `settings.json`
+### 2. Configuration via `settings.json`
 
 1. **Open Command Palette**
 
    - Press `Ctrl` (or `Cmd`) + `Shift` + `P`.
-   - Type and select **“Preferences: Open User Settings (JSON)”**.
+   - Type and select **"Preferences: Open User Settings (JSON)"**.
 
 2. Now, you are in **User Settings JSON**.
 3. Add the following **MCP Configuration block**.
@@ -65,11 +65,11 @@ Before proceeding, ensure that:
 }
 ```
 
-4. Save you `settings.json` file.
+4. Save your `settings.json` file.
 5. You will see a faint Start button popping right up on top of the MCP object in your present settings.json file.
-6. Click on that and your MCP server wil ready to use!
+6. Click on that and your MCP server will be ready to use!
 
-**You're done! Your MCP server is now connected via Directly confiuring `settings.json` file.**
+**You're done! Your MCP server is now connected via directly configuring the `settings.json` file.**
 
 ## Troubleshooting
 
@@ -79,5 +79,3 @@ Before proceeding, ensure that:
 | "Start" button not visible | Outdated VS Code version        | Upgrade to v1.101+                                                                         |
 | No response from server    | Network/firewall blocking SSE   | Allow outbound access to `https://mcp.getalchemystai.com`                                  |
 | Local setup not working    | Missing Node/Python environment | Verify local dependencies                                                                  |
-
-

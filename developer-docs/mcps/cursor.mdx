@@ -7,27 +7,27 @@ keywords: ['cursor', 'mcps', 'memory', 'llm']
 
 ### Prerequisites
 
-Befor Starting make sure,you have:
+Before starting, make sure you have:
 
-- You have **Visual Studio Code v1.101+** installed.
-- You have a valid **Alchemyst Platform API key**.
-- MCP must be enabled in cursor.
+- **Visual Studio Code v1.101+** installed.
+- A valid **Alchemyst Platform API key**.
+- MCP must be enabled in Cursor.
 
-Now, to cofigure **Alchemyst AI** with **Cursor** via **MCP** follow the below commands:
+Now, to configure **Alchemyst AI** with **Cursor** via **MCP**, follow the below commands:
 
 ### Configuring via mcp.json
 
-1. Launch **Cursor** application in you (MAC/Windows).
-2. Invoke the **Command Palette** with `⌘K` (Mac) or `Ctrl+shift+P` (Windows).
+1. Launch **Cursor** application on your (Mac/Windows).
+2. Invoke the **Command Palette** with `⌘K` (Mac) or `Ctrl+Shift+P` (Windows).
 3. Search for and select:
    **Settings → Cursor Settings.**
 4. In the **Settings** sidebar, search and navigate to:
    **`Tools & MCP`**
-5. On **Tools & MCP** page you will able to see a button named:
+5. On the **Tools & MCP** page, you will be able to see a button named:
    **`New MCP server`**
     Click on it.
-6. When, you click on **New MCP Server** button, `mcp.json` file will be opened automatically.
-7. Now, in the `mcp.json` file you will se **""mcpServers""** object. Add the follwing section inside **""mcpServers""** object:
+6. When you click on the **New MCP Server** button, the `mcp.json` file will be opened automatically.
+7. Now, in the `mcp.json` file, you will see the **"mcpServers"** object. Add the following section inside the **"mcpServers"** object:
 
 ```json
 "your_mcp_server_name": {
@@ -38,12 +38,12 @@ Now, to cofigure **Alchemyst AI** with **Cursor** via **MCP** follow the below c
     }
 ```
 
-8. Change `your_mcp_server_name` to the name you wanted to give your MCP server. e.g > `Alchemyst`.
-9. Change `YOUR_ALCHEMYST_PLATFORM_API_KEY` to the your own key, which you will get after logning on **[Alchemyst Platform](https://platform.getalchemystai.com)**.
-10. Now, save the file navigate back to **`Tools & MCP`** page inside the **Cursor settings**.
-11. Here, you will able to see your added MCP Server.
-12. Make sure the toggle button is in front to MCP server named should **ON (green)**, and there should be green dot on the icon of you MCP server. Indicating server is successfully.
-13. If it so then, congratulations to you. Your **Cursor** is now intgrated with **Alchemyst AI**.
+8. Change `your_mcp_server_name` to the name you want to give your MCP server. e.g., `Alchemyst`.
+9. Change `YOUR_ALCHEMYST_PLATFORM_API_KEY` to your own key, which you will get after logging into the **[Alchemyst Platform](https://platform.getalchemystai.com)**.
+10. Now, save the file and navigate back to the **`Tools & MCP`** page inside the **Cursor settings**.
+11. Here, you will be able to see your added MCP Server.
+12. Make sure the toggle button in front of the MCP server is **ON (green)**, and there should be a green dot on the icon of your MCP server, indicating the server is running successfully.
+13. If so, then congratulations to you. Your **Cursor** is now integrated with **Alchemyst AI**.
 
 **Your Alchemyst MCP server is now live inside Cursor!**
 
@@ -54,9 +54,5 @@ Now, to cofigure **Alchemyst AI** with **Cursor** via **MCP** follow the below c
 | MCP toggle is missing  | Outdated Cursor version             | Update Cursor to the latest version                                      |
 | SSE connection fails   | Network restrictions or firewall    | Allow outbound access to `https://mcp.getalchemystai.com`                |
 | "Authorization failed" | Incorrect or expired API key        | Regenerate your API key from [**Alchemyst Dashboard**](https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web) |
-| MCP server appearing   | `mcps.json` not formatted correctly | Validate your JSON syntax                                                |
+| MCP server not appearing   | `mcp.json` not formatted correctly | Validate your JSON syntax                                                |
 | No context syncing     | MCP service not started             | Click **Start** beside the MCP server entry in Cursor                    |
-
-```
-
-```
