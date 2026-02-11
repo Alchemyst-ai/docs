@@ -14,20 +14,20 @@ It covers two methods of connection:
 
 Before you start, ensure you have the following:
 
-- **Node.js** (v18 or heigher)
+- **Node.js** (v18 or higher)
 - **Docker** (if using the Docker Setup)
-- **SuperGatway** access (via Docker or npx)
+- **SuperGateway** access (via Docker or npx)
 - **Alchemyst API key** - Obtain it from your [Alchemyst AI dashboard](https://getalchemyst.com).
 - **Claude Desktop** (latest version)
 
 ### Run with Docker
 
-1. Click on the **☰ Hamburger Menu** in the top-left corner of **Cursor Desktop**.
+1. Click on the **☰ Hamburger Menu** in the top-left corner of **Claude Desktop**.
 2. Go to **File → Settings...**.
 3. In the sidebar, go to **Developer** Tab.
 4. Click on **Edit Config**.
-5. It will take you to file called **`claude_desktop_config.json`**.
-6. Open teh file and add the following configurations:
+5. It will take you to a file called **`claude_desktop_config.json`**.
+6. Open the file and add the following configurations:
 
 ```json
 "mcpServers": {
@@ -42,33 +42,33 @@ Before you start, ensure you have the following:
         "https://mcp.getalchemystai.com/mcp/sse",
         "--oauth2Bearer",
         "YOUR_ALCHEMYST_PLATFORM_API_KEY",
-        "--keepALive"
+        "--keepAlive"
       ]
     }
   }
 ```
 
-7. Save the file and Restart your **Claude Desktop**.
-8. After, restart navigate back to **Developer** Tab in **File → Settings...**.
-9. You will able to see you added MCP Server.
-10. There should be a **running** (Blue colored) Tag in front of you MCP server name. It will ensure that srever is running fine.
+7. Save the file and restart your **Claude Desktop**.
+8. After restart, navigate back to **Developer** Tab in **File → Settings...**.
+9. You will be able to see your added MCP Server.
+10. There should be a **running** (blue colored) tag in front of your MCP server name. It will ensure that the server is running fine.
 
-If there is **running** tag then **"Congratulations"**, You **Calude Desktop** is integrated with **Alchemyst AI** via Docker Setup.
+If there is a **running** tag then **"Congratulations"**, your **Claude Desktop** is integrated with **Alchemyst AI** via Docker Setup.
 
 ### Common Error
 
-If there is failed tag, then, click on **Error logs** button and this will open a folder **Error Logs** in which navigate and open file named **`alchemyst_context_processor_mcp`**. This contains the error stopping MCP server to run. Try to solve the error and Try again.
+If there is a failed tag, then click on the **Error logs** button and this will open a folder **Error Logs** in which navigate and open the file named **`alchemyst_context_processor_mcp`**. This contains the error stopping the MCP server from running. Try to solve the error and try again.
 
 **Note that these instructions are valid for all desktop applications that use the STDIO MCP mode.**
 
 ### Run with npx
 
-1. Click on the **☰ Hamburger Menu** in the top-left corner of **Cursor Desktop**.
+1. Click on the **☰ Hamburger Menu** in the top-left corner of **Claude Desktop**.
 2. Go to **File → Settings...**.
 3. In the sidebar, go to **Developer** Tab.
 4. Click on **Edit Config**.
-5. It will take you to file called **`claude_desktop_config.json`**.
-6. Open teh file and add the following configurations:
+5. It will take you to a file called **`claude_desktop_config.json`**.
+6. Open the file and add the following configurations:
 
 ```json
 "mcpServers": {
@@ -86,12 +86,12 @@ If there is failed tag, then, click on **Error logs** button and this will open 
 }
 ```
 
-7. Save the file and Restart your **Claude Desktop**.
-8. After, restart navigate back to **Developer** Tab in **File → Settings...**.
-9. You will able to see you added MCP Server.
-10. There should be a **running** (Blue colored) Tag in front of you MCP server name. It will ensure that srever is running fine.
+7. Save the file and restart your **Claude Desktop**.
+8. After restart, navigate back to **Developer** Tab in **File → Settings...**.
+9. You will be able to see your added MCP Server.
+10. There should be a **running** (blue colored) tag in front of your MCP server name. It will ensure that the server is running fine.
 
-If there is **running** tag then **"Congratulations"**, You **Calude Desktop** is integrated with **Alchemyst AI** via npx.
+If there is a **running** tag then **"Congratulations"**, your **Claude Desktop** is integrated with **Alchemyst AI** via npx.
 
 **Note that these instructions are valid for all desktop applications that use the STDIO MCP mode.**
 
@@ -101,8 +101,6 @@ If there is **running** tag then **"Congratulations"**, You **Calude Desktop** i
 | :------------------------------------------------- | :-------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | **Container stops immediately after start**        | Docker is not running or missing admin privileges.        | Run **Docker Desktop as Administrator**.<br/>Ensure the Docker service is active with:<br/>`net start com.docker.service`.                 |
 | **System error 5 has occurred. Access is denied.** | Command Prompt lacks administrator rights.                | Open **Command Prompt as Administrator**, then re-run:<br/>`net start com.docker.service`.                                                 |
-| **“Connecting to SSE…” but nothing happens**       | Incorrect SSE URL or invalid Alchemyst API key.           | Verify the URL:<br/>`https://mcp.getalchemystai.com/mcp/sse`<br/>and ensure your API key is valid and not expired.                         |
+| **"Connecting to SSE…" but nothing happens**       | Incorrect SSE URL or invalid Alchemyst API key.           | Verify the URL:<br/>`https://mcp.getalchemystai.com/mcp/sse`<br/>and ensure your API key is valid and not expired.                         |
 | **`401 Unauthorized` or `403 Forbidden`**          | Invalid or expired API key provided to Supergateway.      | Regenerate your API key from the **Alchemyst Dashboard** and replace it in the command:<br/>`--oauth2Bearer YOUR_API_KEY`.                 |
-| **Claude or MCP not showing as connected**         | MCP configuration not detected or extension not reloaded. | 1. Restart **VS Code**.<br/>2. Open Command Palette → “MCP: List Active MCP Servers”.<br/>3. Confirm `supergateway` is listed and running. |
-
-
+| **Claude or MCP not showing as connected**         | MCP configuration not detected or extension not reloaded. | 1. Restart **VS Code**.<br/>2. Open Command Palette → "MCP: List Active MCP Servers".<br/>3. Confirm `supergateway` is listed and running. |
