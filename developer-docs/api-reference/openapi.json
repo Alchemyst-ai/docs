@@ -446,9 +446,7 @@
               "example": {
                 "documents": [
                   {
-                    "content": "Customer asked about pricing for the Scale plan.",
-                    "containerTag": "support-emails",
-                    "ticketId": "TCK-1234"
+                    "content": "Customer asked about pricing for the Scale plan."
                   }
                 ],
                 "source": "support-inbox",
@@ -802,9 +800,7 @@
               "example": {
                 "documents": [
                   {
-                    "content": "Customer asked about pricing for the Scale plan.",
-                    "containerTag": "support-emails",
-                    "ticketId": "TCK-1234"
+                    "content": "Customer asked about pricing for the Scale plan."
                   }
                 ],
                 "source": "support-inbox",
