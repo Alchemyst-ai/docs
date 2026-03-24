@@ -22,9 +22,9 @@ A simple n8n workflow that captures form submissions and stores them in Alchemys
 
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "message": "Hello, I need help with my account"
+    "name": "John Doe",
+    "email": "john@example.com",
+    "message": "Hello, I need help with my account"
 }
 ```
 
@@ -32,8 +32,8 @@ A simple n8n workflow that captures form submissions and stores them in Alchemys
 
 1. Add an **HTTP Request** node after the webhook
 2. Set these values:
-   - **Method**: POST
-   - **URL**: `https://platform-backend.getalchemystai.com/api/v1/context/add`
+- **Method**: POST
+- **URL**: `https://platform-backend.getalchemystai.com/api/v1/context/add`
 3. Under **Authentication**, select **Generic Credential Type** → **Bearer Token**
 4. Create a new credential and paste your Alchemyst API key
 5. Set **Body Content Type** to **JSON**
@@ -45,7 +45,6 @@ A simple n8n workflow that captures form submissions and stores them in Alchemys
   documents: [
     {
       content: $json.body?.message ?? $json.message ?? "",
-      containerTag: "contact-forms",
       metadata: {
         name: $json.body?.name ?? $json.name ?? "",
         email: $json.body?.email ?? $json.email ?? ""
@@ -83,61 +82,67 @@ Here's the complete workflow you just built. You can import this directly into n
 
 ```json
 {
-  "name": "Alchemyst – Store Contact Forms",
-  "nodes": [
-    {
-      "id": "WebhookContactForm",
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
-      "position": [-200, 300],
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "contact-form",
-        "responseMode": "onReceived",
-        "options": {}
-      }
-    },
-    {
-      "id": "SendToAlchemyst",
-      "name": "Send to Alchemyst",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [200, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://platform-backend.getalchemystai.com/api/v1/context/add",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  documents: [\n    {\n      content: $json.body?.message ?? $json.message,\n      containerTag: \"contact-forms\",\n      metadata: {\n        name: $json.body?.name ?? $json.name,\n        email: $json.body?.email ?? $json.email,\n      },\n    },\n  ],\n  source: `contact-form-${DateTime.now().toMillis()}`,\n  context_type: \"resource\",\n  scope: \"internal\",\n  metadata: {\n    fileName: `contact_form_${DateTime.now().toMillis()}.json`,\n    fileSize: (($json.body?.message ?? $json.message)?.length ?? 0) * 8,\n    fileType: \"contact/form\",\n    lastModified: $now.toISO(),\n  },\n}) }}"
-      },
-      "credentials": {
-        "httpBearerAuth": {
-          "id": "",
-          "name": "Alchemyst API Key"
+    "name": "Alchemyst – Store Contact Forms",
+    "nodes": [
+        {
+            "id": "WebhookContactForm",
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                -200,
+                300
+            ],
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "contact-form",
+                "responseMode": "onReceived",
+                "options": {}
+            }
+        },
+        {
+            "id": "SendToAlchemyst",
+            "name": "Send to Alchemyst",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                200,
+                300
+            ],
+            "parameters": {
+                "method": "POST",
+                "url": "https://platform-backend.getalchemystai.com/api/v1/context/add",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpBearerAuth",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({\n  documents: [\n    {\n      content: $json.body?.message ?? $json.message,\n     metadata: {\n        name: $json.body?.name ?? $json.name,\n        email: $json.body?.email ?? $json.email,\n      },\n    },\n  ],\n  source: `contact-form-${DateTime.now().toMillis()}`,\n  context_type: \"resource\",\n  scope: \"internal\",\n  metadata: {\n    fileName: `contact_form_${DateTime.now().toMillis()}.json`,\n    fileSize: (($json.body?.message ?? $json.message)?.length ?? 0) * 8,\n    fileType: \"contact/form\",\n    lastModified: $now.toISO(),\n  },\n}) }}"
+            },
+            "credentials": {
+                "httpBearerAuth": {
+                    "id": "",
+                    "name": "Alchemyst API Key"
+                }
+            }
         }
-      }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Send to Alchemyst",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
     }
-  ],
-  "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Send to Alchemyst",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1"
-  }
 }
 ```
 
