@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.1.0",
   "info": {
     "title": "Alchemyst AI API v1 documentation",
     "version": "1.0.0",
@@ -7,7 +7,8 @@
   },
   "servers": [
     {
-      "url": "https://platform-backend.getalchemystai.com"
+      "url": "https://platform-backend.getalchemystai.com",
+      "description": "production"
     }
   ],
   "security": [
@@ -18,6 +19,7 @@
   "paths": {
     "/api/v1/context/add-async/{id}/cancel": {
       "delete": {
+        "operationId": "cancelParticularJobInAddContextAsync",
         "summary": "Cancel a context add job",
         "description": "Attempts to cancel a context add job by job id.\n- If the job is already completed or failed, returns 404.\n- If the job is currently running (\"active\"), returns 409 and cannot be cancelled.\n- Only jobs in \"waiting\" or \"delayed\" state can be cancelled.\n",
         "tags": [
@@ -46,18 +48,28 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "jobId",
+                    "status",
+                    "message"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "jobId": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "job_01HXYZABC"
                     },
                     "status": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "cancelled"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Job cancelled successfully"
                     }
                   }
                 }
@@ -70,15 +82,23 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Invalid job id"
                     },
                     "status": {
-                      "type": "number"
+                      "type": "number",
+                      "example": 400
                     }
                   }
                 }
@@ -91,15 +111,23 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Unauthorized"
                     },
                     "status": {
-                      "type": "number"
+                      "type": "number",
+                      "example": 401
                     }
                   }
                 }
@@ -112,15 +140,23 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Payment Required"
                     },
                     "status": {
-                      "type": "number"
+                      "type": "number",
+                      "example": 402
                     }
                   }
                 }
@@ -133,15 +169,23 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Forbidden: insufficient scope"
                     },
                     "status": {
-                      "type": "number"
+                      "type": "number",
+                      "example": 403
                     }
                   }
                 }
@@ -154,15 +198,23 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Job not found"
                     },
                     "status": {
-                      "type": "number"
+                      "type": "number",
+                      "example": 404
                     }
                   }
                 }
@@ -175,9 +227,13 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Context add is running, it cannot be cancelled. You can delete it after it has finished uploading, to preserve the integrity of data."
                     }
                   }
                 }
@@ -185,20 +241,28 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "error"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Internal server error"
                     },
                     "error": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Error details"
                     }
                   }
                 }
@@ -210,6 +274,7 @@
     },
     "/api/v1/context/add-async/{id}/status": {
       "get": {
+        "operationId": "checkStatusForParticularJobInAddContextAsync",
         "summary": "Get status of a context add job",
         "description": "Returns the status and result of a context add job by job id.",
         "tags": [
@@ -237,33 +302,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "jobId": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "string"
-                    },
-                    "result": {
-                      "type": "object"
-                    },
-                    "attemptsMade": {
-                      "type": "number"
-                    },
-                    "failedReason": {
-                      "type": "string"
-                    },
-                    "finishedOn": {
-                      "type": "number"
-                    },
-                    "processedOn": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ContextAddAsyncStatusSuccess"
                 }
               }
             }
@@ -273,18 +312,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -294,18 +322,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -315,18 +332,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -336,18 +342,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "error": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -357,8 +352,9 @@
     },
     "/api/v1/context/add-async": {
       "post": {
-        "summary": "Add context data to the context processor",
-        "description": "This endpoint accepts context data and sends it to a context processor for further handling. It returns a success or error response depending on the result from the context processor.",
+        "operationId": "addContextAsync",
+        "summary": "Asynchronously queue context data to add to the context processor",
+        "description": "This endpoint accepts context data and queues it for asynchronous processing by the context processor. It returns a success or error response depending on the queuing result.",
         "tags": [
           "context"
         ],
@@ -373,6 +369,12 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "documents",
+                  "context_type",
+                  "source",
+                  "scope"
+                ],
                 "properties": {
                   "documents": {
                     "type": "array",
@@ -468,11 +470,15 @@
         },
         "responses": {
           "201": {
-            "description": "Context added successfully",
+            "description": "Context queued successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "queued",
+                    "jobId"
+                  ],
                   "properties": {
                     "queued": {
                       "type": "boolean",
@@ -488,11 +494,16 @@
             }
           },
           "400": {
-            "description": "Bad request – Invalid or missing context data",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -512,7 +523,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized – User is not authenticated",
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -522,7 +533,7 @@
             }
           },
           "402": {
-            "description": "Payment Required - User does not have enough credits",
+            "description": "Payment Required",
             "content": {
               "application/json": {
                 "schema": {
@@ -532,7 +543,7 @@
             }
           },
           "403": {
-            "description": "Forbidden - User does not have required scope",
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -552,7 +563,7 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -571,8 +582,9 @@
     },
     "/api/v1/context/add-async/status": {
       "get": {
+        "operationId": "checkStatusForAllAddAsyncJobs",
         "summary": "List all ongoing context add jobs for the authenticated user",
-        "description": "Returns all jobs (active, waiting, delayed) belonging to the authenticated user.",
+        "description": "Returns all jobs (active, waiting, delayed, failed, completed) belonging to the authenticated user.\n",
         "tags": [
           "context"
         ],
@@ -626,32 +638,49 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "jobs"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "jobs": {
                       "type": "array",
                       "items": {
                         "type": "object",
+                        "required": [
+                          "jobId",
+                          "status",
+                          "attemptsMade",
+                          "data"
+                        ],
                         "properties": {
                           "jobId": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "12345"
                           },
                           "status": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "active"
                           },
                           "attemptsMade": {
-                            "type": "number"
+                            "type": "number",
+                            "example": 1
                           },
                           "failedReason": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "Some error"
                           },
                           "finishedOn": {
-                            "type": "number"
+                            "type": "number",
+                            "example": 1712345678901
                           },
                           "processedOn": {
-                            "type": "number"
+                            "type": "number",
+                            "example": 1712345678900
                           },
                           "data": {
                             "type": "object"
@@ -670,15 +699,51 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "number"
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
                     }
                   }
                 }
@@ -686,20 +751,28 @@
             }
           },
           "500": {
-            "description": "Internal server error",
+            "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "error"
+                  ],
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": false
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Internal server error"
                     },
                     "error": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Error details"
                     }
                   }
                 }
@@ -711,6 +784,7 @@
     },
     "/api/v1/context/add": {
       "post": {
+        "operationId": "addContextSync",
         "summary": "Add context data to the context processor",
         "description": "This endpoint accepts context data and sends it to a context processor for further handling. It returns a success or error response depending on the result from the context processor.",
         "tags": [
@@ -727,6 +801,12 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "documents",
+                  "context_type",
+                  "source",
+                  "scope"
+                ],
                 "properties": {
                   "documents": {
                     "type": "array",
@@ -826,54 +906,67 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ContextAddSuccess"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad request – Invalid or missing context data",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Error details"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized – User is not authenticated"
-          },
-          "402": {
-            "description": "Payment Required - User does not have enough credits"
-          },
-          "403": {
-            "description": "Forbidden - User does not have required scope"
-          },
-          "404": {
-            "description": "Not Found - Invalid context data format"
-          },
-          "500": {
-            "description": "Internal server error",
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "response": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Invalid context data format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -883,11 +976,12 @@
     },
     "/api/v1/context/delete": {
       "post": {
+        "operationId": "deleteContextByDocOrNodeId",
+        "summary": "Delete context data from the context processor",
+        "description": "This endpoint deletes context data based on the provided parameters. It returns a success or error response depending on the result from the context processor.",
         "tags": [
           "context"
         ],
-        "summary": "Delete context data",
-        "description": "Deletes context data based on provided parameters",
         "security": [
           {
             "bearerAuth": []
@@ -899,6 +993,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "source",
+                  "organization_id"
+                ],
                 "properties": {
                   "source": {
                     "type": "string",
@@ -912,8 +1010,8 @@
                   },
                   "organization_id": {
                     "type": "string",
-                    "description": "Optional organization ID",
-                    "nullable": true
+                    "description": "Organization ID",
+                    "nullable": false
                   },
                   "by_doc": {
                     "type": "boolean",
@@ -931,6 +1029,7 @@
               },
               "example": {
                 "source": "support-inbox",
+                "organization_id": "org_01HXYZABC",
                 "by_doc": true,
                 "by_id": false
               }
@@ -939,7 +1038,7 @@
         },
         "responses": {
           "204": {
-            "description": "Successfully deleted context",
+            "description": "Context deleted successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -949,24 +1048,53 @@
             }
           },
           "400": {
-            "description": "Invalid request parameters"
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized - User not authenticated"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden - User lacks required permissions"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v1/context/memory/add": {
       "post": {
+        "operationId": "addContextAsMemory",
         "summary": "Add memory context data",
-        "description": "This endpoint adds memory context data, fetching chat history if needed.",
+        "description": "This endpoint adds memory (chat history) as context.",
         "tags": [
           "context"
         ],
@@ -981,81 +1109,205 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "sessionId",
+                  "contents"
+                ],
                 "properties": {
-                  "memoryId": {
+                  "sessionId": {
                     "type": "string",
-                    "description": "The ID of the memory"
+                    "description": "The ID of the session"
                   },
                   "contents": {
                     "type": "array",
+                    "description": "Array of content objects. Each object must contain at least the 'content' field. Additional properties are allowed.",
                     "items": {
                       "type": "object",
+                      "required": [
+                        "content"
+                      ],
                       "properties": {
                         "content": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "The content of the memory message"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "description": "Additional metadata for the message (optional)",
+                          "properties": {
+                            "messageId": {
+                              "type": "string",
+                              "description": "Unique message ID"
+                            }
+                          }
                         }
                       },
                       "additionalProperties": true
+                    }
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "Optional metadata for the memory context. Defaults to [\"default\"] if not provided.",
+                    "properties": {
+                      "groupName": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Optional group names for the memory context. Defaults to [\"default\"] if not provided.",
+                        "default": [
+                          "default"
+                        ]
+                      }
                     },
-                    "description": "Array of content objects with additional properties allowed"
+                    "additionalProperties": true
                   }
                 }
               },
-              "example": {
-                "memoryId": "support-thread-TCK-1234",
-                "contents": [
-                  {
-                    "content": "Customer asked about pricing for the Scale plan.",
-                    "metadata": {
-                      "messageId": "msg-1"
-                    },
-                    "role": "user",
-                    "id": "msg-1",
-                    "createdAt": "2025-01-10T12:34:56.000Z"
-                  },
-                  {
-                    "content": "Explained the Scale plan pricing and shared the pricing page link.",
-                    "metadata": {
-                      "messageId": "msg-2"
-                    },
-                    "role": "assistant",
-                    "id": "msg-2",
-                    "createdAt": "2025-01-10T12:35:30.000Z"
+              "examples": {
+                "minimal": {
+                  "summary": "Minimal required fields only",
+                  "value": {
+                    "sessionId": "support-thread-TCK-1234",
+                    "contents": [
+                      {
+                        "content": "Customer asked about pricing for the Scale plan."
+                      }
+                    ]
                   }
-                ]
+                },
+                "withMessageMetadata": {
+                  "summary": "With message-level metadata",
+                  "value": {
+                    "sessionId": "support-thread-TCK-1234",
+                    "contents": [
+                      {
+                        "content": "Customer asked about pricing for the Scale plan.",
+                        "metadata": {
+                          "messageId": "msg_001"
+                        }
+                      },
+                      {
+                        "content": "Agent responded with pricing details for Scale plan.",
+                        "metadata": {
+                          "messageId": "msg_002"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "withGroupMetadata": {
+                  "summary": "With custom group names",
+                  "value": {
+                    "sessionId": "support-thread-TCK-1234",
+                    "contents": [
+                      {
+                        "content": "Customer asked about pricing for the Scale plan."
+                      }
+                    ],
+                    "metadata": {
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ]
+                    }
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Memory context added successfully"
+            "description": "Memory context added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContextAddSuccess"
+                },
+                "example": {
+                  "success": true,
+                  "context_id": "ctx_01HXYZABC",
+                  "processed_documents": 1
+                }
+              }
+            }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "INVALID_REQUEST",
+                    "message": "sessionId field is required"
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "402": {
-            "description": "Payment Required"
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v1/context/memory/delete": {
       "post": {
+        "operationId": "deleteContextAsMemory",
         "summary": "Delete memory context data",
-        "description": "Deletes memory context data based on provided parameters",
+        "description": "Deletes memory context data based on provided parameters.",
         "tags": [
           "context"
         ],
@@ -1070,6 +1322,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "memoryId",
+                  "organization_id"
+                ],
                 "properties": {
                   "memoryId": {
                     "type": "string",
@@ -1078,18 +1334,33 @@
                   "user_id": {
                     "type": "string",
                     "description": "Optional user ID",
-                    "deprecated": true,
-                    "nullable": true
+                    "nullable": true,
+                    "deprecated": true
                   },
                   "organization_id": {
                     "type": "string",
-                    "description": "Optional organization ID",
+                    "description": "Organization ID",
+                    "nullable": true
+                  },
+                  "by_doc": {
+                    "type": "boolean",
+                    "description": "Delete by document flag",
+                    "default": true,
+                    "nullable": true
+                  },
+                  "by_id": {
+                    "type": "boolean",
+                    "description": "Delete by ID flag",
+                    "default": false,
                     "nullable": true
                   }
                 }
               },
               "example": {
-                "memoryId": "support-thread-TCK-1234"
+                "memoryId": "support-thread-TCK-1234",
+                "organization_id": "org_01HXYZABC",
+                "by_doc": true,
+                "by_id": false
               }
             }
           }
@@ -1099,22 +1370,51 @@
             "description": "Successfully deleted memory context"
           },
           "400": {
-            "description": "Invalid request parameters"
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v1/context/memory/update": {
       "post": {
+        "operationId": "updateContextAsMemory",
         "summary": "Update memory context data",
         "description": "This endpoint updates memory context data.",
         "tags": [
@@ -1131,8 +1431,12 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "sessionId",
+                  "contents"
+                ],
                 "properties": {
-                  "memoryId": {
+                  "sessionId": {
                     "type": "string",
                     "description": "The ID of the memory to update"
                   },
@@ -1142,17 +1446,34 @@
                       "type": "object",
                       "properties": {
                         "content": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "The content of the memory entry"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "additionalProperties": true,
+                          "description": "Additional metadata for the memory entry"
+                        },
+                        "role": {
+                          "type": "string",
+                          "description": "Role of the message (e.g., user, assistant)"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "Unique ID for the message"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "description": "Creation timestamp"
                         }
-                      },
-                      "additionalProperties": true
+                      }
                     },
                     "description": "Array of updated content objects"
                   }
                 }
               },
               "example": {
-                "memoryId": "support-thread-TCK-1234",
+                "sessionId": "support-thread-TCK-1234",
                 "contents": [
                   {
                     "content": "Customer asked about pricing for the Scale plan.",
@@ -1179,31 +1500,81 @@
         },
         "responses": {
           "200": {
-            "description": "Memory context updated successfully"
+            "description": "Memory context updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemoryUpdateSuccess"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "402": {
-            "description": "Payment Required"
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v1/context/search": {
       "post": {
+        "operationId": "searchUserContext",
         "summary": "Search for context data in the context processor",
         "description": "This endpoint sends a search request to the context processor to retrieve relevant context data based on the provided query.",
         "tags": [
@@ -1290,7 +1661,7 @@
                     "default": "internal",
                     "description": "Search scope"
                   },
-                  "metadata": {
+                  "body_metadata": {
                     "type": "object",
                     "description": "Additional metadata for the search",
                     "default": {}
@@ -1369,7 +1740,7 @@
             }
           },
           "400": {
-            "description": "Bad request - Invalid or missing search parameters",
+            "description": "Bad Request - Invalid or missing search parameters",
             "content": {
               "application/json": {
                 "schema": {
@@ -1385,16 +1756,37 @@
             }
           },
           "401": {
-            "description": "Unauthorized - User not authenticated"
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "402": {
-            "description": "Payment Required - User not allowed to perform action"
+            "description": "Payment Required - User not allowed to perform action",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden - User lacks required scope"
+            "description": "Forbidden - User lacks required scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal error during context search processing",
+            "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1414,10 +1806,11 @@
     },
     "/api/v1/context/traces/{traceId}/delete": {
       "delete": {
+        "operationId": "deleteTraceById",
         "summary": "Delete a specific data trace",
-        "description": "Deletes a data trace for the authenticated user with the specified trace ID",
+        "description": "Deletes a data trace for the authenticated user with the specified trace ID.",
         "tags": [
-          "Traces"
+          "traces"
         ],
         "security": [
           {
@@ -1429,7 +1822,7 @@
             "in": "path",
             "name": "traceId",
             "required": true,
-            "description": "ID of the trace to delete",
+            "description": "The ID of the trace to delete",
             "schema": {
               "type": "string"
             }
@@ -1437,62 +1830,109 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Trace deleted successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "trace": {
-                      "type": "object",
-                      "description": "The deleted trace data"
-                    }
-                  }
-                },
-                "example": {
-                  "trace": {
-                    "_id": "trace_123",
-                    "userId": "user_123",
-                    "type": "context.search",
-                    "data": {
-                      "query": "What did the customer ask about pricing for the Scale plan?",
-                      "source": "support-inbox",
-                      "fileName": "support_thread_TCK-1234.txt"
-                    },
-                    "createdAt": "2025-01-10T12:35:10.000Z",
-                    "updatedAt": "2025-01-10T12:35:10.000Z"
-                  }
+                  "$ref": "#/components/schemas/TraceDeleteSuccess"
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "405": {
-            "description": "Method Not Allowed"
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v1/context/traces": {
       "get": {
+        "operationId": "viewRawContextTracesForUser",
         "summary": "Retrieves a list of traces for the authenticated user",
+        "description": "Returns paginated traces for the authenticated user within their organization.",
         "tags": [
-          "Traces"
+          "traces"
         ],
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of traces per page"
           }
         ],
         "responses": {
@@ -1502,16 +1942,32 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "traces",
+                    "pagination"
+                  ],
                   "properties": {
                     "traces": {
                       "type": "array",
                       "items": {
                         "type": "object",
+                        "required": [
+                          "_id",
+                          "userId",
+                          "organizationId",
+                          "type",
+                          "data",
+                          "createdAt",
+                          "updatedAt"
+                        ],
                         "properties": {
                           "_id": {
                             "type": "string"
                           },
                           "userId": {
+                            "type": "string"
+                          },
+                          "organizationId": {
                             "type": "string"
                           },
                           "type": {
@@ -1530,6 +1986,37 @@
                           }
                         }
                       }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "required": [
+                        "page",
+                        "limit",
+                        "total",
+                        "totalPages",
+                        "hasNextPage",
+                        "hasPrevPage"
+                      ],
+                      "properties": {
+                        "page": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "totalPages": {
+                          "type": "integer"
+                        },
+                        "hasNextPage": {
+                          "type": "boolean"
+                        },
+                        "hasPrevPage": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   }
                 },
@@ -1538,6 +2025,7 @@
                     {
                       "_id": "trace_123",
                       "userId": "user_123",
+                      "organizationId": "org_123",
                       "type": "context.search",
                       "data": {
                         "query": "What did the customer ask about pricing for the Scale plan?",
@@ -1547,32 +2035,55 @@
                       "createdAt": "2025-01-10T12:35:10.000Z",
                       "updatedAt": "2025-01-10T12:35:10.000Z"
                     }
-                  ]
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "limit": 10,
+                    "total": 1,
+                    "totalPages": 1,
+                    "hasNextPage": false,
+                    "hasPrevPage": false
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized - User not found"
+            "description": "Unauthorized - User or organization not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "402": {
-            "description": "Unauthorized - Invalid user"
+            "description": "Unauthorized - Invalid user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden - User lacks required scope"
+            "description": "Forbidden - User lacks required scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusText": {
-                      "type": "string",
-                      "description": "Error message (detailed in debug mode)"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1582,14 +2093,26 @@
     },
     "/api/v1/context/view/docs": {
       "get": {
+        "operationId": "viewDocsInContextForUser",
+        "summary": "Retrieve user contexts by documents",
+        "description": "Fetches documents view for authenticated user with optional organization context.",
         "tags": [
           "context"
         ],
-        "summary": "Retrieve user contexts by documents.",
-        "description": "Fetches documents view for authenticated user with optional organization context",
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "magic_key",
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "description": "Optional magic key for special access or filtering"
           }
         ],
         "responses": {
@@ -1598,7 +2121,50 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "required": [
+                    "documents"
+                  ],
+                  "properties": {
+                    "documents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "fileName",
+                          "fileType",
+                          "groupName",
+                          "lastModified",
+                          "fileSize"
+                        ],
+                        "properties": {
+                          "fileName": {
+                            "type": "string",
+                            "description": "Name of the file"
+                          },
+                          "fileType": {
+                            "type": "string",
+                            "description": "Type/MIME of the file"
+                          },
+                          "groupName": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Array of group names to which the file belongs"
+                          },
+                          "lastModified": {
+                            "type": "string",
+                            "description": "Last modified timestamp (ISO format)"
+                          },
+                          "fileSize": {
+                            "type": "number",
+                            "description": "Size of the file in bytes"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "documents": [
@@ -1618,27 +2184,56 @@
             }
           },
           "401": {
-            "description": "Unauthorized - User not authenticated"
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "402": {
-            "description": "Invalid user"
+            "description": "Invalid user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden - User lacks required scope"
+            "description": "Forbidden - User lacks required scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
-          "default": {
-            "description": "Unexpected error from context processor"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/v1/context/view": {
       "get": {
+        "operationId": "viewRawContextNodesForUser",
+        "summary": "Retrieve user context",
+        "description": "Gets the context information for the authenticated user.",
         "tags": [
           "context"
         ],
-        "summary": "Retrieve user context",
-        "description": "Gets the context information for the authenticated user",
         "security": [
           {
             "bearerAuth": []
@@ -1670,45 +2265,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "context": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "List of context items"
-                    }
-                  }
-                },
-                "example": {
-                  "context": [
-                    {
-                      "content": "Customer asked about pricing for the Scale plan.",
-                      "metadata": {
-                        "fileName": "support_thread_TCK-1234.txt",
-                        "fileType": "text/plain",
-                        "groupName": [
-                          "support",
-                          "pricing"
-                        ],
-                        "lastModified": "2025-01-10T12:34:56.000Z",
-                        "fileSize": 2048
-                      }
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ContextViewSuccess"
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized - User not authenticated"
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden - User doesn't have required scope"
+            "description": "Forbidden - User doesn't have required scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -1807,6 +2397,265 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid job id"
+          },
+          "status": {
+            "type": "number",
+            "example": 400
+          },
+          "error": {
+            "type": "object",
+            "example": "Error details",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "UNAUTHORIZED"
+              },
+              "message": {
+                "type": "string",
+                "example": "User not authenticated"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "statusText": {
+            "type": "string",
+            "description": "Error message (detailed in debug mode)"
+          }
+        }
+      },
+      "ContextAddAsyncStatusSuccess": {
+        "type": "object",
+        "required": [
+          "success",
+          "jobId",
+          "status"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "jobId": {
+            "type": "string",
+            "example": "job_01HXYZABC"
+          },
+          "status": {
+            "type": "string",
+            "example": "completed"
+          },
+          "result": {
+            "type": "object",
+            "description": "Result of the job (if available)"
+          },
+          "attemptsMade": {
+            "type": "number",
+            "example": 1
+          },
+          "failedReason": {
+            "type": "string",
+            "example": ""
+          },
+          "finishedOn": {
+            "type": "number",
+            "example": 1712345678901
+          },
+          "processedOn": {
+            "type": "number",
+            "example": 1712345670000
+          }
+        }
+      },
+      "ContextAddSuccess": {
+        "type": "object",
+        "required": [
+          "success",
+          "context_id"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "context_id": {
+            "type": "string",
+            "example": "ctx_01HXYZABC"
+          },
+          "processed_documents": {
+            "type": "number",
+            "example": 2
+          }
+        }
+      },
+      "MemoryUpdateSuccess": {
+        "type": "object",
+        "required": [
+          "success",
+          "memory_id",
+          "updated_entries"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "memory_id": {
+            "type": "string",
+            "example": "support-thread-TCK-1234"
+          },
+          "updated_entries": {
+            "type": "number",
+            "example": 2
+          }
+        }
+      },
+      "TraceDeleteSuccess": {
+        "type": "object",
+        "required": [
+          "trace"
+        ],
+        "properties": {
+          "trace": {
+            "type": "object",
+            "description": "The deleted trace data",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "trace_123"
+              },
+              "userId": {
+                "type": "string",
+                "example": "user_123"
+              },
+              "organizationId": {
+                "type": "string",
+                "example": "org_123"
+              },
+              "type": {
+                "type": "string",
+                "example": "context.search"
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "example": "What did the customer ask about pricing for the Scale plan?"
+                  },
+                  "source": {
+                    "type": "string",
+                    "example": "support-inbox"
+                  },
+                  "fileName": {
+                    "type": "string",
+                    "example": "support_thread_TCK-1234.txt"
+                  }
+                }
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-01-10T12:35:10.000Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-01-10T12:35:10.000Z"
+              }
+            }
+          }
+        }
+      },
+      "ContextViewSuccess": {
+        "type": "object",
+        "required": [
+          "success",
+          "contexts"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "contexts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "The content of the context item"
+                },
+                "metadata": {
+                  "type": "object",
+                  "properties": {
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "fileType": {
+                      "type": "string"
+                    },
+                    "groupName": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "lastModified": {
+                      "type": "string"
+                    },
+                    "fileSize": {
+                      "type": "number"
+                    }
+                  },
+                  "description": "Additional metadata for the context"
+                }
+              }
+            },
+            "description": "List of context items"
+          }
+        },
+        "example": {
+          "success": true,
+          "contexts": [
+            {
+              "content": "Customer asked about pricing for the Scale plan.",
+              "metadata": {
+                "fileName": "support_thread_TCK-1234.txt",
+                "fileType": "text/plain",
+                "groupName": [
+                  "support",
+                  "pricing"
+                ],
+                "lastModified": "2025-01-10T12:34:56.000Z",
+                "fileSize": 2048
+              }
+            }
+          ]
+        }
       }
     }
   },

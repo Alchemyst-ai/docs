@@ -4,7 +4,7 @@
   "api": {
     "openapi": "https://platform-backend.getalchemystai.com/api/openapi.json"
   },
-  
+
   "fonts": {
     "heading": {
       "family": "Sora",
@@ -135,7 +135,10 @@
             "group": "By our community",
             "pages": [
               "example-projects/community/discord-bot",
-              "example-projects/community/b2b-newsletter-writer"
+              "example-projects/community/b2b-newsletter-writer",
+              "example-projects/community/company_research",
+              "example-projects/community/prompt-evaluator"
+
             ]
           },
           {
@@ -313,6 +316,16 @@
           "href": "https://getalchemystai.com?utm_source=docs&utm_campaign=docs&utm_medium=web",
           "icon": "book-open-cover"
         },
+        {
+        "anchor": "llms.txt",
+        "href": "https://getalchemystai.com/docs/llms.txt",
+        "icon": "file-text"
+      },
+      {
+        "anchor": "llms-full.txt",
+        "href": "https://getalchemystai.com/docs/llms-full.txt",
+        "icon": "book"
+      },
         {
           "anchor": "Community",
           "href": "https://getalchemystai.com/docs/join-discord?utm_source=docs&utm_medium=referral&utm_campaign=discord_join",
