@@ -1,0 +1,110 @@
+---
+title: 'OpenClaw Plugin'
+description: "Persistent memory and context for OpenClaw agents"
+icon: "terminal"
+keywords: ['openclaw', 'cli', 'plugin', 'memory', 'integration']
+---
+
+# OpenClaw Plugin
+
+**OpenClaw Alchemyst Integration** gives OpenClaw CLI agents perfect memory and context recall powered by Alchemyst AI.
+
+## Features
+
+- **Auto-Recall** — automatically injects relevant context before AI turns
+- **Auto-Capture** — stores conversations automatically after AI responses
+- **5 AI tools** for manual memory management
+- **Slash commands** — `/remember` and `/recall` for in-chat use
+- **CLI commands** — search, profile, and wipe memories from terminal
+
+## Installation
+
+### 1. Add API keys
+
+Add your keys to `~/.openclaw/.env`:
+
+```bash
+nano ~/.openclaw/.env
+```
+
+```env
+ALCHEMYST_API_KEY=your_alchemyst_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+Get your Alchemyst API key at [platform.getalchemystai.com](https://platform.getalchemystai.com).
+
+### 2. Install the plugin
+
+```bash
+cp -r /path/to/openclaw-alchemyst ~/.openclaw/extensions/alchemyst-memory
+```
+
+The destination folder **must** be named `alchemyst-memory`.
+
+### 3. Enable in `~/.openclaw/openclaw.json`
+
+```json
+{
+  "plugins": {
+    "slots": {
+      "memory": "alchemyst-memory"
+    },
+    "entries": {
+      "alchemyst-memory": {
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
+> Do not add a `config` block — OpenClaw's schema will reject it.
+
+### 4. Verify
+
+```bash
+openclaw plugins list
+```
+
+Expected output:
+
+```
+[Alchemyst] Client initialized
+[Alchemyst] Registered 5 tools
+[Alchemyst] Registered auto-recall hook (before_agent_start)
+[Alchemyst] Registered auto-capture hook (agent_end)
+[Alchemyst] Plugin registered successfully ✓
+```
+
+## How It Works
+
+- **Before each AI turn**: the recall hook searches Alchemyst for relevant past context and prepends it to the prompt automatically.
+- **After each AI turn**: the capture hook stores user and assistant messages under the session `openclaw-default`.
+
+## Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `ALCHEMYST_API_KEY` | env | **required** | Alchemyst API key |
+| `withMemory` | boolean | `true` | Enable auto-recall |
+| `similarityThreshold` | number | `0.7` | Context retrieval threshold |
+| `minimumSimilarityThreshold` | number | `0.5` | Fallback threshold |
+| `maxMemories` | number | `10` | Max memories per turn |
+| `debug` | boolean | `false` | Enable debug logging |
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `/remember <text>` | Manually store something |
+| `/recall <query>` | Search stored memories |
+| `openclaw alchemyst-search <query>` | CLI memory search |
+| `openclaw alchemyst-profile` | View configuration |
+| `openclaw alchemyst-wipe` | Delete all memories |
+
+## Resources
+
+- [GitHub Repository](https://github.com/Alchemyst-ai/openclaw-plugin)
+- [Alchemyst Platform](https://platform.getalchemystai.com)
+- [OpenClaw Documentation](https://github.com/openclaw)

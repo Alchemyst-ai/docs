@@ -1,0 +1,108 @@
+---
+title: 'OpenCode Plugin'
+description: "Persistent retrievable memory for opencode agents"
+icon: "code"
+keywords: ['opencode', 'plugin', 'memory', 'context', 'integration']
+---
+
+# OpenCode Plugin
+
+**opencode-alchemyst-context** gives opencode agents persistent, retrievable memory backed by Alchemyst AI. Agents can search context, save decisions, manage conversation memory, and ask grounded questions — all through a set of dedicated tools.
+
+## Features
+
+- **Context search** — retrieve relevant documents before answering
+- **Context add** — save decisions, snippets, and conventions
+- **Memory persist** — store conversation turns keyed by session
+- **Grounded Q&A** — ask questions and get synthesized answers
+- **Security guard** — heuristic outbound content blocking for secrets
+
+## Installation
+
+```bash
+npm install opencode-alchemyst-context
+```
+
+Add to `opencode.json`:
+
+```json
+{
+  "plugin": ["opencode-alchemyst-context"]
+}
+```
+
+## Setup
+
+On first use, tell the agent to configure the API key:
+
+```
+alchemyst_configure: set my key to <your-jwt-bearer-token>
+```
+
+This saves to `~/.config/opencode-alchemyst/config.json` and persists across sessions.
+
+You can also pre-configure manually:
+
+```json
+{
+  "apiKey": "your-jwt-bearer-token",
+  "groupName": ["opencode", "my-project"]
+}
+```
+
+### Environment variables
+
+| Env var | Default | Priority |
+|---------|---------|----------|
+| `ALCHEMYST_BASE_URL` | `https://platform-backend.getalchemystai.com` | overrides config |
+| `ALCHEMYST_DEFAULT_SCOPE` | `internal` | overrides config |
+| `ALCHEMYST_GROUP_NAME` | `opencode` | overrides config |
+
+## Tools
+
+### `alchemyst_configure`
+
+Set the Alchemyst API key and connection settings. Required before using any other tool.
+
+### `alchemyst_context_search`
+
+Search stored context for relevant documents. Use when you need to check if decisions or reference material already exist.
+
+### `alchemyst_context_add`
+
+Save a decision, snippet, or convention. Runs through a security guard that blocks keys, tokens, and passwords before sending.
+
+### `alchemyst_memory_add`
+
+Persist conversation turns keyed by session ID.
+
+### `alchemyst_memory_update`
+
+Update previously saved memory entries for the current session.
+
+### `alchemyst_context_ask`
+
+Ask a grounded question and get a synthesized answer from stored context.
+
+```
+query: "What's our policy on dependency versions?"
+steeringPrompt: "answer in one sentence"
+```
+
+## Security
+
+The plugin includes an outbound content guard that blocks:
+
+- Private key headers (`BEGIN RSA PRIVATE KEY`)
+- AWS access keys (`AKIA...`)
+- OpenAI-style API keys (`sk-...`)
+- GitHub tokens (`ghp_...`, `gho_...`, `ghu_...`)
+- Generic `SECRET`/`TOKEN`/`PASSWORD` assignments
+
+Matched content is blocked before any network request. The API key is stored with `0600` permissions and never logged.
+
+## Resources
+
+- [GitHub Repository](https://github.com/Alchemyst-ai/opencode-alchemyst-context)
+- [Alchemyst Platform](https://platform.getalchemystai.com)
+- [npm Package](https://www.npmjs.com/package/opencode-alchemyst-context)

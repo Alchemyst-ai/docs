@@ -217,6 +217,9 @@
                 ]
               },
               "integrations/third-party/agnoagi",
+              "integrations/third-party/openclaw",
+              "integrations/third-party/opencode-plugin",
+              "integrations/third-party/livekit",
               {
                 "group": "LangChain",
                 "pages": [

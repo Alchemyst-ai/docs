@@ -1,0 +1,102 @@
+---
+title: 'LiveKit Plugin'
+description: "Persistent cross-session memory for LiveKit voice agents"
+icon: "phone"
+keywords: ['livekit', 'voice', 'memory', 'plugin', 'integration']
+---
+
+# LiveKit Plugin
+
+**livekit-plugin-alchemyst** gives your LiveKit voice agents persistent, cross-session memory powered by Alchemyst AI. Voice agents remember users across conversations — preferences, past requests, personal details — and use that context for personalised responses without any manual state management.
+
+## Features
+
+- **Automatic RAG injection** — relevant memories are semantically retrieved and injected before each LLM response via the `onUserTurnCompleted` hook
+- **Auto-persist** — completed user/assistant turns are stored to Alchemyst automatically
+- **LLM tools** — exposes `remember`, `recall`, and `forget` tools for explicit memory management
+- **Per-session scoping** — memories scoped by `groupName`, session ID, and user identity
+- **Provider-agnostic** — works with any LLM (OpenAI, Gemini, Anthropic, etc.)
+
+## Installation
+
+```bash
+npm install livekit-plugin-alchemyst
+```
+
+**Peer dependencies** (install separately if needed):
+
+```bash
+npm install @livekit/agents zod
+```
+
+## Quick Start
+
+```ts
+import 'dotenv/config';
+import { createAlchemystPlugin } from 'livekit-plugin-alchemyst';
+import { voice } from '@livekit/agents';
+
+const alchemyst = createAlchemystPlugin({
+  apiKey: process.env.ALCHEMYST_API_KEY,
+  groupNames: ['voice-agent'],
+});
+
+class MyAgent extends voice.Agent {
+  constructor() {
+    super({
+      instructions: 'You are a helpful voice assistant with persistent memory.',
+      tools: alchemyst.getTools(),
+    });
+  }
+
+  override async onUserTurnCompleted(
+    turnCtx: llm.ChatContext,
+    newMessage: llm.ChatMessage,
+  ): Promise<void> {
+    const userText = newMessage.textContent;
+    if (!userText) return;
+
+    const memories = await alchemyst.search(userText);
+    if (memories.length > 0) {
+      turnCtx.addMessage({
+        role: 'system',
+        content: memories.map((m, i) => `${i + 1}. ${m.content}`).join('\n'),
+      });
+    }
+  }
+}
+```
+
+## Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `apiKey` | string | `ALCHEMYST_API_KEY` env | Alchemyst API key |
+| `userId` | string | `"anonymous"` | User identifier |
+| `sessionId` | string | auto-generated | Session identifier |
+| `similarityThreshold` | number | `0.5` | Similarity threshold (0–1) |
+| `maxMemories` | number | `5` | Max memories returned per search |
+| `groupNames` | string[] | `["voice-agent"]` | Group tags for filtering |
+| `autoPersist` | boolean | `true` | Auto-store turns |
+
+## LLM Tools
+
+| Tool | Description |
+|------|-------------|
+| `remember` | Store a fact or preference in persistent memory |
+| `recall` | Semantic search over stored memories |
+| `forget` | Permanently delete a memory by ID |
+
+## Use Cases
+
+- **Customer support** — remember account details and past issues across calls
+- **Personal companion** — learn user preferences, routines, and interests
+- **Sales qualification** — track prospect details and buying signals
+- **Multi-tenant SaaS** — scope memory per organization and user
+
+## Resources
+
+- [GitHub Repository](https://github.com/Alchemyst-ai/alchemyst-livekit)
+- [Alchemyst Platform](https://platform.getalchemystai.com)
+- [npm Package](https://www.npmjs.com/package/livekit-plugin-alchemyst)
+- [LiveKit Agents Documentation](https://docs.livekit.io/agents)
