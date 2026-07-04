@@ -1,0 +1,176 @@
+---
+title: 'Pi Agent Harness Integration'
+description: "Persistent memory and context for Pi agents"
+icon: "terminal"
+keywords: ['pi', 'agent', 'harness', 'plugin', 'memory', 'integration']
+---
+
+# Pi Agent Harness Integration
+
+**Pi Alchemyst Integration** adds persistent, retrievable memory to Pi agent harness, enabling agents to remember decisions, documentation, and context across coding sessions.
+
+## Why use Pi with Alchemyst AI?
+
+Pi is a powerful agent harness for building AI coding assistants. However, LLMs are "forgetful"—they don't retain context between sessions or remember important decisions. Alchemyst AI solves this by providing persistent memory that:
+
+* Saves important coding decisions and recalls them later
+* Maintains context across multiple agent sessions
+* Blocks sensitive data like secrets and credentials automatically
+* Organizes context hierarchically with tags
+
+## Features
+
+- **Persistent Memory** — store and retrieve coding decisions across sessions
+- **6 AI tools** for manual memory management
+- **Hierarchical tagging** with `groupName` for precise context filtering
+- **Security guards** — automatic protection against secrets and sensitive data
+- **Session memory** — persists conversation history automatically
+
+## Installation
+
+### 1. Via git (recommended)
+
+```bash
+pi install git:github.com/AlchemystAI/pi-alchemyst
+```
+
+### 2. Via npm (if published)
+
+```bash
+pi install npm:@alchemystai/pi
+```
+
+### 3. Local installation for testing
+
+```bash
+git clone https://github.com/AlchemystAI/pi-alchemyst ~/.pi/agent/extensions/pi-alchemyst
+```
+
+## Setup
+
+### Add API key
+
+Get your Alchemyst API key at [platform.getalchemystai.com](https://platform.getalchemystai.com).
+
+Configure the extension using the `alchemyst_configure` tool:
+
+```json
+{
+  "apiKey": "your-jwt-token-here",
+  "defaultScope": "internal",
+  "groupName": ["pi", "my-project"]
+}
+```
+
+This saves your configuration to `~/.config/pi-alchemyst/config.json`.
+
+### Environment Variables (optional)
+
+```env
+ALCHEMYST_API_KEY=your_alchemyst_api_key_here
+ALCHEMYST_BASE_URL=https://api.getalchemystai.com  # Override API endpoint
+ALCHEMYST_DEFAULT_SCOPE=internal
+ALCHEMYST_GROUP_NAME=pi,project-name
+```
+
+Environment variables take priority over saved configuration values.
+
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `alchemyst_context_search` | Search stored context for decisions, docs, and reference material |
+| `alchemyst_context_add` | Save context to Alchemyst for future retrieval |
+| `alchemyst_context_ask` | Ask questions grounded in your stored context |
+| `alchemyst_memory_add` | Persist conversation turns to Alchemyst memory |
+| `alchemyst_memory_update` | Update saved memory entries |
+| `alchemyst_configure` | Configure the Alchemyst API key and settings |
+
+## Usage
+
+### Context Search
+
+Search for previously stored context and decisions:
+
+```python
+# Use the alchemyst_context_search tool
+result = alchemyst_context_search({
+    "query": "authentication decisions",
+    "groupName": ["engineering", "backend", "auth"]
+})
+```
+
+### Add Context
+
+Store important decisions and documentation:
+
+```python
+alchemyst_context_add({
+    "text": "Implemented JWT auth with refresh tokens. Expires in 7 days.",
+    "groupName": ["engineering", "backend", "auth", "decisions"]
+})
+```
+
+### Ask Questions
+
+Query your stored context:
+
+```python
+response = alchemyst_context_ask({
+    "question": "What authentication strategy did we choose?",
+    "groupName": ["engineering", "backend"]
+})
+```
+
+### Memory Operations
+
+Add or update memory entries:
+
+```python
+alchemyst_memory_add({
+    "text": "User prefers TypeScript over JavaScript",
+    "groupName": ["user-preferences"]
+})
+
+alchemyst_memory_update({
+    "memoryId": "existing-memory-id",
+    "text": "Updated preference: User prefers TypeScript"
+})
+```
+
+## Context Arithmetic Best Practices
+
+Use hierarchical `groupName` tags for precise context filtering:
+
+```
+Layer 1: Domain (e.g., "engineering", "docs")
+Layer 2: Project/Categories (e.g., "backend", "frontend")
+Layer 3: Specifics (e.g., "auth", "decisions", "patterns")
+```
+
+Example session structure:
+
+```json
+{
+  "groupName": ["engineering", "backend", "auth", "decisions"]
+}
+```
+
+This organization makes it easy to:
+- Filter context by domain or project
+- Search across all engineering decisions
+- Isolate project-specific configurations
+
+## Configuration Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `apiKey` | string | Your Alchemyst API JWT token (required) |
+| `defaultScope` | string | "internal" or "external" |
+| `groupName` | string[] | Comma-separated tags for context organization |
+
+## Resources
+
+- [GitHub Repository](https://github.com/AlchemystAI/pi-alchemyst)
+- [Alchemyst Platform](https://platform.getalchemystai.com)
+- [Pi Documentation](https://pi.dev)
