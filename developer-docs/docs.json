@@ -220,6 +220,7 @@
               "integrations/third-party/openclaw",
               "integrations/third-party/opencode-plugin",
               "integrations/third-party/livekit",
+              "integrations/third-party/pi",
               {
                 "group": "LangChain",
                 "pages": [
