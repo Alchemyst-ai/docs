@@ -1135,27 +1135,23 @@
                     "description": "Source identifier for the context"
                   },
                   "user_id": {
-                    "type": "string",
+                    "type": ["string", "null"],
                     "description": "Optional user ID",
-                    "deprecated": true,
-                    "nullable": true
+                    "deprecated": true
                   },
                   "organization_id": {
                     "type": "string",
-                    "description": "Organization ID",
-                    "nullable": false
+                    "description": "Organization ID"
                   },
                   "by_doc": {
-                    "type": "boolean",
+                    "type": ["boolean", "null"],
                     "description": "Flag to delete by document",
-                    "default": true,
-                    "nullable": true
+                    "default": true
                   },
                   "by_id": {
-                    "type": "boolean",
+                    "type": ["boolean", "null"],
                     "description": "Flag to delete by ID",
-                    "default": false,
-                    "nullable": true
+                    "default": false
                   }
                 }
               },
@@ -1447,27 +1443,23 @@
                     "description": "The ID of the memory to delete"
                   },
                   "user_id": {
-                    "type": "string",
+                    "type": ["string", "null"],
                     "description": "Optional user ID",
-                    "nullable": true,
                     "deprecated": true
                   },
                   "organization_id": {
-                    "type": "string",
-                    "description": "Organization ID",
-                    "nullable": true
+                    "type": ["string", "null"],
+                    "description": "Organization ID"
                   },
                   "by_doc": {
-                    "type": "boolean",
+                    "type": ["boolean", "null"],
                     "description": "Delete by document flag",
-                    "default": true,
-                    "nullable": true
+                    "default": true
                   },
                   "by_id": {
-                    "type": "boolean",
+                    "type": ["boolean", "null"],
                     "description": "Delete by ID flag",
-                    "default": false,
-                    "nullable": true
+                    "default": false
                   }
                 }
               },
@@ -2029,6 +2021,10 @@
                     "answer": {
                       "type": "string",
                       "description": "The LLM-generated answer based on the retrieved context"
+                    },
+                    "model": {
+                      "type": "string",
+                      "description": "The LLM model used to generate the answer"
                     },
                     "context": {
                       "type": "string",
@@ -2632,57 +2628,85 @@
               }
             }
           }
-        }
-      },
-      "responses": {
-        "200": {
-          "401": {
-            "description": "Unauthorized - User not authenticated"
-          },
-          "402": {
-            "description": "Invalid user"
-          },
-          "403": {
-            "description": "Forbidden - User lacks required scope"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          },
-          "description": "Successfully retrieved documents view",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "documents": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "_id": {
-                          "type": "string"
-                        },
-                        "id": {
-                          "type": "string"
-                        },
-                        "doc_type": {
-                          "type": "string"
-                        },
-                        "group_name": {
-                          "type": "array",
-                          "items": {
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved documents view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "documents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "_id": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "doc_type": {
+                            "type": "string"
+                          },
+                          "group_name": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "size": {
+                            "type": "number"
+                          },
+                          "last_modified_at": {
                             "type": "string"
                           }
-                        },
-                        "size": {
-                          "type": "number"
-                        },
-                        "last_modified_at": {
-                          "type": "string"
                         }
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Invalid user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User lacks required scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -2694,6 +2718,11 @@
       "post": {
         "tags": ["Organization"],
         "summary": "View organization context",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {

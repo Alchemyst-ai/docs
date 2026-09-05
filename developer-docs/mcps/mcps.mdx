@@ -7,6 +7,27 @@ keywords: ['claude', 'mcps', 'claude', 'vs-code']
 
 ## Overview
 
-Use the instructions below to connect the Alchemyst Context Processor MCP to your preferred environment. Replace `YOUR_ALCHEMYST_PLATFORM_API_KEY` with your real API key.
+Use the instructions below to connect the Alchemyst Context Processor MCP to your preferred environment.
+
+Endpoint: `https://mcp.getalchemystai.com/mcp` (Streamable HTTP, SSE-compatible). Auth via OAuth 2.1 (Authorization Code + PKCE) — sign in once with your Alchemyst API key at the hosted login; a short-lived JWT (`mcp:read` / `mcp:write`) is issued for tool calls.
+
+## Available Tools
+
+### Context
+
+* `alchemyst_ai_search_context` — `POST /api/v1/context/search` (`query`, `similarity_threshold`/`minimum_similarity_threshold`, `scope`, `body_metadata`)
+* `alchemyst_ai_add_context` — `POST /api/v1/context/add` (`documents`, `source`, `context_type`, `scope`, `metadata{fileName, fileType, fileSize, groupName, lastModified}`)
+* `alchemyst_ai_context_mcp_view_context` — `GET /api/v1/context/view` (`file_name`, `magic_key`)
+* `alchemyst_ai_context_mcp_view_docs` — `GET /api/v1/context/view/docs` (`magic_key`)
+* `alchemyst_ai_delete_context` — `POST /api/v1/context/delete` (`source`, `by_doc`, `by_id`)
+
+### Memory — New
+
+* `alchemyst_ai_memory_add` — `POST /api/v1/context/memory/add` (`sessionId`, `contents[{content, metadata.messageId}]`, `metadata.groupName`)
+* `alchemyst_ai_memory_update` — `POST /api/v1/context/memory/update` (same shape, for edits)
+* `alchemyst_ai_memory_search` — `POST /api/v1/context/memory/get` (`query`, thresholds, `scope`, `body_metadata`)
+* `alchemyst_ai_memory_delete` — `POST /api/v1/context/memory/delete` (`memoryId`, `by_doc`, `by_id`)
+
+See [Introduction](/docs/mcps/introduction#available-mcp-tools) for full parameter tables. Available in Claude Desktop, Cursor, and VS Code MCP setups.
 
 

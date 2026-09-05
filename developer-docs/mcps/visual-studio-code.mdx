@@ -10,12 +10,14 @@ This guide explains **two integration methods**:
 1. HTTP / Server-Sent Events (recommended)
 2. Direct configuration via `settings.json`
 
+MCP now uses **OAuth 2.1** — just add the server URL. VS Code will open a browser login where you paste your Alchemyst API key once to verify and get a short-lived token. No API key in the config is needed (direct `Bearer` header still works as fallback).
+
 ## Prerequisites
 
 Before proceeding, ensure that:
 
 - You have **Visual Studio Code v1.101+** installed.
-- You have a valid **Alchemyst Platform API key**.
+- You have a valid **Alchemyst Platform API key** (paste once at OAuth login).
 - Your VS Code supports **MCP integration** (either via the OpenAI MCP extension or natively if available).
 - You are familiar with editing VS Code's `settings.json`
 
@@ -25,22 +27,14 @@ Before proceeding, ensure that:
 2. Type MCP and select `MCP: Add Server....`
 3. Choose HTTP (HTTP or Server-Sent Events) as the transport type.
 4. Enter the URL:
-   `https://mcp.getalchemystai.com/mcp/sse`
+   `https://mcp.getalchemystai.com/mcp`
 5. Select Server ID: This is going to be your server name. e.g., `Alchemyst-server-mcp`.
 6. Then, you will be asked to choose whether to save settings at User-level `settings.json` or Workspace level.
-7. You'll be redirected to your respective `settings.json` file.
-8. Then edit the headers inside the MCP server object (name you gave to your server) in `settings.json` with:
+7. VS Code will trigger OAuth discovery and open `https://mcp.getalchemystai.com/auth/login` — paste your Alchemyst API key there once to verify. No `headers` edit is needed. Fallback without OAuth: add `"headers": { "Authorization": "Bearer YOUR_ALCHEMYST_PLATFORM_API_KEY" }`.
+8. You will see a faint Start button popping right up on top of the MCP object in your present settings.json file.
+9. Click on that and your MCP server will be ready to use!
 
-```json
-"headers": {
-  "Authorization": "Bearer YOUR_ALCHEMYST_PLATFORM_API_KEY"
-}
-```
-
-9. You will see a faint Start button popping right up on top of the MCP object in your present settings.json file.
-10. Click on that and your MCP server will be ready to use!
-
-**You're done! Your MCP server is now connected via HTTP (SSE).**
+**You're done! Your MCP server is now connected via HTTP (SSE) with OAuth.**
 
 ### 2. Configuration via `settings.json`
 
@@ -56,14 +50,12 @@ Before proceeding, ensure that:
 "mcp": {
   "servers": {
     "alchemyst-context-mcp": {
-      "url": "https://mcp.getalchemystai.com/mcp/sse",
-      "headers": {
-        "Authorization": "Bearer YOUR_ALCHEMYST_PLATFORM_API_KEY"
-      }
+      "url": "https://mcp.getalchemystai.com/mcp"
     }
   }
 }
 ```
+OAuth will open a browser login to verify your API key. Fallback: add `"headers": { "Authorization": "Bearer YOUR_ALCHEMYST_PLATFORM_API_KEY" }` inside the server object.
 
 4. Save your `settings.json` file.
 5. You will see a faint Start button popping right up on top of the MCP object in your present settings.json file.
@@ -75,7 +67,7 @@ Before proceeding, ensure that:
 
 | **Issue**                  | **Possible Cause**              | **Fix**                                                                                    |
 | :------------------------- | :------------------------------ | :----------------------------------------------------------------------------------------- |
-| MCP server not starting    | Invalid or expired API key      | Regenerate your API key from **[Alchemyst Platform](https://platform.getalchemystai.com)** |
+| MCP server not starting    | OAuth not completed or API key invalid | Complete the OAuth browser login and paste a valid API key, or regenerate from **[Alchemyst Platform](https://platform.getalchemystai.com)** |
 | "Start" button not visible | Outdated VS Code version        | Upgrade to v1.101+                                                                         |
 | No response from server    | Network/firewall blocking SSE   | Allow outbound access to `https://mcp.getalchemystai.com`                                  |
 | Local setup not working    | Missing Node/Python environment | Verify local dependencies                                                                  |

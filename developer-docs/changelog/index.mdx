@@ -10,7 +10,32 @@ Stay up to date with the latest changes and improvements to Alchemyst.
 
 ---
 
-## What's New This Month  ( January )
+## What's New This Month (September 2026)
+
+**September 2026** — MCP now with memory and OAuth:
+
+### For Developers
+
+* **MCP — 3 New Memory Tools** — `https://mcp.getalchemystai.com/mcp` now exposes native memory lifecycle tools: `alchemyst_ai_memory_add`, `alchemyst_ai_memory_update`, and `alchemyst_ai_memory_delete` (+ `alchemyst_ai_memory_search` for recall). Store and manage `sessionId` / `contents[]` / `groupName` directly from Claude Desktop, Cursor, VS Code, or any MCP client. See [MCP Introduction](/docs/mcps/introduction#available-mcp-tools).
+* **Memory Search & Context Deletion via MCP** — `alchemyst_ai_memory_search` recalls saved memories by `query` and filters; new `alchemyst_ai_delete_context` deletes stored context by `source`.
+* **OAuth for MCP** — MCP now uses OAuth 2.1 (Authorization Code + PKCE). Your Alchemyst API key is entered once at the hosted login to verify your identity, then a short-lived token is issued for MCP tool calls — no API key in your MCP config.
+
+---
+
+## July 2026 — Steering API (Grounded Generation)
+
+**July 2026** introduced the Steering API for grounded, steering-controlled generation:
+
+### For Developers
+
+* **Steering API — `POST /api/v1/context/search/steer`** — Search context and get an LLM-powered answer in one call. The endpoint runs a context search, joins matching chunks, and prompts an LLM to produce a grounded answer. By default returns `answer`, `model`, and token `usage` (`inputTokens` / `outputTokens` / `totalTokens`); pass `?context=true` to also return the joined `context` string used for grounding. See [API Reference](/docs/api-reference/endpoint/api/v1/context/search/steer/post).
+* **`steeringPrompt` Controls Output Shape** — New optional `steeringPrompt` field steers formatting and structure, e.g., `"Return only the basic details of the person in a structured JSON schema with the fields \"name\", \"status\", \"location\""` or `"answer in one sentence"`.
+* **Similarity & Scope Filters** — Supports `query`, `similarity_threshold` / `minimum_similarity_threshold`, `scope` (`internal` | `external`, default `internal`), and `body_metadata` (`fileName`, `groupName`, `lastModifiedAt`, etc.) for precise retrieval — same filtering model as `POST /api/v1/context/search`.
+* **Mode Toggle** — `?mode=fast` prioritizes speed, `?mode=standard` (default) runs a comprehensive search.
+
+---
+
+## January 2026 — Integrations & Documentation Update
 
 **January 2026** brought major improvements to integrations and developer documentation:
 

@@ -5,12 +5,14 @@ icon: "/logo/cursor-logo.svg"
 keywords: ['cursor', 'mcps', 'memory', 'llm']
 ---
 
+MCP now uses **OAuth 2.1** — add just the server URL; Cursor will open a browser login where you paste your Alchemyst API key once to verify and get a short-lived token. No API key in `mcp.json` is needed (direct `Bearer` header still works as fallback).
+
 ### Prerequisites
 
 Before starting, make sure you have:
 
 - **Visual Studio Code v1.101+** installed.
-- A valid **Alchemyst Platform API key**.
+- A valid **Alchemyst Platform API key** (you'll paste it once at login).
 - MCP must be enabled in Cursor.
 
 Now, to configure **Alchemyst AI** with **Cursor** via **MCP**, follow the below commands:
@@ -31,15 +33,12 @@ Now, to configure **Alchemyst AI** with **Cursor** via **MCP**, follow the below
 
 ```json
 "your_mcp_server_name": {
-      "url": "https://mcp.getalchemystai.com/mcp/sse",
-      "headers": {
-        "Authorization": "Bearer YOUR_ALCHEMYST_PLATFORM_API_KEY"
-      }
+      "url": "https://mcp.getalchemystai.com/mcp"
     }
 ```
 
 8. Change `your_mcp_server_name` to the name you want to give your MCP server. e.g., `Alchemyst`.
-9. Change `YOUR_ALCHEMYST_PLATFORM_API_KEY` to your own key, which you will get after logging into the **[Alchemyst Platform](https://platform.getalchemystai.com)**.
+9. Save — Cursor will trigger OAuth discovery and open `https://mcp.getalchemystai.com/auth/login`. Paste your Alchemyst API key there once to verify (create one at **[Alchemyst Platform](https://platform.getalchemystai.com)** if needed). Fallback without OAuth: add `"headers": { "Authorization": "Bearer YOUR_ALCHEMYST_PLATFORM_API_KEY" }`.
 10. Now, save the file and navigate back to the **`Tools & MCP`** page inside the **Cursor settings**.
 11. Here, you will be able to see your added MCP Server.
 12. Make sure the toggle button in front of the MCP server is **ON (green)**, and there should be a green dot on the icon of your MCP server, indicating the server is running successfully.
@@ -53,6 +52,6 @@ Now, to configure **Alchemyst AI** with **Cursor** via **MCP**, follow the below
 | :--------------------- | :---------------------------------- | :----------------------------------------------------------------------- |
 | MCP toggle is missing  | Outdated Cursor version             | Update Cursor to the latest version                                      |
 | SSE connection fails   | Network restrictions or firewall    | Allow outbound access to `https://mcp.getalchemystai.com`                |
-| "Authorization failed" | Incorrect or expired API key        | Regenerate your API key from [**Alchemyst Dashboard**](https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web) |
+| "Authorization failed" | OAuth not completed or API key invalid | Complete the OAuth browser login and paste a valid API key, or regenerate from [**Alchemyst Dashboard**](https://getalchemystai.com?utm_source=docs.getalchemystai.com&utm_campaign=docs&utm_medium=web) |
 | MCP server not appearing   | `mcp.json` not formatted correctly | Validate your JSON syntax                                                |
 | No context syncing     | MCP service not started             | Click **Start** beside the MCP server entry in Cursor                    |

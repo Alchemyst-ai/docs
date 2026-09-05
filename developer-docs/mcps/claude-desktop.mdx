@@ -5,6 +5,8 @@ icon: "/logo/claude-2.svg"
 keywords: ['claude', 'mcps', 'memory', 'llm']
 ---
 
+MCP now uses **OAuth 2.1** — you no longer put your API key directly in the config. Add the server URL below; your client will open a browser login where you paste your Alchemyst API key once. The key is verified against the backend and a short-lived token is issued for MCP. Direct `Bearer` API-key header still works as fallback, but OAuth is recommended.
+
 It covers two methods of connection:
 
 - **Docker Based Setup**
@@ -39,14 +41,14 @@ Before you start, ensure you have the following:
         "--rm",
         "supercorp/supergateway",
         "--sse",
-        "https://mcp.getalchemystai.com/mcp/sse",
-        "--oauth2Bearer",
-        "YOUR_ALCHEMYST_PLATFORM_API_KEY",
+        "https://mcp.getalchemystai.com/mcp",
         "--keepAlive"
       ]
     }
   }
 ```
+
+When the MCP client connects it will trigger OAuth discovery at `https://mcp.getalchemystai.com/.well-known/oauth-protected-resource` and open `https://mcp.getalchemystai.com/auth/login` — paste your Alchemyst API key there once to verify. As fallback you can still pass `--oauth2Bearer YOUR_ALCHEMYST_PLATFORM_API_KEY`.
 
 7. Save the file and restart your **Claude Desktop**.
 8. After restart, navigate back to **Developer** Tab in **File → Settings...**.
@@ -78,13 +80,13 @@ If there is a failed tag, then click on the **Error logs** button and this will 
       "-y",
       "supergateway",
       "--sse",
-      "https://mcp.getalchemystai.com/mcp/sse",
-      "--oauth2Bearer",
-      "YOUR_ALCHEMYST_PLATFORM_API_KEY"
+      "https://mcp.getalchemystai.com/mcp"
     ]
   }
 }
 ```
+
+The client will trigger OAuth and open the hosted login to verify your API key. Fallback: add `"--oauth2Bearer", "YOUR_ALCHEMYST_PLATFORM_API_KEY"` to `args`.
 
 7. Save the file and restart your **Claude Desktop**.
 8. After restart, navigate back to **Developer** Tab in **File → Settings...**.
@@ -102,5 +104,5 @@ If there is a **running** tag then **"Congratulations"**, your **Claude Desktop*
 | **Container stops immediately after start**        | Docker is not running or missing admin privileges.        | Run **Docker Desktop as Administrator**.<br/>Ensure the Docker service is active with:<br/>`net start com.docker.service`.                 |
 | **System error 5 has occurred. Access is denied.** | Command Prompt lacks administrator rights.                | Open **Command Prompt as Administrator**, then re-run:<br/>`net start com.docker.service`.                                                 |
 | **"Connecting to SSE…" but nothing happens**       | Incorrect SSE URL or invalid Alchemyst API key.           | Verify the URL:<br/>`https://mcp.getalchemystai.com/mcp/sse`<br/>and ensure your API key is valid and not expired.                         |
-| **`401 Unauthorized` or `403 Forbidden`**          | Invalid or expired API key provided to Supergateway.      | Regenerate your API key from the **Alchemyst Dashboard** and replace it in the command:<br/>`--oauth2Bearer YOUR_API_KEY`.                 |
+| **`401 Unauthorized` or `403 Forbidden`**          | OAuth not completed or API key invalid.                   | Complete the OAuth browser login at `https://mcp.getalchemystai.com/auth/login` and paste a valid Alchemyst API key. Fallback: pass `--oauth2Bearer YOUR_API_KEY`. Regenerate keys from the **Alchemyst Dashboard** if expired. |
 | **Claude or MCP not showing as connected**         | MCP configuration not detected or extension not reloaded. | 1. Restart **VS Code**.<br/>2. Open Command Palette → "MCP: List Active MCP Servers".<br/>3. Confirm `supergateway` is listed and running. |

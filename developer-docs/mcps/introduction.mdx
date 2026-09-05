@@ -102,6 +102,31 @@ Alchemyst operationalizes this principle by treating memory as shared infrastruc
 
 ---
 
+## Available MCP Tools
+
+Alchemyst MCP is served at `https://mcp.getalchemystai.com/mcp` (Streamable HTTP) and uses OAuth 2.1. You sign in once with your Alchemyst API key at the hosted login — the key is verified against the backend and a short-lived JWT is issued for MCP. The endpoint now exposes 9 tools:
+
+### Context Tools
+
+| Tool | Backend | Description |
+| :--- | :--- | :--- |
+| `alchemyst_ai_search_context` | `POST /api/v1/context/search` | Search stored context by natural-language `query` + `similarity_threshold` (default `0.8`) / `minimum_similarity_threshold` (default `0.5`), `scope` (`internal`\|`external`), and `body_metadata` filters (`groupName`, `fileName`, …) |
+| `alchemyst_ai_add_context` | `POST /api/v1/context/add` | Add `documents[{content}]` with `source`, `context_type` (`resource`\|`conversation`\|`instruction`), `scope`, and `metadata` (`fileName` dedup key, `fileType`, `fileSize`, `groupName`, `lastModified`) |
+| `alchemyst_ai_context_mcp_view_context` | `GET /api/v1/context/view` | List/inspect stored context for the authenticated user — optionally filter by `file_name` or `magic_key` |
+| `alchemyst_ai_context_mcp_view_docs` | `GET /api/v1/context/view/docs` | Document-level view for the authenticated user — optional `magic_key` |
+| `alchemyst_ai_delete_context` | `POST /api/v1/context/delete` | Delete by `source` — `by_doc: true` deletes the whole source (file), `by_id: true` deletes by IDs |
+
+### Memory Tools — New in Sep 2026
+
+| Tool | Backend | Description |
+| :--- | :--- | :--- |
+| `alchemyst_ai_memory_add` | `POST /api/v1/context/memory/add` | Store conversation history — `sessionId` (e.g. `support-thread-TCK-1234`) + `contents[{content, metadata.messageId}]` + `metadata.groupName` |
+| `alchemyst_ai_memory_update` | `POST /api/v1/context/memory/update` | Update existing session memory with new/edited messages — same shape as `memory_add` |
+| `alchemyst_ai_memory_search` | `POST /api/v1/context/memory/get` | Recall memories by relevance — `query` + thresholds / `scope` / `body_metadata` (e.g. `{"groupName":["support"]}`) |
+| `alchemyst_ai_memory_delete` | `POST /api/v1/context/memory/delete` | Delete memory by `memoryId` — `by_doc` / `by_id` |
+
+All tools share the same auth as the MCP SSE endpoint and are available in Claude Desktop, Cursor, VS Code, and any MCP-compatible client. Use `memory_add` → `memory_search` for session-scoped recall, and `search_context` / `add_context` for resource context.
+
 ## Prerequisites
 
 Before integrating Alchemyst with an MCP-enabled tool, ensure the following:

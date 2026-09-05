@@ -8,6 +8,38 @@ Track the evolution of Alchemyst's context and memory platform. From performance
 
 ---
 
+### 1 September 2026
+**MCP — 3 New Memory Tools & OAuth**
+
+**What's new:**
+- **Memory lifecycle via MCP** — 3 new tools at `https://mcp.getalchemystai.com/mcp`:
+  - `alchemyst_ai_memory_add` — store conversation history (`sessionId` + `contents` + `groupName`)
+  - `alchemyst_ai_memory_update` — update existing session memory
+  - `alchemyst_ai_memory_delete` — delete by `memoryId`
+  - Also `alchemyst_ai_memory_search` for recall and `alchemyst_ai_delete_context` for removing context by `source`
+- All memory operations work from Claude Desktop, Cursor, VS Code, or any MCP client — no need to call the REST API directly. See [MCP docs](/docs/mcps/introduction#available-mcp-tools).
+
+**What changed:**
+- **Authentication** — MCP now uses OAuth 2.1 (Authorization Code + PKCE) with short-lived JWTs. You sign in once with your Alchemyst API key at the hosted login page — the key is verified against the backend and a scoped token is issued for MCP. This replaces putting the API key directly in your MCP config.
+- **Transport** — Upgraded to Streamable HTTP with per-session handling for reliable connections across clients and standard OAuth discovery.
+
+---
+
+### 4 July 2026
+**Steering API — `POST /api/v1/context/search/steer`**
+
+**What's new:**
+- New endpoint `POST /api/v1/context/search/steer` (`steerUserContext`) — search + LLM synthesis in a single call. Performs a context search, joins all matching chunks into one string, and sends that context plus your `query` to an LLM for a grounded natural-language `answer`.
+- `steeringPrompt` field to control answer shape/format — e.g., `Return only the basic details of the person in a structured JSON schema with the fields "name", "status", "location"` or `answer in one sentence`
+- Query flags `?mode=fast|standard` (default `standard`) and `?context=true` (default `false`) — when `true`, response also includes the joined `context` string used to ground the answer, plus `model` and token `usage` (`inputTokens`, `outputTokens`, `totalTokens`)
+
+**What changed:**
+- You can now get a grounded answer directly without a separate generation step after search
+- Supports the same filtering as Search: `query` (required), `similarity_threshold` / `minimum_similarity_threshold` (required), `scope` (`internal` | `external`), and `body_metadata` (`fileName`, `groupName`, `lastModifiedAt`, etc.)
+- Documented at [`POST /api/v1/context/search/steer`](/docs/api-reference/endpoint/api/v1/context/search/steer/post).
+
+---
+
 ### 31 January 2026
 **Data Sources Documentation**
 
