@@ -1,0 +1,156 @@
+---
+title: "Use with the OpenAI SDK"
+description: "Drop-in OpenAI SDK setup for Alchemyst chat completions, grounded in your private context."
+keywords: ['openai sdk', 'quickstart', 'chat completions', 'big bull alpha', 'drop-in']
+---
+
+# Use with the OpenAI SDK
+
+Alchemyst exposes an OpenAI-compatible chat completions endpoint, so you can keep
+using the OpenAI SDK and only change the `baseURL`. Answers are grounded in your
+private Alchemyst context, and the default model is **Big Bull Alpha**.
+
+## 1. Install the SDK
+
+<CodeGroup>
+```bash npm
+npm install openai
+```
+```bash pnpm
+pnpm add openai
+```
+```bash python
+pip install openai
+```
+</CodeGroup>
+
+## 2. Point the client at Alchemyst
+
+The SDK appends `/chat/completions` to `baseURL`, so end it at `/chat`:
+
+<CodeGroup>
+```typescript TypeScript
+import OpenAI from 'openai';
+
+const client = new OpenAI({
+  baseURL:
+    'https://platform-backend.getalchemystai.com/api/v1/context/search/chat',
+  apiKey: process.env.ALCHEMYST_API_KEY,
+});
+```
+```python Python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+  base_url="https://platform-backend.getalchemystai.com/api/v1/context/search/chat",
+  api_key=os.environ["ALCHEMYST_API_KEY"],
+)
+```
+</CodeGroup>
+
+This targets `POST /api/v1/context/search/chat/completions` for completions and
+`GET /api/v1/context/search/chat/models` for model listing.
+
+## 3. Make your first request
+
+<CodeGroup>
+```typescript TypeScript
+const completion = await client.chat.completions.create({
+  model: 'Big Bull Alpha',
+  messages: [{ role: 'user', content: 'What did we decide about pricing?' }],
+});
+
+console.log(completion.choices[0].message.content);
+```
+```python Python
+completion = client.chat.completions.create(
+  model="Big Bull Alpha",
+  messages=[{"role": "user", "content": "What did we decide about pricing?"}],
+)
+
+print(completion.choices[0].message.content)
+```
+</CodeGroup>
+
+## Authentication options
+
+| Mode | `apiKey` | When to use |
+| --- | --- | --- |
+| Alchemyst account | Your Alchemyst API key | Existing Alchemyst users. |
+| OpenRouter only | Your OpenRouter key (`sk-or-...`) | Try Big Bull Alpha without an Alchemyst account. |
+
+OpenRouter-only callers must send an `email` on the first request. If an
+Alchemyst account already exists for that email, authenticate with the Alchemyst
+API key instead.
+
+## Bring your own model key
+
+Send a provider key as `llm_api_key` (or `x-llm-api-key`) to use OpenRouter or
+another compatible provider.
+
+```typescript
+const completion = await client.chat.completions.create({
+  model: 'Big Bull Alpha',
+  messages: [{ role: 'user', content: 'Summarize my saved project notes.' }],
+  llm_api_key: process.env.OPENROUTER_API_KEY,
+} as any);
+```
+
+You can also pass any OpenRouter `provider/model` id as `model`.
+
+## Choose fast or standard search
+
+Set `mode` to trade latency for retrieval depth:
+
+```typescript
+const completion = await client.chat.completions.create(
+  {
+    model: 'Big Bull Alpha',
+    messages: [{ role: 'user', content: 'What is our refund policy?' }],
+  },
+  { query: { mode: 'fast' } },
+);
+```
+
+- `standard` (default) performs a more complete search.
+- `fast` prioritizes latency.
+
+## Include the grounding context
+
+Pass `?context=true` to receive the joined context alongside the completion:
+
+```typescript
+const completion = await client.chat.completions.create(
+  {
+    model: 'Big Bull Alpha',
+    messages: [{ role: 'user', content: 'What is our refund policy?' }],
+  },
+  { query: { context: true } },
+);
+
+console.log(completion.context);
+```
+
+## Stream responses
+
+`stream: true` is proxied as `text/event-stream`, so the usual OpenAI streaming
+helpers work:
+
+```typescript
+const stream = await client.chat.completions.create({
+  model: 'Big Bull Alpha',
+  messages: [{ role: 'user', content: 'Summarize my notes.' }],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content ?? '');
+}
+```
+
+## Next steps
+
+- [Chat completions API reference](/api-reference/chat-completions)
+- [Models](/api-reference/models)
+- [Add memory to your agent](/getting-started/quickstart-memory)

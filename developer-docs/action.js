@@ -158,6 +158,13 @@ const generateNewDocsJson = () => {
 							pages: ["api-reference/introduction"],
 						},
 						{
+							group: "Models",
+							pages: [
+								"api-reference/chat-completions",
+								"api-reference/models/index",
+							],
+						},
+						{
 							group: "Endpoint examples",
 							pages: endpointFiles,
 						},

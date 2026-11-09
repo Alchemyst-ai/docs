@@ -81,7 +81,8 @@
                 "group": "Quickstart",
                 "pages": [
                   "getting-started/quickstart",
-                  "getting-started/quickstart-memory"
+                  "getting-started/quickstart-memory",
+                  "getting-started/openai-sdk"
                 ]
               }
             ]
@@ -270,6 +271,13 @@
             "group": "API documentation",
             "pages": [
               "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Models",
+            "pages": [
+              "api-reference/chat-completions",
+              "api-reference/models/index"
             ]
           },
           {

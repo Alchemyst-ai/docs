@@ -22,7 +22,10 @@
     "schemas": {
       "ErrorResponse": {
         "type": "object",
-        "required": ["success", "error"],
+        "required": [
+          "success",
+          "error"
+        ],
         "properties": {
           "success": {
             "type": "boolean",
@@ -39,7 +42,10 @@
           "error": {
             "type": "object",
             "example": "Error details",
-            "required": ["code", "message"],
+            "required": [
+              "code",
+              "message"
+            ],
             "properties": {
               "code": {
                 "type": "string",
@@ -63,7 +69,11 @@
       },
       "ContextAddAsyncStatusSuccess": {
         "type": "object",
-        "required": ["success", "jobId", "status"],
+        "required": [
+          "success",
+          "jobId",
+          "status"
+        ],
         "properties": {
           "success": {
             "type": "boolean",
@@ -101,7 +111,10 @@
       },
       "ContextAddSuccess": {
         "type": "object",
-        "required": ["success", "context_id"],
+        "required": [
+          "success",
+          "context_id"
+        ],
         "properties": {
           "success": {
             "type": "boolean",
@@ -119,7 +132,11 @@
       },
       "MemoryUpdateSuccess": {
         "type": "object",
-        "required": ["success", "memory_id", "updated_entries"],
+        "required": [
+          "success",
+          "memory_id",
+          "updated_entries"
+        ],
         "properties": {
           "success": {
             "type": "boolean",
@@ -137,7 +154,9 @@
       },
       "TraceDeleteSuccess": {
         "type": "object",
-        "required": ["trace"],
+        "required": [
+          "trace"
+        ],
         "properties": {
           "trace": {
             "type": "object",
@@ -192,7 +211,10 @@
       },
       "ContextViewSuccess": {
         "type": "object",
-        "required": ["success", "contexts"],
+        "required": [
+          "success",
+          "contexts"
+        ],
         "properties": {
           "success": {
             "type": "boolean",
@@ -244,7 +266,10 @@
               "metadata": {
                 "fileName": "support_thread_TCK-1234.txt",
                 "fileType": "text/plain",
-                "groupName": ["support", "pricing"],
+                "groupName": [
+                  "support",
+                  "pricing"
+                ],
                 "lastModified": "2025-01-10T12:34:56.000Z",
                 "fileSize": 2048
               }
@@ -260,7 +285,9 @@
         "operationId": "cancelParticularJobInAddContextAsync",
         "summary": "Cancel a context add job",
         "description": "Attempts to cancel a context add job by job id.\n- If the job is already completed or failed, returns 404.\n- If the job is currently running (\"active\"), returns 409 and cannot be cancelled.\n- Only jobs in \"waiting\" or \"delayed\" state can be cancelled.\n",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -284,7 +311,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "jobId", "status", "message"],
+                  "required": [
+                    "success",
+                    "jobId",
+                    "status",
+                    "message"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -313,7 +345,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "status"],
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -338,7 +374,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "status"],
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -363,7 +403,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "status"],
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -388,7 +432,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "status"],
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -413,7 +461,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "status"],
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -438,7 +490,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error"],
+                  "required": [
+                    "error"
+                  ],
                   "properties": {
                     "error": {
                       "type": "string",
@@ -455,7 +509,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "error"],
+                  "required": [
+                    "success",
+                    "message",
+                    "error"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -482,7 +540,9 @@
         "operationId": "checkStatusForParticularJobInAddContextAsync",
         "summary": "Get status of a context add job",
         "description": "Returns the status and result of a context add job by job id.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -558,7 +618,9 @@
         "operationId": "addContextAsync",
         "summary": "Asynchronously queue context data to add to the context processor",
         "description": "This endpoint accepts context data and queues it for asynchronous processing by the context processor. It returns a success or error response depending on the queuing result.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -570,7 +632,12 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["documents", "context_type", "source", "scope"],
+                "required": [
+                  "documents",
+                  "context_type",
+                  "source",
+                  "scope"
+                ],
                 "properties": {
                   "documents": {
                     "type": "array",
@@ -594,12 +661,19 @@
                   },
                   "context_type": {
                     "type": "string",
-                    "enum": ["resource", "conversation", "instruction"],
+                    "enum": [
+                      "resource",
+                      "conversation",
+                      "instruction"
+                    ],
                     "description": "Type of context being added"
                   },
                   "scope": {
                     "type": "string",
-                    "enum": ["internal", "external"],
+                    "enum": [
+                      "internal",
+                      "external"
+                    ],
                     "default": "internal",
                     "description": "Scope of the context"
                   },
@@ -631,6 +705,13 @@
                         "description": "Size of the file in bytes"
                       }
                     }
+                  },
+                  "webhook_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Optional IDs of webhooks to trigger after the context is processed"
                   }
                 }
               },
@@ -646,7 +727,10 @@
                 "metadata": {
                   "fileName": "support_thread_TCK-1234.txt",
                   "fileType": "text/plain",
-                  "groupName": ["support", "pricing"],
+                  "groupName": [
+                    "support",
+                    "pricing"
+                  ],
                   "lastModified": "2025-01-10T12:34:56.000Z",
                   "fileSize": 2048
                 }
@@ -661,7 +745,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["queued", "jobId"],
+                  "required": [
+                    "queued",
+                    "jobId"
+                  ],
                   "properties": {
                     "queued": {
                       "type": "boolean",
@@ -682,7 +769,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "status"],
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -764,7 +855,9 @@
         "operationId": "checkStatusForAllAddAsyncJobs",
         "summary": "List all ongoing context add jobs for the authenticated user",
         "description": "Returns all jobs (active, waiting, delayed, failed, completed) belonging to the authenticated user.\n",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -776,7 +869,12 @@
             "name": "type",
             "schema": {
               "type": "string",
-              "enum": ["all", "active", "failed", "completed"],
+              "enum": [
+                "all",
+                "active",
+                "failed",
+                "completed"
+              ],
               "default": "all"
             },
             "description": "Type of jobs to list",
@@ -810,7 +908,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "jobs"],
+                  "required": [
+                    "success",
+                    "jobs"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -820,7 +921,12 @@
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": ["jobId", "status", "attemptsMade", "data"],
+                        "required": [
+                          "jobId",
+                          "status",
+                          "attemptsMade",
+                          "data"
+                        ],
                         "properties": {
                           "jobId": {
                             "type": "string",
@@ -863,7 +969,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success"],
+                  "required": [
+                    "success"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -880,7 +988,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success"],
+                  "required": [
+                    "success"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -897,7 +1007,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success"],
+                  "required": [
+                    "success"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -914,7 +1026,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["success", "message", "error"],
+                  "required": [
+                    "success",
+                    "message",
+                    "error"
+                  ],
                   "properties": {
                     "success": {
                       "type": "boolean",
@@ -941,7 +1057,9 @@
         "operationId": "addContextSync",
         "summary": "Add context data to the context processor",
         "description": "This endpoint accepts context data and sends it to a context processor for further handling. It returns a success or error response depending on the result from the context processor.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -953,7 +1071,12 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["documents", "context_type", "source", "scope"],
+                "required": [
+                  "documents",
+                  "context_type",
+                  "source",
+                  "scope"
+                ],
                 "properties": {
                   "documents": {
                     "type": "array",
@@ -977,12 +1100,19 @@
                   },
                   "context_type": {
                     "type": "string",
-                    "enum": ["resource", "conversation", "instruction"],
+                    "enum": [
+                      "resource",
+                      "conversation",
+                      "instruction"
+                    ],
                     "description": "Type of context being added"
                   },
                   "scope": {
                     "type": "string",
-                    "enum": ["internal", "external"],
+                    "enum": [
+                      "internal",
+                      "external"
+                    ],
                     "default": "internal",
                     "description": "Scope of the context"
                   },
@@ -1014,6 +1144,13 @@
                         "description": "Size of the file in bytes"
                       }
                     }
+                  },
+                  "webhook_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Optional IDs of webhooks to trigger after the context is processed"
                   }
                 }
               },
@@ -1029,7 +1166,10 @@
                 "metadata": {
                   "fileName": "support_thread_TCK-1234.txt",
                   "fileType": "text/plain",
-                  "groupName": ["support", "pricing"],
+                  "groupName": [
+                    "support",
+                    "pricing"
+                  ],
                   "lastModified": "2025-01-10T12:34:56.000Z",
                   "fileSize": 2048
                 }
@@ -1111,12 +1251,14 @@
         }
       }
     },
-    "/api/v1/context/delete": {
+    "/api/v1/context/async/add": {
       "post": {
-        "operationId": "deleteContextByDocOrNodeId",
-        "summary": "Delete context data from the context processor",
-        "description": "This endpoint deletes context data based on the provided parameters. It returns a success or error response depending on the result from the context processor.",
-        "tags": ["context"],
+        "operationId": "addContextAsync",
+        "summary": "Asynchronously queue context data to add to the context processor",
+        "description": "This endpoint accepts context data and queues it for asynchronous processing by the context processor. It returns a success or error response depending on the queuing result.",
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1128,30 +1270,274 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["source", "organization_id"],
+                "required": [
+                  "documents",
+                  "context_type",
+                  "source",
+                  "scope"
+                ],
+                "properties": {
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string",
+                          "description": "The content of the document"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "Array of documents with content and additional metadata"
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "The source of the context data"
+                  },
+                  "context_type": {
+                    "type": "string",
+                    "enum": [
+                      "resource",
+                      "conversation",
+                      "instruction"
+                    ],
+                    "description": "Type of context being added"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "internal",
+                      "external"
+                    ],
+                    "default": "internal",
+                    "description": "Scope of the context"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "Additional metadata for the context",
+                    "properties": {
+                      "fileName": {
+                        "type": "string",
+                        "description": "Name of the file"
+                      },
+                      "fileType": {
+                        "type": "string",
+                        "description": "Type/MIME of the file"
+                      },
+                      "groupName": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Array of Group Name to which the file belongs to"
+                      },
+                      "lastModified": {
+                        "type": "string",
+                        "description": "Last modified timestamp"
+                      },
+                      "fileSize": {
+                        "type": "number",
+                        "description": "Size of the file in bytes"
+                      }
+                    }
+                  },
+                  "webhook_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Optional IDs of webhooks to trigger after the context is processed"
+                  }
+                }
+              },
+              "example": {
+                "documents": [
+                  {
+                    "content": "Customer asked about pricing for the Scale plan."
+                  }
+                ],
+                "source": "support-inbox",
+                "context_type": "resource",
+                "scope": "internal",
+                "metadata": {
+                  "fileName": "support_thread_TCK-1234.txt",
+                  "fileType": "text/plain",
+                  "groupName": [
+                    "support",
+                    "pricing"
+                  ],
+                  "lastModified": "2025-01-10T12:34:56.000Z",
+                  "fileSize": 2048
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Context queued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "queued",
+                    "jobId"
+                  ],
+                  "properties": {
+                    "queued": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "jobId": {
+                      "type": "string",
+                      "example": "context-add-123456"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "status"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Error details"
+                    },
+                    "status": {
+                      "type": "number",
+                      "example": 400
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Invalid context data format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/context/delete": {
+      "post": {
+        "operationId": "deleteContextByDocOrNodeId",
+        "summary": "Delete context data from the context processor",
+        "description": "This endpoint deletes context data based on the provided parameters. It returns a success or error response depending on the result from the context processor.",
+        "tags": [
+          "context"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "source",
+                  "organization_id"
+                ],
                 "properties": {
                   "source": {
                     "type": "string",
                     "description": "Source identifier for the context"
                   },
                   "user_id": {
-                    "type": ["string", "null"],
+                    "type": "string",
                     "description": "Optional user ID",
-                    "deprecated": true
+                    "deprecated": true,
+                    "nullable": true
                   },
                   "organization_id": {
                     "type": "string",
-                    "description": "Organization ID"
+                    "description": "Organization ID",
+                    "nullable": false
                   },
                   "by_doc": {
-                    "type": ["boolean", "null"],
+                    "type": "boolean",
                     "description": "Flag to delete by document",
-                    "default": true
+                    "default": true,
+                    "nullable": true
                   },
                   "by_id": {
-                    "type": ["boolean", "null"],
+                    "type": "boolean",
                     "description": "Flag to delete by ID",
-                    "default": false
+                    "default": false,
+                    "nullable": true
                   }
                 }
               },
@@ -1223,7 +1609,9 @@
         "operationId": "addContextAsMemory",
         "summary": "Add memory context data",
         "description": "This endpoint adds memory (chat history) as context.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1235,7 +1623,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["sessionId", "contents"],
+                "required": [
+                  "sessionId",
+                  "contents"
+                ],
                 "properties": {
                   "sessionId": {
                     "type": "string",
@@ -1246,7 +1637,9 @@
                     "description": "Array of content objects. Each object must contain at least the 'content' field. Additional properties are allowed.",
                     "items": {
                       "type": "object",
-                      "required": ["content"],
+                      "required": [
+                        "content"
+                      ],
                       "properties": {
                         "content": {
                           "type": "string",
@@ -1276,7 +1669,9 @@
                           "type": "string"
                         },
                         "description": "Optional group names for the memory context. Defaults to [\"default\"] if not provided.",
-                        "default": ["default"]
+                        "default": [
+                          "default"
+                        ]
                       }
                     },
                     "additionalProperties": true
@@ -1325,7 +1720,10 @@
                       }
                     ],
                     "metadata": {
-                      "groupName": ["support", "pricing"]
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ]
                     }
                   }
                 }
@@ -1424,7 +1822,9 @@
         "operationId": "deleteContextAsMemory",
         "summary": "Delete memory context data",
         "description": "Deletes memory context data based on provided parameters.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1436,30 +1836,37 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["memoryId", "organization_id"],
+                "required": [
+                  "memoryId",
+                  "organization_id"
+                ],
                 "properties": {
                   "memoryId": {
                     "type": "string",
                     "description": "The ID of the memory to delete"
                   },
                   "user_id": {
-                    "type": ["string", "null"],
+                    "type": "string",
                     "description": "Optional user ID",
+                    "nullable": true,
                     "deprecated": true
                   },
                   "organization_id": {
-                    "type": ["string", "null"],
-                    "description": "Organization ID"
+                    "type": "string",
+                    "description": "Organization ID",
+                    "nullable": true
                   },
                   "by_doc": {
-                    "type": ["boolean", "null"],
+                    "type": "boolean",
                     "description": "Delete by document flag",
-                    "default": true
+                    "default": true,
+                    "nullable": true
                   },
                   "by_id": {
-                    "type": ["boolean", "null"],
+                    "type": "boolean",
                     "description": "Delete by ID flag",
-                    "default": false
+                    "default": false,
+                    "nullable": true
                   }
                 }
               },
@@ -1524,7 +1931,9 @@
         "operationId": "searchUserContext",
         "summary": "Search for context data in the context processor",
         "description": "This endpoint sends a search request to the context processor to retrieve relevant context data based on the provided query.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1536,7 +1945,10 @@
             "name": "metadata",
             "schema": {
               "type": "string",
-              "enum": ["true", "false"],
+              "enum": [
+                "true",
+                "false"
+              ],
               "default": "false"
             },
             "required": false,
@@ -1547,7 +1959,10 @@
             "name": "mode",
             "schema": {
               "type": "string",
-              "enum": ["fast", "standard"],
+              "enum": [
+                "fast",
+                "standard"
+              ],
               "default": "standard"
             },
             "required": false,
@@ -1593,14 +2008,63 @@
                   },
                   "scope": {
                     "type": "string",
-                    "enum": ["internal", "external"],
+                    "enum": [
+                      "internal",
+                      "external"
+                    ],
                     "default": "internal",
                     "description": "Search scope"
                   },
                   "body_metadata": {
                     "type": "object",
-                    "description": "Additional metadata for the search",
-                    "default": {}
+                    "description": "Metadata filters for the search. Recognized keys: fileName,\ngroupName, lastModifiedAt, modalities. Extra keys are allowed.\nWhen body_metadata is present without groupName, the search\ndefaults to the \"default\" group.\n",
+                    "default": {},
+                    "properties": {
+                      "fileName": {
+                        "type": "string",
+                        "description": "Filter contexts by file name",
+                        "example": "support_thread_TCK-1234.txt"
+                      },
+                      "groupName": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Array of group names to filter contexts by",
+                        "default": [
+                          "default"
+                        ]
+                      },
+                      "lastModifiedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Filter contexts by last modified timestamp",
+                        "example": "2025-01-10T12:34:56.000Z"
+                      },
+                      "modalities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "text",
+                            "image"
+                          ]
+                        },
+                        "description": "Modalities to search across"
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  "magic_key": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Magic key (sk_context_share_...) to search within contexts shared with the caller",
+                    "example": "sk_context_share_nC0KUEF9T6UGDHYVUiMU"
+                  },
+                  "joined": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "When true, matching context chunks are returned joined into a single string"
                   }
                 }
               },
@@ -1623,7 +2087,18 @@
                     "scope": "internal",
                     "metadata": {
                       "fileName": "support_thread_TCK-1234.txt",
-                      "groupName": ["support", "pricing"],
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ],
+                      "lastModifiedAt": "2025-01-10T12:34:56.000Z"
+                    },
+                    "body_metadata": {
+                      "fileName": "support_thread_TCK-1234.txt",
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ],
                       "lastModifiedAt": "2025-01-10T12:34:56.000Z"
                     }
                   }
@@ -1742,7 +2217,9 @@
         "operationId": "updateContextAsMemory",
         "summary": "Update memory context data",
         "description": "This endpoint updates memory context data.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1754,7 +2231,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["sessionId", "contents"],
+                "required": [
+                  "sessionId",
+                  "contents"
+                ],
                 "properties": {
                   "sessionId": {
                     "type": "string",
@@ -1892,12 +2372,128 @@
         }
       }
     },
+    "/api/v1/context/search/models": {
+      "get": {
+        "operationId": "openContextListModels",
+        "summary": "List the models Alchemyst provides (OpenAI-compatible)",
+        "description": "OpenAI-compatible `GET /models` endpoint.\n\nReturns only the model Alchemyst provides for this endpoint family:\n**Big Bull Alpha**, grounded with Alchemyst context retrieval.\nIt is free while in launch.\n\nPass the listing id as `model` in\n`POST /api/v1/context/search/chat/completions`, or omit `model`\nentirely — Big Bull Alpha is the default model.\n",
+        "tags": [
+          "context"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Models list in OpenAI format (Big Bull Alpha only).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "example": "list"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "Big Bull Alpha"
+                          },
+                          "object": {
+                            "type": "string",
+                            "example": "model"
+                          },
+                          "created": {
+                            "type": "integer",
+                            "example": 1767225600
+                          },
+                          "owned_by": {
+                            "type": "string",
+                            "example": "alchemyst"
+                          },
+                          "is_free": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "pricing": {
+                            "type": "object",
+                            "description": "USD per token — 0 means free.",
+                            "properties": {
+                              "prompt": {
+                                "type": "string",
+                                "example": "0"
+                              },
+                              "completion": {
+                                "type": "string",
+                                "example": "0"
+                              },
+                              "request": {
+                                "type": "string",
+                                "example": "0"
+                              }
+                            }
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusText": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User lacks required scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusText": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/context/search/steer": {
       "post": {
         "operationId": "steerUserContext",
         "summary": "Search context and generate an LLM-powered answer",
         "description": "This endpoint performs a context search using the context processor, joins all\nmatching context chunks into a single string, then sends that joined context\nalong with the user's query to an LLM to produce a\nnatural-language answer grounded in the retrieved context.\n\nBy default the response only includes the generated `answer`. Pass\n`?context=true` to also receive the joined context string that was used to\nground the answer.\n",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1909,7 +2505,10 @@
             "name": "mode",
             "schema": {
               "type": "string",
-              "enum": ["fast", "standard"],
+              "enum": [
+                "fast",
+                "standard"
+              ],
               "default": "standard"
             },
             "required": false,
@@ -1923,7 +2522,7 @@
               "default": false
             },
             "required": false,
-            "description": "When set to `true`, the response includes the joined `context` string used\nto ground the answer. Defaults to `false` (only `answer`, `model`, and\n`usage` are returned).\n"
+            "description": "When set to `true`, the response includes the joined `context` string used\nto ground the answer. Defaults to `false` (only `answer`,and\n`usage` are returned).\n"
           }
         ],
         "requestBody": {
@@ -1970,14 +2569,58 @@
                   },
                   "scope": {
                     "type": "string",
-                    "enum": ["internal", "external"],
+                    "enum": [
+                      "internal",
+                      "external"
+                    ],
                     "default": "internal",
                     "description": "Search scope"
                   },
                   "body_metadata": {
                     "type": "object",
-                    "description": "Additional metadata for the search",
-                    "default": {}
+                    "description": "Metadata filters for the underlying context search. Recognized keys:\nfileName, groupName, lastModifiedAt, modalities. Extra keys are allowed.\nWhen body_metadata is present without groupName, the search\ndefaults to the \"default\" group.\n",
+                    "default": {},
+                    "properties": {
+                      "fileName": {
+                        "type": "string",
+                        "description": "Filter contexts by file name",
+                        "example": "support_thread_TCK-1234.txt"
+                      },
+                      "groupName": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Array of group names to filter contexts by",
+                        "default": [
+                          "default"
+                        ]
+                      },
+                      "lastModifiedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Filter contexts by last modified timestamp",
+                        "example": "2025-01-10T12:34:56.000Z"
+                      },
+                      "modalities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "text",
+                            "image"
+                          ]
+                        },
+                        "description": "Modalities to search across"
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  "magic_key": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Magic key (sk_context_share_...) to search within contexts shared with the caller",
+                    "example": "sk_context_share_nC0KUEF9T6UGDHYVUiMU"
                   }
                 }
               },
@@ -2000,7 +2643,10 @@
                     "scope": "internal",
                     "body_metadata": {
                       "fileName": "support_thread_TCK-1234.txt",
-                      "groupName": ["support", "pricing"],
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ],
                       "lastModifiedAt": "2025-01-10T12:34:56.000Z"
                     }
                   }
@@ -2016,15 +2662,14 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["answer", "model", "usage"],
+                  "required": [
+                    "answer",
+                    "usage"
+                  ],
                   "properties": {
                     "answer": {
                       "type": "string",
                       "description": "The LLM-generated answer based on the retrieved context"
-                    },
-                    "model": {
-                      "type": "string",
-                      "description": "The LLM model used to generate the answer"
                     },
                     "context": {
                       "type": "string",
@@ -2120,7 +2765,9 @@
         "operationId": "deleteTraceById",
         "summary": "Delete a specific data trace",
         "description": "Deletes a data trace for the authenticated user with the specified trace ID.",
-        "tags": ["traces"],
+        "tags": [
+          "traces"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2216,7 +2863,9 @@
         "operationId": "viewRawContextTracesForUser",
         "summary": "Retrieves a list of traces for the authenticated user",
         "description": "Returns paginated traces for the authenticated user within their organization.",
-        "tags": ["traces"],
+        "tags": [
+          "traces"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2249,7 +2898,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["traces", "pagination"],
+                  "required": [
+                    "traces",
+                    "pagination"
+                  ],
                   "properties": {
                     "traces": {
                       "type": "array",
@@ -2400,7 +3052,9 @@
         "operationId": "viewDocsInContextForUser",
         "summary": "Retrieve user contexts by documents",
         "description": "Fetches documents view for authenticated user with optional organization context.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2424,7 +3078,9 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["documents"],
+                  "required": [
+                    "documents"
+                  ],
                   "properties": {
                     "documents": {
                       "type": "array",
@@ -2471,7 +3127,10 @@
                     {
                       "fileName": "support_thread_TCK-1234.txt",
                       "fileType": "text/plain",
-                      "groupName": ["support", "pricing"],
+                      "groupName": [
+                        "support",
+                        "pricing"
+                      ],
                       "lastModified": "2025-01-10T12:34:56.000Z",
                       "fileSize": 2048
                     }
@@ -2528,7 +3187,9 @@
         "operationId": "viewRawContextNodesForUser",
         "summary": "Retrieve user context",
         "description": "Gets the context information for the authenticated user.",
-        "tags": ["context"],
+        "tags": [
+          "context"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2598,12 +3259,14 @@
         }
       }
     },
-    "/api/v1/org/context/view/docs": {
+    "/api/v1/context/webhook/manage/headers": {
       "post": {
-        "operationId": "viewOrgDocs",
-        "summary": "Retrieve organization contexts by documents",
-        "description": "Fetches documents view for an organization with role-based visibility.",
-        "tags": ["Organization"],
+        "operationId": "revealWebhookHeaders",
+        "summary": "Reveal a webhook's custom headers",
+        "description": "The list endpoint only reports header names. Call this when the user explicitly asks to see or copy the values, e.g. to edit them.",
+        "tags": [
+          "context-webhook"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2615,7 +3278,430 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userIds"],
+                "required": [
+                  "webhookId"
+                ],
+                "properties": {
+                  "webhookId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The custom headers"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Webhook not found"
+          }
+        }
+      }
+    },
+    "/api/v1/context/webhook/manage": {
+      "get": {
+        "operationId": "listWebhooks",
+        "summary": "List registered webhooks for the organization",
+        "tags": [
+          "context-webhook"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of webhooks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "webhooks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "_id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Display name for the webhook"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "events": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "hasSecret": {
+                            "type": "boolean",
+                            "description": "Whether a signing secret is set. The value is only shown once at creation and never exposed again."
+                          },
+                          "headerNames": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Custom header names. Values are only available from /api/v1/context/webhook/manage/headers."
+                          },
+                          "lastFiredAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "lastError": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createWebhook",
+        "summary": "Register a new webhook URL",
+        "tags": [
+          "context-webhook"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Display name for the webhook"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "The webhook endpoint URL. Must be a publicly routable http(s) address."
+                  },
+                  "events": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "context.add",
+                        "context.search",
+                        "context.steer",
+                        "context.delete",
+                        "context.view",
+                        "context.memory.add",
+                        "context.memory.delete",
+                        "context.memory.update"
+                      ]
+                    },
+                    "description": "Events to subscribe to (defaults to all)"
+                  },
+                  "secret": {
+                    "type": "string",
+                    "description": "Optional signing secret for HMAC verification (min 16 characters)"
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "description": "Optional custom headers merged into every delivery"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Webhook registered"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateWebhook",
+        "summary": "Update a webhook's URL, event subscriptions, enabled state or signing secret",
+        "tags": [
+          "context-webhook"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhookId"
+                ],
+                "properties": {
+                  "webhookId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name for the webhook"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "events": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "context.add",
+                        "context.search",
+                        "context.steer",
+                        "context.delete",
+                        "context.view",
+                        "context.memory.add",
+                        "context.memory.delete",
+                        "context.memory.update"
+                      ]
+                    }
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "secret": {
+                    "type": "string",
+                    "description": "New signing secret (min 16 characters)"
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook updated"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Webhook not found"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "removeWebhook",
+        "summary": "Delete a webhook registration",
+        "tags": [
+          "context-webhook"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhookId"
+                ],
+                "properties": {
+                  "webhookId": {
+                    "type": "string",
+                    "description": "The webhook registration ID to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook deleted"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/context/webhook": {
+      "post": {
+        "summary": "Context processor webhook endpoint",
+        "description": "Receives context events from the context processor and re-emits them to the SSE feed and any registered outbound webhook subscribers.",
+        "tags": [
+          "context"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "event",
+                  "organization_id"
+                ],
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "enum": [
+                      "context.add",
+                      "context.async.add.started",
+                      "context.async.add.in-progress",
+                      "context.async.add.failed",
+                      "context.async.add.completed",
+                      "context.search",
+                      "context.steer",
+                      "context.delete",
+                      "context.view",
+                      "context.memory.add",
+                      "context.memory.delete",
+                      "context.memory.update"
+                    ]
+                  },
+                  "organization_id": {
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event received"
+          },
+          "400": {
+            "description": "Bad request - invalid payload"
+          },
+          "401": {
+            "description": "Invalid webhook secret"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/org/context/view/docs": {
+      "post": {
+        "operationId": "viewOrgDocs",
+        "summary": "Retrieve organization contexts by documents",
+        "description": "Fetches documents view for an organization with role-based visibility.",
+        "tags": [
+          "Organization"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userIds"
+                ],
                 "properties": {
                   "userIds": {
                     "type": "array",
@@ -2628,85 +3714,57 @@
               }
             }
           }
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully retrieved documents view",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "documents": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "_id": {
-                            "type": "string"
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "doc_type": {
-                            "type": "string"
-                          },
-                          "group_name": {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            }
-                          },
-                          "size": {
-                            "type": "number"
-                          },
-                          "last_modified_at": {
+        }
+      },
+      "responses": {
+        "200": {
+          "401": {
+            "description": "Unauthorized - User not authenticated"
+          },
+          "402": {
+            "description": "Invalid user"
+          },
+          "403": {
+            "description": "Forbidden - User lacks required scope"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "description": "Successfully retrieved documents view",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "_id": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "doc_type": {
+                          "type": "string"
+                        },
+                        "group_name": {
+                          "type": "array",
+                          "items": {
                             "type": "string"
                           }
+                        },
+                        "size": {
+                          "type": "number"
+                        },
+                        "last_modified_at": {
+                          "type": "string"
                         }
                       }
                     }
                   }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - User not authenticated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Invalid user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - User lacks required scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -2716,20 +3774,19 @@
     },
     "/api/v1/org/context/view": {
       "post": {
-        "tags": ["Organization"],
-        "summary": "View organization context",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "Organization"
         ],
+        "summary": "View organization context",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["userIds"],
+                "required": [
+                  "userIds"
+                ],
                 "properties": {
                   "userIds": {
                     "type": "array",
@@ -2741,7 +3798,10 @@
                 }
               },
               "example": {
-                "userIds": ["user_123", "user_456"]
+                "userIds": [
+                  "user_123",
+                  "user_456"
+                ]
               }
             }
           }
@@ -2767,7 +3827,10 @@
                         "metadata": {
                           "fileName": "support_thread_TCK-1234.txt",
                           "fileType": "text/plain",
-                          "groupName": ["support", "pricing"],
+                          "groupName": [
+                            "support",
+                            "pricing"
+                          ],
                           "lastModified": "2025-01-10T12:34:56.000Z",
                           "fileSize": 2048
                         }
@@ -2800,7 +3863,9 @@
       "patch": {
         "summary": "Update a member's role in an organization",
         "description": "Updates the role of a specific member within an organization. The user performing this action must be the 'owner' of the organization. The target member's role cannot be 'owner'.\n",
-        "tags": ["Organization Members"],
+        "tags": [
+          "Organization Members"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2826,11 +3891,18 @@
                   "role": {
                     "type": "string",
                     "description": "The new role for the member.",
-                    "enum": ["member", "admin"],
+                    "enum": [
+                      "member",
+                      "admin"
+                    ],
                     "example": "admin"
                   }
                 },
-                "required": ["organizationId", "memberId", "role"]
+                "required": [
+                  "organizationId",
+                  "memberId",
+                  "role"
+                ]
               }
             }
           }

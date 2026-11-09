@@ -38,6 +38,9 @@ developer-docs/
 ├─ development.mdx
 ├─ api-reference/
 │  ├─ introduction.mdx
+│  ├─ chat-completions.mdx
+│  ├─ models/
+│  │  └─ index.mdx
 │  ├─ openapi.json
 │  └─ endpoint/api/v1/
 │     └─ context/

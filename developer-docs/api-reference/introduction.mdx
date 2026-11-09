@@ -1,37 +1,122 @@
 ---
 title: 'Introduction'
 description: 'API documentation and reference'
-keywords: ['apis', 'add', 'search', 'delete', 'memory']
+keywords: ['apis', 'add', 'search', 'delete', 'memory', 'models']
 ---
 
 ## Welcome
 
-**[OpenAPI Specification](https://platform-backend.getalchemystai.com/api/openapi.json)** for the **Alchemyst Platform APIs**.
+The Alchemyst API reference covers every endpoint available for adding,
+searching, and managing context, memory, asynchronous ingestion jobs, traces,
+and organization-level context.
 
-<Card
-  title="Alchemyst Platform endpoints"
-  icon="code"
-  href="https://platform-backend.getalchemystai.com/api/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+Use the cards below to jump to an endpoint.
+
+## Models
+
+<CardGroup cols={2}>
+  <Card
+    title="Chat completions"
+    icon="comments"
+    href="/api-reference/chat-completions"
+  >
+    OpenAI-compatible chat completions grounded in your Alchemyst context.
+  </Card>
+  <Card
+    title="Models"
+    icon="microchip"
+    href="/api-reference/models"
+  >
+    Big Bull Alpha, is the default
+    Alchemyst-served model. See the model section for details.
+  </Card>
+</CardGroup>
 
 ## Authentication
 
-
 To obtain your **API key**, follow these steps:
 
-1. Go to the **[Alchemyst Platform](https://platform.getalchemystai.com)** and sign up using your **Google account**.  
-2. After logging in, navigate to the **Get Started** section to generate your API key.  
-3. You can also view and manage your API keys anytime from the **Settings** page.
+1. Go to the **[Alchemyst Platform](https://platform.getalchemystai.com)** and sign up using your **Google account**.
+2. After logging in, open the **[API Keys page](https://platform.getalchemystai.com/apikeys)** to generate your API key.
+3. You can view and manage your API keys anytime from the same **API Keys** page.
 
-Use the following authentication schema when making API requests:
+Include your API key in the `Authorization` header on every request:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+curl https://platform-backend.getalchemystai.com/api/v1/context/search \
+  -H "Authorization: Bearer <ALCHEMYST_API_KEY>"
 ```
+
+## Context
+
+<CardGroup cols={2}>
+  <Card title="Add context" icon="plus" href="/api-reference/endpoint/api/v1/context/add/post">
+    Store documents and resources in your private context.
+  </Card>
+  <Card title="Add context asynchronously" icon="clock" href="/api-reference/endpoint/api/v1/context/add-async/post">
+    Queue a large add operation and track it as a job.
+  </Card>
+  <Card title="Delete context" icon="trash" href="/api-reference/endpoint/api/v1/context/delete/post">
+    Remove documents or resources from your context.
+  </Card>
+  <Card title="Search context" icon="magnifying-glass" href="/api-reference/endpoint/api/v1/context/search/post">
+    Retrieve the most relevant chunks for a query.
+  </Card>
+  <Card title="Steer context search" icon="compass" href="/api-reference/endpoint/api/v1/context/search/steer/post">
+    Search and summarize context using a steering prompt.
+  </Card>
+  <Card title="View context" icon="eye" href="/api-reference/endpoint/api/v1/context/view/get">
+    List the context stored for the current account.
+  </Card>
+  <Card title="View context documents" icon="file-lines" href="/api-reference/endpoint/api/v1/context/view/docs/get">
+    Inspect stored documents and their metadata.
+  </Card>
+</CardGroup>
+
+## Memory
+
+<CardGroup cols={2}>
+  <Card title="Add memory" icon="brain" href="/api-reference/endpoint/api/v1/context/memory/add/post">
+    Save facts and conversation state for later retrieval.
+  </Card>
+  <Card title="Update memory" icon="pen" href="/api-reference/endpoint/api/v1/context/memory/update/post">
+    Change an existing memory entry.
+  </Card>
+  <Card title="Delete memory" icon="eraser" href="/api-reference/endpoint/api/v1/context/memory/delete/post">
+    Remove a memory entry.
+  </Card>
+</CardGroup>
+
+## Asynchronous jobs
+
+<CardGroup cols={2}>
+  <Card title="Get async job status" icon="circle-info" href="/api-reference/endpoint/api/v1/context/add-async/status/get">
+    Check the status of the most recent add job.
+  </Card>
+  <Card title="Get async job status by id" icon="hashtag" href="/api-reference/endpoint/api/v1/context/add-async/{id}/status/get">
+    Check the status of a specific add job.
+  </Card>
+  <Card title="Cancel async job" icon="ban" href="/api-reference/endpoint/api/v1/context/add-async/{id}/cancel/delete">
+    Cancel a running add job.
+  </Card>
+</CardGroup>
+
+## Traces
+
+<CardGroup cols={2}>
+  <Card title="List traces" icon="route" href="/api-reference/endpoint/api/v1/context/traces/get">
+    Retrieve request traces for debugging and observability.
+  </Card>
+  <Card title="Delete trace" icon="trash" href="/api-reference/endpoint/api/v1/context/traces/{traceId}/delete/delete">
+    Delete a specific trace by id.
+  </Card>
+</CardGroup>
+
+## Organization
+
+<CardGroup cols={2}>
+  <Card title="View organization context" icon="building" href="/api-reference/endpoint/api/v1/org/context/view/post">
+    Read context shared across your organization.
+  </Card>
+</CardGroup>
 
