@@ -1253,7 +1253,7 @@
     },
     "/api/v1/context/async/add": {
       "post": {
-        "operationId": "addContextAsync",
+        "operationId": "addContextAsyncV2",
         "summary": "Asynchronously queue context data to add to the context processor",
         "description": "This endpoint accepts context data and queues it for asynchronous processing by the context processor. It returns a success or error response depending on the queuing result.",
         "tags": [
@@ -3617,6 +3617,7 @@
     },
     "/api/v1/context/webhook": {
       "post": {
+        "operationId": "contextWebhook",
         "summary": "Context processor webhook endpoint",
         "description": "Receives context events from the context processor and re-emits them to the SSE feed and any registered outbound webhook subscribers.",
         "tags": [
@@ -3714,10 +3715,49 @@
               }
             }
           }
-        }
-      },
-      "responses": {
-        "200": {
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved documents view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "documents": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "_id": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "doc_type": {
+                            "type": "string"
+                          },
+                          "group_name": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "size": {
+                            "type": "number"
+                          },
+                          "last_modified_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized - User not authenticated"
           },
@@ -3729,51 +3769,13 @@
           },
           "500": {
             "description": "Internal Server Error"
-          },
-          "description": "Successfully retrieved documents view",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "documents": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "_id": {
-                          "type": "string"
-                        },
-                        "id": {
-                          "type": "string"
-                        },
-                        "doc_type": {
-                          "type": "string"
-                        },
-                        "group_name": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "size": {
-                          "type": "number"
-                        },
-                        "last_modified_at": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
           }
         }
       }
     },
     "/api/v1/org/context/view": {
       "post": {
+        "operationId": "viewOrgContext",
         "tags": [
           "Organization"
         ],
@@ -3861,6 +3863,7 @@
     },
     "/api/v1/org/members/role": {
       "patch": {
+        "operationId": "updateOrgMemberRole",
         "summary": "Update a member's role in an organization",
         "description": "Updates the role of a specific member within an organization. The user performing this action must be the 'owner' of the organization. The target member's role cannot be 'owner'.\n",
         "tags": [
