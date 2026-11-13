@@ -104,7 +104,7 @@ Alchemyst operationalizes this principle by treating memory as shared infrastruc
 
 ## Available MCP Tools
 
-Alchemyst MCP is served at `https://mcp.getalchemystai.com/mcp` (Streamable HTTP) and uses OAuth 2.1. You sign in once with your Alchemyst API key at the hosted login — the key is verified against the backend and a short-lived JWT is issued for MCP. The endpoint now exposes 9 tools:
+Alchemyst MCP is served at `https://mcp.getalchemystai.com/mcp` (Streamable HTTP) and uses OAuth 2.1. You sign in once with your Alchemyst API key at the hosted login — the key is verified against the backend and a short-lived JWT is issued for MCP. The endpoint exposes **71 tools**: 12 context tools, 4 memory tools, and 55 platform tools (traces, webhooks, magic keys, organizations, API keys, user, billing & payments, referrals, integrations, chats, and dashboard). See [MCPs](/docs/mcps) for the full inventory. The core tools:
 
 ### Context Tools
 
@@ -125,7 +125,7 @@ Alchemyst MCP is served at `https://mcp.getalchemystai.com/mcp` (Streamable HTTP
 | `alchemyst_ai_memory_search` | `POST /api/v1/context/memory/get` | Recall memories by relevance — `query` + thresholds / `scope` / `body_metadata` (e.g. `{"groupName":["support"]}`) |
 | `alchemyst_ai_memory_delete` | `POST /api/v1/context/memory/delete` | Delete memory by `memoryId` — `by_doc` / `by_id` |
 
-All tools share the same auth as the MCP SSE endpoint and are available in Claude Desktop, Cursor, VS Code, and any MCP-compatible client. Use `memory_add` → `memory_search` for session-scoped recall, and `search_context` / `add_context` for resource context.
+All tools share the same auth as the MCP endpoint and are available in Claude Desktop, Cursor, VS Code, and any MCP-compatible client. Use `memory_add` → `memory_search` for session-scoped recall, and `search_context` / `add_context` for resource context.
 
 ## Prerequisites
 

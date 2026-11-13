@@ -40,7 +40,7 @@ Before you start, ensure you have the following:
         "-i",
         "--rm",
         "supercorp/supergateway",
-        "--sse",
+        "--streamableHttp",
         "https://mcp.getalchemystai.com/mcp",
         "--keepAlive"
       ]
@@ -79,7 +79,7 @@ If there is a failed tag, then click on the **Error logs** button and this will 
     "args": [
       "-y",
       "supergateway",
-      "--sse",
+      "--streamableHttp",
       "https://mcp.getalchemystai.com/mcp"
     ]
   }
@@ -103,6 +103,7 @@ If there is a **running** tag then **"Congratulations"**, your **Claude Desktop*
 | :------------------------------------------------- | :-------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
 | **Container stops immediately after start**        | Docker is not running or missing admin privileges.        | Run **Docker Desktop as Administrator**.<br/>Ensure the Docker service is active with:<br/>`net start com.docker.service`.                 |
 | **System error 5 has occurred. Access is denied.** | Command Prompt lacks administrator rights.                | Open **Command Prompt as Administrator**, then re-run:<br/>`net start com.docker.service`.                                                 |
-| **"Connecting to SSE…" but nothing happens**       | Incorrect SSE URL or invalid Alchemyst API key.           | Verify the URL:<br/>`https://mcp.getalchemystai.com/mcp/sse`<br/>and ensure your API key is valid and not expired.                         |
+| **"Connecting to SSE…" but nothing happens**       | Incorrect SSE URL or invalid Alchemyst API key.           | Verify the URL:<br/>`https://mcp.getalchemystai.com/mcp`<br/>and ensure your API key is valid and not expired.                         |
+| **`Bad Request: No valid session ID provided`**     | The server invalidated your MCP session (e.g. the SSE stream disconnected or a tool call timed out). | Restart the MCP server (re-run the `docker` / `npx` command) so a fresh session is initialized, then retry the request. |
 | **`401 Unauthorized` or `403 Forbidden`**          | OAuth not completed or API key invalid.                   | Complete the OAuth browser login at `https://mcp.getalchemystai.com/auth/login` and paste a valid Alchemyst API key. Fallback: pass `--oauth2Bearer YOUR_API_KEY`. Regenerate keys from the **Alchemyst Dashboard** if expired. |
 | **Claude or MCP not showing as connected**         | MCP configuration not detected or extension not reloaded. | 1. Restart **VS Code**.<br/>2. Open Command Palette → "MCP: List Active MCP Servers".<br/>3. Confirm `supergateway` is listed and running. |

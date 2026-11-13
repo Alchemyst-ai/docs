@@ -9,25 +9,88 @@ keywords: ['claude', 'mcps', 'claude', 'vs-code']
 
 Use the instructions below to connect the Alchemyst Context Processor MCP to your preferred environment.
 
-Endpoint: `https://mcp.getalchemystai.com/mcp` (Streamable HTTP, SSE-compatible). Auth via OAuth 2.1 (Authorization Code + PKCE) — sign in once with your Alchemyst API key at the hosted login; a short-lived JWT (`mcp:read` / `mcp:write`) is issued for tool calls.
+Endpoint: `https://mcp.getalchemystai.com/mcp` (Streamable HTTP, SSE-compatible). Auth via OAuth 2.1 (Authorization Code + PKCE) — sign in once with your Alchemyst API key at the hosted login; a short-lived JWT (`mcp:read` / `mcp:write`) is issued for tool calls. A direct `Authorization: Bearer <API key>` header also works.
 
 ## Available Tools
 
+The MCP server (`platform-mcp-server`) exposes **71 tools**. Tool names below omit the `alchemyst_ai_` prefix.
+
 ### Context
 
-* `alchemyst_ai_search_context` — `POST /api/v1/context/search` (`query`, `similarity_threshold`/`minimum_similarity_threshold`, `scope`, `body_metadata`)
-* `alchemyst_ai_add_context` — `POST /api/v1/context/add` (`documents`, `source`, `context_type`, `scope`, `metadata{fileName, fileType, fileSize, groupName, lastModified}`)
-* `alchemyst_ai_context_mcp_view_context` — `GET /api/v1/context/view` (`file_name`, `magic_key`)
-* `alchemyst_ai_context_mcp_view_docs` — `GET /api/v1/context/view/docs` (`magic_key`)
-* `alchemyst_ai_delete_context` — `POST /api/v1/context/delete` (`source`, `by_doc`, `by_id`)
+* `search_context` — `POST /api/v1/context/search` (`query`, `similarity_threshold` / `minimum_similarity_threshold`, `scope`, `body_metadata`)
+* `context_steer` — search indexed context and synthesize a steered answer with `query` + `steering_prompt`
+* `context_models_list` — list Alchemyst-served context search models
+* `add_context` — `POST /api/v1/context/add` (`documents`, `source`, `context_type`, `scope`, `metadata{fileName, fileType, fileSize, groupName, lastModified}`)
+* `context_add_async` — enqueue a background job to ingest documents (same arguments as `add_context`)
+* `context_add_jobs_list` / `context_add_job_retrieve` / `context_add_job_cancel` — list, inspect, and cancel async ingestion jobs
+* `context_mcp_view_context` — `GET /api/v1/context/view` (`file_name`, `magic_key`)
+* `context_mcp_view_docs` — `GET /api/v1/context/view/docs` (`magic_key`)
+* `context_groups_list` — list context group names for the user/organization
+* `delete_context` — `POST /api/v1/context/delete` (`source`, `by_doc`, `by_id`)
 
 ### Memory — New
 
-* `alchemyst_ai_memory_add` — `POST /api/v1/context/memory/add` (`sessionId`, `contents[{content, metadata.messageId}]`, `metadata.groupName`)
-* `alchemyst_ai_memory_update` — `POST /api/v1/context/memory/update` (same shape, for edits)
-* `alchemyst_ai_memory_search` — `POST /api/v1/context/memory/get` (`query`, thresholds, `scope`, `body_metadata`)
-* `alchemyst_ai_memory_delete` — `POST /api/v1/context/memory/delete` (`memoryId`, `by_doc`, `by_id`)
+* `memory_add` — `POST /api/v1/context/memory/add` (`sessionId`, `contents[{content, metadata.messageId}]`, `metadata.groupName`)
+* `memory_update` — `POST /api/v1/context/memory/update` (same shape, for edits)
+* `memory_search` — `POST /api/v1/context/memory/get` (`query`, thresholds, `scope`, `body_metadata`)
+* `memory_delete` — `POST /api/v1/context/memory/delete` (`memoryId`, `by_doc`, `by_id`)
+
+### Traces
+
+* `traces_list` / `traces_retrieve` / `traces_delete` — list, inspect, and delete context/search telemetry traces
+
+### Webhooks
+
+* `webhooks_list` / `webhooks_create` / `webhooks_update` / `webhooks_delete` — manage outbound context webhooks
+* `webhooks_reveal_headers` — reveal plaintext custom HTTP headers configured on a webhook
+
+### Magic Keys
+
+* `magic_keys_list` — list context-sharing magic keys
+* `magic_keys_modify` — grant or revoke magic-key access to entities
+* `magic_keys_template_create` — create a shared ContextSpace template from a magic key
+
+### Organizations
+
+* `org_list` / `org_create` / `org_update` / `org_delete` — manage organizations
+* `org_is_owner` / `org_usage` / `org_logs` — role checks, usage metrics, request logs
+* `org_members_list` / `org_member_remove` / `org_member_role_update` — membership management
+* `org_invite_send` / `org_invite_retrieve` / `org_invite_accept` — organization invitations
+* `org_context_view` / `org_context_docs_list` — cross-member context with role-based visibility
+
+### API Keys
+
+* `api_keys_list` / `api_keys_create` / `api_keys_delete` — manage platform API keys
+
+### User
+
+* `user_status` — authenticated user profile and account metadata
+* `user_onboarding_retrieve` / `user_onboarding_update` — onboarding state transitions
+* `user_demographics_retrieve` / `user_demographics_update` — demographics answers
+
+### Billing & Payments
+
+* `billing_retrieve` / `billing_usage_retrieve` — credit balance, unit costs, usage counters
+* `payment_orders_list` / `payment_invoices_list` — top-up orders and invoices
+* `payment_razorpay_order_create` / `payment_dodo_order_create` — checkout orders (Razorpay / Dodo)
+
+### Referrals
+
+* `referral_code_retrieve` / `referral_verify` — referral codes and redemption
+
+### Integrations
+
+* `integrations_list` / `integrations_create` / `integrations_pull` / `integration_toggle` / `integrations_delete` — external data source integrations
+* `integrations_job_retrieve` — integration sync job status
+
+### Chats
+
+* `chats_list` / `chats_retrieve` / `chats_create_empty` / `chats_delete` — saved Converse chat sessions
+
+### Dashboard & Platform
+
+* `dashboard_retrieve` — aggregate API usage, document storage stats, and recent traces
+* `platform_invite_send` — platform-level referral invites
+* `placeholder_claim` — claim a placeholder account/organization
 
 See [Introduction](/docs/mcps/introduction#available-mcp-tools) for full parameter tables. Available in Claude Desktop, Cursor, and VS Code MCP setups.
-
-
